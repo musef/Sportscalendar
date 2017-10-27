@@ -17,6 +17,9 @@ package controllers;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
 
+import components.LibraryClass;
+import daos.UsuariosDAO;
+
 /**
  *
  * @author floren
@@ -24,11 +27,13 @@ import javax.faces.bean.RequestScoped;
 @ManagedBean
 @RequestScoped
 public class LoginBean {
-
+   
     private String username;
     private String userpass;
     private String loginmessage;
     
+    private long iduser;
+    private UsuariosDAO udao;
     
     public LoginBean() {
     
@@ -36,9 +41,23 @@ public class LoginBean {
 
     
     public String login() {
-        if (this.username.equals("superadmin") &&
-                this.userpass.equals("12345678")) {
-            this.loginmessage="Autenticación correcta";    
+        
+        if (this.username==null || this.username.length()< LibraryClass.MIN_LENGTH_USERNAME
+                || this.username.length()> LibraryClass.MAX_LENGTH_USERNAME ||
+            this.userpass==null || this.userpass.length()< LibraryClass.MIN_LENGTH_USERPASS
+                || this.userpass.length()> LibraryClass.MAX_LENGTH_USERPASS ) {
+            
+            udao=new UsuariosDAO();
+            
+            iduser=udao.identifyUser(username, userpass);
+            
+            if (this.iduser==0) this.loginmessage="Usuario-contraseña inexistente";   
+            if (this.iduser==-1) this.loginmessage="Error procesando su solicitud";  
+            if (this.iduser>0) {
+                this.loginmessage="Autenticación correcta "+this.iduser;
+                return "main";
+            }  
+  
         } else this.loginmessage="Usuario-contraseña no válidos. Pruebe de nuevo";  
         
         return "index";
