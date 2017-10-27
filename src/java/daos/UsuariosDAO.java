@@ -16,6 +16,8 @@ package daos;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import models.Usuarios;
 
 /**
@@ -30,6 +32,12 @@ public class UsuariosDAO implements UsuariosInterface {
      * @param user
      * @return boolean con el resultado de la operacion
      */
+    
+    private final int MIN_LENGTH_USERNAME=6;
+    private final int MAX_LENGTH_USERNAME=15;
+    private final int MIN_LENGTH_USERPASS=8;
+    private final int MAX_LENGTH_USERPASS=20;
+    
     @Override
     public boolean createUser(Usuarios user) {
 
@@ -156,6 +164,54 @@ public class UsuariosDAO implements UsuariosInterface {
     @Override
     public boolean deleteUser(Long id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    /**
+     * 
+     * @param username
+     * @param userpass
+     * @return long - retorna el id del usuario si correcto; 
+     *                  0 si incorrecto o 
+     *                  -1 si fails
+     */
+    public long identifyUser (String username, String userpass) {
+        
+        // verificacion de parametros
+        if (username==null || username.length()<MIN_LENGTH_USERNAME || username.length()>MAX_LENGTH_USERNAME) return -1;
+        if (userpass==null || userpass.length()<MIN_LENGTH_USERPASS || userpass.length()>MAX_LENGTH_USERPASS) return -1;
+        
+        /* proceso de datos */
+        
+        EntityManager em=Factory.getEmf().createEntityManager();
+        
+        EntityTransaction tx=em.getTransaction();
+        
+        Query q=em.createNamedQuery("Usuarios.findByLoginPassword");
+                         
+        Usuarios us=null;
+        
+        try {
+            tx.begin();
+            
+            q.setParameter("usn", username);
+            q.setParameter("pss", userpass);
+            us=(Usuarios) q.getSingleResult();
+                       
+            tx.commit();
+            
+        } catch (NoResultException nr) {
+            em.close();
+            return 0;   
+        } catch (Exception ex) {
+            if (tx!=null && tx.isActive()) tx.rollback();
+            System.err.println("Error Usuarios idtf-01");
+            em.close();
+            return -1;   
+        }
+        
+        if (us==null) return -1;
+        
+        return us.getId();
     }
     
 }

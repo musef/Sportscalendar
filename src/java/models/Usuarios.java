@@ -50,12 +50,11 @@ import javax.persistence.Table;
     , @NamedQuery(name = "Usuarios.findById", query = "SELECT u FROM Usuarios u WHERE u.id = :id")
     , @NamedQuery(name = "Usuarios.findByKeyuser", query = "SELECT u FROM Usuarios u WHERE u.keyuser = :keyuser")
     , @NamedQuery(name = "Usuarios.findByLogin", query = "SELECT u FROM Usuarios u WHERE u.login = :login")
+    , @NamedQuery(name = "Usuarios.findByLoginPassword", query = "SELECT u FROM Usuarios u WHERE u.login = :usn AND u.password = :pss")
     , @NamedQuery(name = "Usuarios.findByPassword", query = "SELECT u FROM Usuarios u WHERE u.password = :password")
     , @NamedQuery(name = "Usuarios.findByNameuser", query = "SELECT u FROM Usuarios u WHERE u.nameuser = :nameuser")
     , @NamedQuery(name = "Usuarios.findByEmail", query = "SELECT u FROM Usuarios u WHERE u.email = :email")})
 public class Usuarios implements Serializable {
-
-
 
     private static final long serialVersionUID = 1L;
     

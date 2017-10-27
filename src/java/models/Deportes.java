@@ -31,7 +31,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 
-
 /**
  *
  * @author musef2904@gmail.com
@@ -77,7 +76,7 @@ public class Deportes implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "idsport")
     private List<Actividades> recorridosList;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "iduser")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idsport")
     private List<Agenda> agendaList;
     
     
