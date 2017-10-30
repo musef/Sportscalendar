@@ -48,8 +48,16 @@
             
             <main>
                 <h:form>
-
-                    <div class="mainbox"></div>
+                    <div class="mainbox">
+                        <h:form>
+                            <h:panelGrid columns="2">
+                                <h:outputText value="Deporte"></h:outputText>
+                                <h:selectOneMenu id="sportselect" value="">
+                                    <f:selectItems itemValue="" itemLabel=""></f:selectItems>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                        </h:form>                     
+                    </div>
                     <div class="messagebox"></div>
 
                 </h:form>
@@ -63,4 +71,3 @@
    
     </h:body>
 </html>
-
