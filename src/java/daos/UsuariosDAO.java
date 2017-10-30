@@ -170,15 +170,24 @@ public class UsuariosDAO implements UsuariosInterface {
      * 
      * @param username
      * @param userpass
-     * @return long - retorna el id del usuario si correcto; 
-     *                  0 si incorrecto o 
-     *                  -1 si fails
+     * @return long - retorna el usuario si correcto; 
+     *                  getId == -1 si incorrecto o 
+     *                  getId == 0 si no existe o 
+     *                  null si fails
      */
-    public long identifyUser (String username, String userpass) {
+    public Usuarios identifyUser (String username, String userpass) {
+        
+        // objecto a devolver
+        Usuarios us=null;
         
         // verificacion de parametros
-        if (username==null || username.length()<MIN_LENGTH_USERNAME || username.length()>MAX_LENGTH_USERNAME) return -1;
-        if (userpass==null || userpass.length()<MIN_LENGTH_USERPASS || userpass.length()>MAX_LENGTH_USERPASS) return -1;
+        if (username==null || username.length()<MIN_LENGTH_USERNAME || username.length()>MAX_LENGTH_USERNAME ||
+            userpass==null || userpass.length()<MIN_LENGTH_USERPASS || userpass.length()>MAX_LENGTH_USERPASS) {
+        
+            us=new Usuarios((long)0);
+            return us; 
+            
+        }
         
         /* proceso de datos */
         
@@ -188,7 +197,6 @@ public class UsuariosDAO implements UsuariosInterface {
         
         Query q=em.createNamedQuery("Usuarios.findByLoginPassword");
                          
-        Usuarios us=null;
         
         try {
             tx.begin();
@@ -201,17 +209,16 @@ public class UsuariosDAO implements UsuariosInterface {
             
         } catch (NoResultException nr) {
             em.close();
-            return 0;   
+            us=new Usuarios((long)-1);
+            return us;   
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
             System.err.println("Error Usuarios idtf-01");
             em.close();
-            return -1;   
+            return null;   
         }
-        
-        if (us==null) return -1;
-        
-        return us.getId();
+                      
+        return us;
     }
     
 }

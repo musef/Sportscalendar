@@ -15,28 +15,41 @@
 package controllers;
 
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.RequestScoped;
 
 import components.LibraryClass;
 import daos.UsuariosDAO;
+import javax.faces.bean.SessionScoped;
+import models.Usuarios;
+import components.LoginComponent;
+
 
 /**
  *
- * @author floren
+ * @author musef2904@gmail.com
  */
 @ManagedBean
-@RequestScoped
-public class LoginBean {
+@SessionScoped
+public class LoginBean extends LoginComponent{
    
+    // variable de identificacion
     private String username;
     private String userpass;
     private String loginmessage;
     
-    private long iduser;
+    // datos del usuario
+    public static Usuarios user;
+
+    private String worksHoursM;
+    private String worksSessM;
+    private String worksHoursY;
+    private String worksSessY;
+    
+    
     private UsuariosDAO udao;
     
-    public LoginBean() {
     
+    public LoginBean() {
+        
     }
 
     
@@ -49,12 +62,16 @@ public class LoginBean {
             
             udao=new UsuariosDAO();
             
-            iduser=udao.identifyUser(username, userpass);
+            user=udao.identifyUser(username, userpass);
             
-            if (this.iduser==0) this.loginmessage="Usuario-contraseña inexistente";   
-            if (this.iduser==-1) this.loginmessage="Error procesando su solicitud";  
-            if (this.iduser>0) {
-                this.loginmessage="Autenticación correcta "+this.iduser;
+            if (user.getId()==0) this.loginmessage="Usuario-contraseña inexistente";   
+            if (user.getId()==-1) this.loginmessage="Error procesando su solicitud";  
+            if (user.getId()>0) {
+                this.loginmessage="Autenticación correcta "+user.getId();
+                this.worksHoursM="00:00:00";
+                this.worksSessM="0";
+                this.setWorksHoursY("00:00:00");
+                this.setWorksSessY("0");
                 return "main";
             }  
   
@@ -62,6 +79,7 @@ public class LoginBean {
         
         return "index";
     }
+
     
     public String clear() {
         this.username="";
@@ -69,6 +87,20 @@ public class LoginBean {
         this.loginmessage="";
         return "index";
     }
+    
+    
+    public String exit() {
+        // borramos los datos del usuario
+        user=null;
+        this.username="";
+        this.userpass="";
+        // lanzamos mensaje
+        this.loginmessage="Ha salido de la aplicación de forma correcta";        
+        
+        
+        return "index";
+    }
+    
     
     /**
      * @return the username
@@ -110,6 +142,78 @@ public class LoginBean {
      */
     public void setLoginmessage(String loginmessage) {
         this.loginmessage = loginmessage;
+    }
+
+   
+
+    /**
+     * @return the user
+     */
+    public Usuarios getUser() {
+        return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(Usuarios user) {
+        this.user = user;
+    }
+
+    /**
+     * @return the worksHoursM
+     */
+    public String getWorksHoursM() {
+        return worksHoursM;
+    }
+
+    /**
+     * @param worksHoursM the worksHoursM to set
+     */
+    public void setWorksHoursM(String worksHoursM) {
+        this.worksHoursM = worksHoursM;
+    }
+
+    /**
+     * @return the worksSessM
+     */
+    public String getWorksSessM() {
+        return worksSessM;
+    }
+
+    /**
+     * @param worksSessM the worksSessM to set
+     */
+    public void setWorksSessM(String worksSessM) {
+        this.worksSessM = worksSessM;
+    }
+
+    /**
+     * @return the worksHoursY
+     */
+    public String getWorksHoursY() {
+        return worksHoursY;
+    }
+
+    /**
+     * @param worksHoursY the worksHoursY to set
+     */
+    public void setWorksHoursY(String worksHoursY) {
+        this.worksHoursY = worksHoursY;
+    }
+
+    /**
+     * @return the worksSessY
+     */
+    public String getWorksSessY() {
+        return worksSessY;
+    }
+
+    /**
+     * @param worksSessY the worksSessY to set
+     */
+    public void setWorksSessY(String worksSessY) {
+        this.worksSessY = worksSessY;
     }
     
     
