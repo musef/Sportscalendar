@@ -25,12 +25,92 @@ body {
     color: #222222;
 }
 
+.indexmain {
+    width: 100%;
+    margin: 0 auto 0 auto;
+}
+
+.mainzone {
+    width: 100%;
+    border:3px solid #333;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.headselector {
+    min-width: 1000px;
+    width: 100%;
+    margin-left: 0px;
+    margin-top: 15px;
+    border-bottom: 1px solid #333;
+    display: inline-flex;
+}
+.selector {
+    width: 515px;
+    margin: 0 auto 0 auto;
+}
+
+
+.selector img,input[type="image"] {
+    height: 100px;
+    width: 150px;
+    margin: 10px 10px 10px 10px;
+        
+}
+
+.out {
+    width: 50px;
+    height: 50px;
+    float: right;    
+}
+
+.out input[type="image"] {
+    width: 50px;
+    height: 50px;
+    float: right;
+}
+
+aside {
+    width:24%;
+    min-height: 400px;
+    border-right: 1px solid #333;
+    float: left;
+    display: block;
+    font-size: 0.9em;
+}
+
+.userdata {
+    width: 100%;
+}
+
+aside .userdata img {
+    
+    height: 150px;
+    width: 125px;
+    margin-left: 25%;
+    margin-right: 25%;   
+    
+}
+
+aside ul {
+    text-decoration: none;
+    list-style: none;
+    padding-left: 10px;
+}
+
+aside li {
+    margin-bottom: 10px;
+}
+
+
 main {
+    float: left;
     display: block;
     min-height: 400px;
-    min-width: 75%;
-    margin: 0 auto 0 auto;       
+    min-width: 75%;    
 }
+
+
 
 .loginbox {
     width: 450px;

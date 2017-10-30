@@ -17,6 +17,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
     Author     : floren
 */
 
+footer {
+    border-top: 1px solid #333;
+    display: inline-block;
+}
+
 .footer, .subfooter {
     float: left;
     min-width: 1000px;
