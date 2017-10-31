@@ -52,8 +52,9 @@
                         <h:form>
                             <h:panelGrid columns="2">
                                 <h:outputText value="Deporte"></h:outputText>
-                                <h:selectOneMenu id="sportselect" value="">
-                                    <f:selectItems itemValue="" itemLabel=""></f:selectItems>
+                                <h:selectOneMenu id="sportselect" value="#{deportesBean.sport}">
+                                    <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
+                                    <f:selectItems value="#{deportesBean.sports}" var="deporte" itemValue="#{deporte.id}" itemLabel="#{deporte.sportName}"></f:selectItems>
                                 </h:selectOneMenu>
                             </h:panelGrid>
                         </h:form>                     

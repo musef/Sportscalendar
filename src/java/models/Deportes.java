@@ -47,6 +47,7 @@ import javax.persistence.Table;
 @Table(name = "deportes")
 @NamedQueries({
     @NamedQuery(name = "Deportes.findAll", query = "SELECT d FROM Deportes d")
+    , @NamedQuery(name = "Deportes.findByIduser", query = "SELECT d FROM Deportes d WHERE d.iduser = :iduser")
     , @NamedQuery(name = "Deportes.findById", query = "SELECT d FROM Deportes d WHERE d.id = :id")
     , @NamedQuery(name = "Deportes.findByKeyuser", query = "SELECT d FROM Deportes d WHERE d.keyuser = :keyuser")
     , @NamedQuery(name = "Deportes.findBySportName", query = "SELECT d FROM Deportes d WHERE d.sportName = :sportName")
