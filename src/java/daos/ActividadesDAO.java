@@ -19,35 +19,41 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
+import models.Actividades;
 import models.Deportes;
-import models.Usuarios;
 
 /**
  *
  * @author musef2904@gmail.com
  */
-
-public class DeportesDAO implements DeportesInterface {
+public class ActividadesDAO implements ActividadesInterface{
 
     EntityManager em;
     EntityTransaction tx;
-
+    
     /**
-     * Este metodo crea un nuevo Deporte en la DDBB, con el objeto
-     * Deportes suministrado
-     * @param sport
+     * Este metodo graba en DDBB un objeto Actividades, suministrado
+     * en el parametro
+     * Verifica previamente que cumple las condiciones
+     * @param activity
      * @return boolean, con el resultado de la operacion
-     */    
+     */
     @Override
-    public boolean createSport(Deportes sport) {
+    public boolean createActivity(Actividades activity) {
         
         /* Verificacion de condiciones */
-        if (sport==null) return false;
+        if (activity==null) return false;
         
-        if (sport.getSportName().isEmpty()) return false;
-        if (sport.getSportName().length()>50) return false;
+        if (activity.getName().isEmpty()) return false;
+        if (activity.getName().length()>100) return false;
         
-        if ((sport.getSportDescrip()!=null) && (sport.getSportDescrip().length()>50)) return false;
+        if (activity.getTiming()==null) return false;
+        
+        if (activity.getSlope()<0) return false;
+        if (activity.getDistance()<0) return false;
+        if ((activity.getSite()!=null) && (activity.getSite().length()>100)) return false;
+        if ((activity.getDescription()!=null) && (activity.getDescription().length()>255)) return false;
+        
         
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
@@ -56,12 +62,12 @@ public class DeportesDAO implements DeportesInterface {
         // iniciamos la transaccion
         try {
             tx.begin();
-            em.persist(sport);
+            em.persist(activity);
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes cr-01");
+            System.err.println("ERROR: Actividades cr-01");
             em.close();
             return false;
         }
@@ -71,13 +77,16 @@ public class DeportesDAO implements DeportesInterface {
         
     }
 
+    
     /**
-     * Este metodo devuelve el objeto Deportes correspondiente al id
+     * Este metodo busca y devuelve un objeto Actividades en DDBB, segun el id
+     * suministrado.
+     * Verifica previamente que cumple las condiciones
      * @param id
-     * @return Object || null
+     * @return objeto Actividades || null
      */
     @Override
-    public Deportes readSport(Long id) {
+    public Actividades readActivity(Long id) {
         
         if (id<1) return null;
         
@@ -86,85 +95,61 @@ public class DeportesDAO implements DeportesInterface {
         tx=em.getTransaction();
         
         // creamos el objeto
-        Deportes sport;
+        Actividades activity;
         
         // iniciamos la transaccion
         try {
             tx.begin();
-            Query q=em.createNamedQuery("Deportes.findById");
+            Query q=em.createNamedQuery("Actividades.findById");
             q.setParameter("id", id);
             
-            sport=(Deportes)q.getSingleResult();
+            activity=(Actividades)q.getSingleResult();
             
             tx.commit();
             
         } catch (NonUniqueResultException nr) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes rd-02A"); 
+            System.err.println("ERROR: Actividades rd-02A");  
             em.close();
             return null;
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes rd-02B");            
+            System.err.println("ERROR: Actividades rd-02B");            
             em.close();
             return null;
         }
         
         em.close();
-        return sport;
         
-    }
-
-    
-    /**
-     * Este metodo actualiza el objeto Deportes en DDBB, con
-     * el objeto suministrado
-     * @param sport
-     * @return boolean, con el resultado de la operacion
-     */
-    @Override
-    public boolean updateSport(Deportes sport) {
-        
-                /* Verificacion de condiciones */
-        if (sport==null) return false;
-        
-        if (sport.getSportName().isEmpty()) return false;
-        if (sport.getSportName().length()>50) return false;
-        
-        if ((sport.getSportDescrip()!=null) && (sport.getSportDescrip().length()>50)) return false;
-        
-        //creamos los objetos de transaccion
-        em=Factory.getEmf().createEntityManager();
-        tx=em.getTransaction();
-        
-        // iniciamos la transaccion
-        try {
-            tx.begin();
-            // attaching el objeto
-            Deportes sportattached=em.merge(sport);
-            em.persist(sportattached);
-            tx.commit();
-            
-        } catch (Exception ex) {
-            if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes up-03");            
-            em.close();
-            return false;
-        }
-        
-        em.close();
-        return true;
+        return activity;
+                
     }
 
     /**
-     * Este metodo borra el objeto Deportes de la DDBB, correspondiente
-     * al id suministrado
-     * @param id
+     * Este metodo actualiza en DDBB un objeto Actividades, segun el
+     * objeto suministrado
+     * Verifica previamente que cumple las condiciones
+     * @param activity
      * @return boolean, con el resultado de la operacion
      */
     @Override
-    public boolean deleteSport(Long id) {
-
+    public boolean updateActivity(Actividades activity) {
+        
+        /* Verificacion de condiciones */
+        if (activity==null) return false;
+        
+        if (activity.getId()==0) return false;
+        
+        if (activity.getName().isEmpty()) return false;
+        if (activity.getName().length()>100) return false;
+        
+        if (activity.getTiming()==null) return false;
+        
+        if (activity.getSlope()<0) return false;
+        if (activity.getDistance()<0) return false;
+        if ((activity.getSite()!=null) && (activity.getSite().length()>100)) return false;
+        if ((activity.getDescription()!=null) && (activity.getDescription().length()>255)) return false;
+        
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
@@ -173,13 +158,50 @@ public class DeportesDAO implements DeportesInterface {
         try {
             tx.begin();
             // attaching el objeto
-            Deportes sport=em.find(Deportes.class, id);
-            em.remove(sport);          
+            Actividades act=em.merge(activity);
+            em.persist(act);
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes dl-04");            
+            System.err.println("ERROR: Actividades up-03");
+            em.close();
+            return false;
+        }
+        
+        em.close();
+        return true;
+        
+    }
+
+    
+    /**
+     * Este metodo borra de la DDBB un objeto Actividades, segun el 
+     * id suministrado
+     * Verifica previamente que cumple las condiciones
+     * @param id
+     * @return boolean, con el resultado de la operacion
+     */
+    @Override
+    public boolean deleteActivity(Long id) {
+        
+        if (id<1) return false;
+        
+        // creamos los objetos de transaccion
+        em=Factory.getEmf().createEntityManager();
+        tx=em.getTransaction();
+        
+        // iniciamos la transaccion
+        try {
+            tx.begin();
+            // attaching el objeto
+            Actividades act=em.find(Actividades.class, id);
+            em.remove(act);          
+            tx.commit();
+            
+        } catch (Exception ex) {
+            if (tx!=null && tx.isActive()) tx.rollback();
+            System.err.println("ERROR: Actividades dl-04");            
             em.close();
             return false;
         }
@@ -189,40 +211,40 @@ public class DeportesDAO implements DeportesInterface {
     }
     
     
-    /**
-     * Este metodo lee todos los deportes correspondientes al usuario user
-     * y los devuelve en forma de lista
-     * @param  user
+     /**
+     * Este metodo lee todas las actividades correspondientes al Deporte
+     * sport y los devuelve en forma de lista
+     * @param  sport
      * @return null | List
      */
-    public List<Deportes> readAllUserSports(Usuarios user) {
+    public List<Actividades> readAllSportActivities(Deportes sport) {
         
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
         
         // creamos el objeto
-        List<Deportes> sport;
+        List<Actividades> activities;
         
         // iniciamos la transaccion
         try {
             tx.begin();
-            Query q=em.createNamedQuery("Deportes.findByIduser");
-            q.setParameter("iduser", user);
+            Query q=em.createNamedQuery("Actividades.findByIdsport");
+            q.setParameter("idsport", sport.getId());
             
-            sport=(List<Deportes>)q.getResultList();
+            activities=(List<Actividades>)q.getResultList();
             
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes rd-05");
+            System.err.println("ERROR: Actividades rd-05");
             em.close();
             return null;
         }
         
         em.close();
-        return sport;
+        return activities;
         
     }
     

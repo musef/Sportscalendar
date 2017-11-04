@@ -14,41 +14,42 @@
  */
 package daos;
 
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
-import models.Deportes;
-import models.Usuarios;
+import models.Actividades;
+import models.Agenda;
 
 /**
  *
  * @author musef2904@gmail.com
  */
-
-public class DeportesDAO implements DeportesInterface {
+public class AgendaDAO implements AgendaInterface{
 
     EntityManager em;
     EntityTransaction tx;
-
+    
     /**
-     * Este metodo crea un nuevo Deporte en la DDBB, con el objeto
-     * Deportes suministrado
-     * @param sport
+     * Este metodo graba en DDBB un objeto Agenda, con el parametro
+     * suministrado
+     * Verifica previamente que cumple las condiciones
+     * @param calendar
      * @return boolean, con el resultado de la operacion
-     */    
+     */
     @Override
-    public boolean createSport(Deportes sport) {
-        
+    public boolean createCalendar(Agenda calendar) {
+      
         /* Verificacion de condiciones */
-        if (sport==null) return false;
+        if (calendar==null) return false;      
+
+        if (calendar.getDate()==null) return false;
         
-        if (sport.getSportName().isEmpty()) return false;
-        if (sport.getSportName().length()>50) return false;
-        
-        if ((sport.getSportDescrip()!=null) && (sport.getSportDescrip().length()>50)) return false;
-        
+        if (calendar.getSlope()!=null && calendar.getSlope()<0) return false;
+        if (calendar.getDistance()!=null && calendar.getDistance()<0) return false;        
+        if (calendar.getTiming()==null) return false;
+        if ((calendar.getComments()!=null) && (calendar.getComments().length()>255)) return false;
+     
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
@@ -56,29 +57,32 @@ public class DeportesDAO implements DeportesInterface {
         // iniciamos la transaccion
         try {
             tx.begin();
-            em.persist(sport);
+            em.persist(calendar);
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes cr-01");
+            System.err.println("ERROR: Agenda cr-01");
             em.close();
             return false;
         }
         
         em.close();
-        return true;
+        return true;        
         
     }
 
+    
     /**
-     * Este metodo devuelve el objeto Deportes correspondiente al id
+     * Este metodo devuelve un objeto Agenda, dado el id suministrado
+     * Verifica previamente que cumple las condiciones
      * @param id
-     * @return Object || null
+     * @return objeto Agenda || null
      */
     @Override
-    public Deportes readSport(Long id) {
-        
+    public Agenda readCalendar(Long id) {
+    
+        /* Verificacion de condiciones */
         if (id<1) return null;
         
         // creamos los objetos de transaccion
@@ -86,54 +90,57 @@ public class DeportesDAO implements DeportesInterface {
         tx=em.getTransaction();
         
         // creamos el objeto
-        Deportes sport;
+        Agenda calendar;
         
         // iniciamos la transaccion
         try {
             tx.begin();
-            Query q=em.createNamedQuery("Deportes.findById");
+            Query q=em.createNamedQuery("Agenda.findById");
             q.setParameter("id", id);
             
-            sport=(Deportes)q.getSingleResult();
+            calendar=(Agenda)q.getSingleResult();
             
             tx.commit();
             
         } catch (NonUniqueResultException nr) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes rd-02A"); 
+            System.err.println("ERROR: Agenda rd-02A");  
             em.close();
             return null;
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes rd-02B");            
+            System.err.println("ERROR: Agenda rd-02B");            
             em.close();
             return null;
         }
         
         em.close();
-        return sport;
+        
+        return calendar;
         
     }
 
-    
     /**
-     * Este metodo actualiza el objeto Deportes en DDBB, con
-     * el objeto suministrado
-     * @param sport
+     * Este metodo modifica en DDBB un objeto Agenda, con el objeto
+     * Agenda suministrado
+     * Verifica previamente que cumple las condiciones
+     * @param calendar
      * @return boolean, con el resultado de la operacion
      */
     @Override
-    public boolean updateSport(Deportes sport) {
+    public boolean updateCalendar(Agenda calendar) {
         
-                /* Verificacion de condiciones */
-        if (sport==null) return false;
+        /* Verificacion de condiciones */
+        if (calendar==null) return false;      
+
+        if (calendar.getDate()==null) return false;
         
-        if (sport.getSportName().isEmpty()) return false;
-        if (sport.getSportName().length()>50) return false;
+        if (calendar.getSlope()!=null && calendar.getSlope()<0) return false;
+        if (calendar.getDistance()!=null && calendar.getDistance()<0) return false;        
+        if (calendar.getTiming()==null) return false;
+        if ((calendar.getComments()!=null) && (calendar.getComments().length()>255)) return false;
         
-        if ((sport.getSportDescrip()!=null) && (sport.getSportDescrip().length()>50)) return false;
-        
-        //creamos los objetos de transaccion
+        // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
         
@@ -141,30 +148,36 @@ public class DeportesDAO implements DeportesInterface {
         try {
             tx.begin();
             // attaching el objeto
-            Deportes sportattached=em.merge(sport);
-            em.persist(sportattached);
+            Agenda cal=em.merge(calendar);
+            em.persist(cal);
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes up-03");            
+            System.err.println("ERROR: Agenda up-03");
             em.close();
             return false;
         }
         
         em.close();
-        return true;
+        return true;        
+        
     }
 
+    
     /**
-     * Este metodo borra el objeto Deportes de la DDBB, correspondiente
-     * al id suministrado
+     * Este metodo borra de DDBB un objeto Agenda, con el parametro
+     * id suministrado
+     * Verifica previamente que cumple las condiciones
      * @param id
      * @return boolean, con el resultado de la operacion
      */
     @Override
-    public boolean deleteSport(Long id) {
-
+    public boolean deleteCalendar(Long id) {
+       
+        /* Verificacion de condiciones */
+        if (id<1) return false;
+        
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
@@ -173,56 +186,19 @@ public class DeportesDAO implements DeportesInterface {
         try {
             tx.begin();
             // attaching el objeto
-            Deportes sport=em.find(Deportes.class, id);
-            em.remove(sport);          
+            Agenda cal=em.find(Agenda.class, id);
+            em.remove(cal);          
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes dl-04");            
+            System.err.println("ERROR: Agenda dl-04");            
             em.close();
             return false;
         }
         
         em.close();
         return true;
-    }
-    
-    
-    /**
-     * Este metodo lee todos los deportes correspondientes al usuario user
-     * y los devuelve en forma de lista
-     * @param  user
-     * @return null | List
-     */
-    public List<Deportes> readAllUserSports(Usuarios user) {
-        
-        // creamos los objetos de transaccion
-        em=Factory.getEmf().createEntityManager();
-        tx=em.getTransaction();
-        
-        // creamos el objeto
-        List<Deportes> sport;
-        
-        // iniciamos la transaccion
-        try {
-            tx.begin();
-            Query q=em.createNamedQuery("Deportes.findByIduser");
-            q.setParameter("iduser", user);
-            
-            sport=(List<Deportes>)q.getResultList();
-            
-            tx.commit();
-            
-        } catch (Exception ex) {
-            if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes rd-05");
-            em.close();
-            return null;
-        }
-        
-        em.close();
-        return sport;
         
     }
     

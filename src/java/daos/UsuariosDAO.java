@@ -26,18 +26,20 @@ import models.Usuarios;
  */
 public class UsuariosDAO implements UsuariosInterface {
 
-    /**
-     * Funcion que crea un usuario en DDBB.
-     * Verifica que el usuario cumpla las condiciones para ser creado.
-     * @param user
-     * @return boolean con el resultado de la operacion
-     */
+
     
     private final int MIN_LENGTH_USERNAME=6;
     private final int MAX_LENGTH_USERNAME=15;
     private final int MIN_LENGTH_USERPASS=8;
     private final int MAX_LENGTH_USERPASS=20;
+
     
+    /**
+     * Funcion que crea un usuario en DDBB.
+     * Verifica que el usuario cumpla las condiciones para ser creado.
+     * @param user
+     * @return boolean con el resultado de la operacion
+     */    
     @Override
     public boolean createUser(Usuarios user) {
 
@@ -91,11 +93,47 @@ public class UsuariosDAO implements UsuariosInterface {
         return true;
     }
 
+    
+    /**
+     * Este metodo devuelve el objeto Usuarios de la DDBB, correspondiente
+     * al id suministrado
+     * @param id
+     * @return Usuarios || null
+     */
     @Override
     public Usuarios readUser(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       
+        /* Verificacion de condiciones */
+        if (id<1) return null;
+        
+        // creamos los objetos de transaccion
+        EntityManager em=Factory.getEmf().createEntityManager();       
+        EntityTransaction tx=em.getTransaction();
+        
+        // objeto a devolver
+        Usuarios us=null;
+        
+        // iniciamos la transaccion
+        try {
+            
+            tx.begin();
+            // attaching el objeto
+            us=em.find(Usuarios.class, id);        
+            tx.commit();
+            
+        } catch (Exception ex) {
+            if (tx!=null && tx.isActive()) tx.rollback();
+            System.err.println("ERROR: Usuarios rd-02");            
+            em.close();
+            return null;
+        }
+        
+        em.close();
+        return us;
+    
     }
 
+    
     /**
      * Funcion que actualiza un usuario en DDBB.
      * Verifica que el usuario cumpla las condiciones para ser actualizado
@@ -145,14 +183,15 @@ public class UsuariosDAO implements UsuariosInterface {
             tx.begin();
             
             Usuarios us=em.merge(user);
+            em.persist(us);
             
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("Error Usuarios up-01");
+            System.err.println("Error Usuarios up-03");
             em.close();
-            return false;            
+            return false;          
         }
 
         // grabacion exitosa
@@ -160,14 +199,48 @@ public class UsuariosDAO implements UsuariosInterface {
         return true;
     }
 
-    
+    /**
+     * Este metodo borra el Usuario de la BBDD, correspondiente al 
+     * id suministrado
+     * @param id
+     * @return boolean, con el resultado de la operacion
+     */
     @Override
     public boolean deleteUser(Long id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
+        /* Verificacion de condiciones */
+        if (id<1) return false;
+        
+        // creamos los objetos de transaccion
+        EntityManager em=Factory.getEmf().createEntityManager();
+        
+        EntityTransaction tx=em.getTransaction();
+        
+        // iniciamos la transaccion
+        try {
+            
+            tx.begin();
+            // attaching el objeto
+            Usuarios us=em.find(Usuarios.class, id);
+            em.remove(us);          
+            tx.commit();
+            
+        } catch (Exception ex) {
+            if (tx!=null && tx.isActive()) tx.rollback();
+            System.err.println("ERROR: Usuarios dl-04");            
+            em.close();
+            return false;
+        }
+        
+        em.close();
+        return true;
     }
     
+    
     /**
-     * 
+     * Este metodo obtiene un objeto Usuarios en la DDBB, si coincide con
+     * el username and userpass suministrado, y lo devuelve.
+     * Verifica que los parametros son adecuados
      * @param username
      * @param userpass
      * @return long - retorna el usuario si correcto; 
@@ -213,7 +286,7 @@ public class UsuariosDAO implements UsuariosInterface {
             return us;   
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("Error Usuarios idtf-01");
+            System.err.println("Error Usuarios rd-05");
             em.close();
             return null;   
         }
