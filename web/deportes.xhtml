@@ -50,18 +50,18 @@
                 <h:form>
                     <div class="mainbox">                  
                         <h:panelGrid columns="2">
-                            <h:outputText value="Seleccione"></h:outputText>
+                            <h:outputLabel value="Seleccione"></h:outputLabel>
                             <h:selectOneMenu id="sportselect" onchange="submit()" valueChangeListener="#{deportesBean.changeName}" >
                                 <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
                                 <f:selectItems value="#{deportesBean.sports}" var="deporte" itemValue="#{deporte.id}" itemLabel="#{deporte.sportName}"></f:selectItems>
                             </h:selectOneMenu>
-                            <h:outputText value="Nombre"></h:outputText>
+                            <h:outputLabel value="Nombre"></h:outputLabel>
                             <h:inputText value="#{deportesBean.sportName}" ></h:inputText>
-                            <h:outputText value="Descripción"></h:outputText>
+                            <h:outputLabel value="Descripción"></h:outputLabel>
                             <h:inputText value="#{deportesBean.sportDescription}" ></h:inputText>
+                        </h:panelGrid>             
                             <h:commandButton action="#{deportesBean.deleteSport}" value="Eliminar" onclick="return confirm('¿Seguro que desea eliminar este deporte?')"></h:commandButton>
                             <h:commandButton action="#{deportesBean.recordSport}" value="Grabar" onclick="return confirm('¿Seguro que desea grabar este deporte?')" ></h:commandButton>
-                        </h:panelGrid>             
                     </div>
                     <div class="messagebox">
                         <h:outputText value="#{deportesBean.message}"></h:outputText>

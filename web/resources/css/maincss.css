@@ -110,8 +110,6 @@ main {
     min-width: 75%;    
 }
 
-
-
 .loginbox {
     width: 450px;
     margin: 50px auto 0 auto;  
@@ -133,6 +131,36 @@ main {
     height: 45px;
     font-size: 2em;
     margin: 15px 5px 0 5px;
+}
+
+.mainbox {
+    width: 50%;
+    margin-top: 25px;
+    margin-left: 10%;
+}
+
+.mainbox label {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+.mainbox input[type="text"],select {
+    width: 250px;
+    height: 45px;
+    margin-top:5px;
+    margin-bottom: 5px;
+}
+
+.mainbox input[type="submit"] {
+    width: 30%;
+    margin-left: 10%;
+    margin-top: 10px;
+    height: 35px;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
 }
 
 .messagebox {
