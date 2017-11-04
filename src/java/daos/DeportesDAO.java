@@ -46,6 +46,7 @@ public class DeportesDAO implements DeportesInterface {
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
+            System.err.println("ERROR: Deportes cr-01");
             em.close();
             return false;
         }
@@ -81,6 +82,7 @@ public class DeportesDAO implements DeportesInterface {
             return null;
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
+            System.err.println("ERROR: Deportes rd-02");            
             em.close();
             return null;
         }
@@ -93,21 +95,21 @@ public class DeportesDAO implements DeportesInterface {
     @Override
     public boolean updateSport(Deportes sport) {
         
-// creamos los objetos de transaccion
+        //creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
         
         // iniciamos la transaccion
         try {
             tx.begin();
-            
-            //Deportes sportmerge=em.find(Deportes.class, sport.getId());
-            em.merge(sport);
-            
+            // attaching el objeto
+            Deportes sportattached=em.merge(sport);
+            em.persist(sportattached);
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
+            System.err.println("ERROR: Deportes up-03");            
             em.close();
             return false;
         }
@@ -126,14 +128,14 @@ public class DeportesDAO implements DeportesInterface {
         // iniciamos la transaccion
         try {
             tx.begin();
-            
+            // attaching el objeto
             Deportes sport=em.find(Deportes.class, id);
-            em.remove(sport);
-            
+            em.remove(sport);          
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
+            System.err.println("ERROR: Deportes dl-04");            
             em.close();
             return false;
         }
@@ -144,9 +146,9 @@ public class DeportesDAO implements DeportesInterface {
     
     
     /**
-     * Este metodo lee todos los deportes correspondientes al usuario con iduser,
+     * Este metodo lee todos los deportes correspondientes al usuario user
      * y los devuelve en forma de lista
-     * @param iduser
+     * @param  user
      * @return null | List
      */
     public List<Deportes> readAllUserSports(Usuarios user) {
@@ -170,7 +172,7 @@ public class DeportesDAO implements DeportesInterface {
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.out.println("ERROR: "+ex.toString());
+            System.err.println("ERROR: Deportes rd-05");
             em.close();
             return null;
         }
