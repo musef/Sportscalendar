@@ -22,6 +22,9 @@ import javax.faces.bean.SessionScoped;
 import models.Usuarios;
 import components.LoginComponent;
 
+import java.io.Serializable;
+import javax.persistence.Transient;
+
 
 /**
  *
@@ -29,7 +32,7 @@ import components.LoginComponent;
  */
 @ManagedBean
 @SessionScoped
-public class LoginBean extends LoginComponent{
+public class LoginBean extends LoginComponent implements Serializable{
    
     // variable de identificacion
     private String username;
@@ -37,6 +40,7 @@ public class LoginBean extends LoginComponent{
     private String loginmessage;
     
     // datos del usuario
+    
     public static Usuarios user;
 
     private String worksHoursM;
@@ -45,7 +49,6 @@ public class LoginBean extends LoginComponent{
     private String worksSessY;
     
     
-    private UsuariosDAO udao;
     
     
     public LoginBean() {
@@ -60,7 +63,7 @@ public class LoginBean extends LoginComponent{
             this.userpass==null || this.userpass.length()< LibraryClass.MIN_LENGTH_USERPASS
                 || this.userpass.length()> LibraryClass.MAX_LENGTH_USERPASS ) {
             
-            udao=new UsuariosDAO();
+            UsuariosDAO udao=new UsuariosDAO();
             
             user=udao.identifyUser(username, userpass);
             
