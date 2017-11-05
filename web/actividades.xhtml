@@ -48,9 +48,37 @@
             
             <main>
                 <h:form>
-
-                    <div class="mainbox"></div>
-                    <div class="messagebox"></div>
+                    <div class="mainbox">                  
+                        <h:panelGrid columns="2">
+                            <h:outputLabel value="Deporte: "></h:outputLabel>
+                            <h:selectOneMenu id="sportselect" onchange="submit()" valueChangeListener="#{actividadesBean.changeSport}" >
+                                <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
+                                <f:selectItems value="#{actividadesBean.sports}" var="spr" itemValue="#{spr.id}" itemLabel="#{spr.sportName}"></f:selectItems>
+                            </h:selectOneMenu>
+                            <h:outputLabel value="Actividad: "></h:outputLabel>
+                            <h:selectOneMenu id="activityselect" value="#{actividadesBean.activityidx}" onchange="submit()" valueChangeListener="#{actividadesBean.changeActivity}" >
+                                <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
+                                <f:selectItems value="#{actividadesBean.activities}" var="act" itemValue="#{act.id}" itemLabel="#{act.name}"></f:selectItems>
+                            </h:selectOneMenu>                            
+                            <h:outputLabel value="Nombre"></h:outputLabel>
+                            <h:inputText value="#{actividadesBean.activityName}" ></h:inputText>
+                            <h:outputLabel value="Distancia"></h:outputLabel>
+                            <h:inputText value="#{actividadesBean.activityDistance}" ></h:inputText>
+                            <h:outputLabel value="Desnivel"></h:outputLabel>
+                            <h:inputText value="#{actividadesBean.activitySlope}" ></h:inputText>
+                            <h:outputLabel value="Duración"></h:outputLabel>
+                            <h:inputText value="#{actividadesBean.activityTimming}" title="Duración en formato hh:mm:ss" ></h:inputText>
+                            <h:outputLabel value="Lugar"></h:outputLabel>
+                            <h:inputText value="#{actividadesBean.activitySite}" ></h:inputText>
+                            <h:outputLabel value="Descripción"></h:outputLabel>
+                            <h:inputText value="#{actividadesBean.activityDescription}" ></h:inputText>                            
+                        </h:panelGrid>             
+                        <h:commandButton action="#{actividadesBean.deleteActivity}" value="Eliminar" onclick="return confirm('¿Seguro que desea eliminar esta actividad?')"></h:commandButton>
+                        <h:commandButton action="#{actividadesBean.recordActivity}" value="Grabar" onclick="return confirm('¿Seguro que desea grabar esta actividad?')" ></h:commandButton>
+                    </div>
+                    <div class="messagebox">
+                        <h:outputText value="#{actividadesBean.message}"></h:outputText>
+                    </div>
 
                 </h:form>
             </main>

@@ -50,6 +50,7 @@ import javax.persistence.TemporalType;
 @NamedQueries({
     @NamedQuery(name = "Actividades.findAll", query = "SELECT r FROM Actividades r")
     , @NamedQuery(name = "Actividades.findById", query = "SELECT r FROM Actividades r WHERE r.id = :id")
+    , @NamedQuery(name = "Actividades.findByIdsport", query = "SELECT d FROM Actividades d WHERE d.idsport = :idsport")        
     , @NamedQuery(name = "Actividades.findByKeyuser", query = "SELECT r FROM Actividades r WHERE r.keyuser = :keyuser")
     , @NamedQuery(name = "Actividades.findByName", query = "SELECT r FROM Actividades r WHERE r.name = :name")
     , @NamedQuery(name = "Actividades.findByDistance", query = "SELECT r FROM Actividades r WHERE r.distance = :distance")
