@@ -58,8 +58,8 @@ public class DeportesBean {
         
         if (sportidx!=0) {
             boolean result=ddao.deleteSport(sportidx);
-            if (result) message="Nuevo deporte grabado correctamente";
-            else message="No ha sido posible grabar un nuevo deporte";
+            if (result) message="Nuevo deporte borrado correctamente";
+            else message="No ha sido posible borrar un nuevo deporte";
         }
         return "deportes";
     }

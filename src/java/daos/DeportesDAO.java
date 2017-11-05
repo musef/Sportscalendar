@@ -47,7 +47,7 @@ public class DeportesDAO implements DeportesInterface {
         if (sport.getSportName().isEmpty()) return false;
         if (sport.getSportName().length()>50) return false;
         
-        if ((sport.getSportDescrip()!=null) && (sport.getSportDescrip().length()>50)) return false;
+        if ((sport.getSportDescrip()!=null) && (sport.getSportDescrip().length()>255)) return false;
         
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
