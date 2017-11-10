@@ -14,7 +14,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 /* 
     Created on : 24-oct-2017, 19:36:49
-    Author     : floren
+    Author     : musef2904@gmail.com
 */
 
 body {
@@ -164,8 +164,8 @@ main {
 }
 
 .messagebox {
-    width: 500px;
-    margin: 10px auto;
+    width: 75%;
+    margin-top: 10px;
     font-size: 2em;
     color: red;
     text-align: center;

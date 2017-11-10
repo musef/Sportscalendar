@@ -42,6 +42,7 @@ public class ActividadesDAO implements ActividadesInterface{
     public boolean createActivity(Actividades activity) {
         
         /* Verificacion de condiciones */
+        /*
         if (activity==null) return false;
         
         if (activity.getName().isEmpty()) return false;
@@ -53,7 +54,7 @@ public class ActividadesDAO implements ActividadesInterface{
         if (activity.getDistance()<0) return false;
         if ((activity.getSite()!=null) && (activity.getSite().length()>100)) return false;
         if ((activity.getDescription()!=null) && (activity.getDescription().length()>255)) return false;
-        
+        */
         
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
@@ -136,6 +137,7 @@ public class ActividadesDAO implements ActividadesInterface{
     public boolean updateActivity(Actividades activity) {
         
         /* Verificacion de condiciones */
+        /*
         if (activity==null) return false;
         
         if (activity.getId()==0) return false;
@@ -149,7 +151,7 @@ public class ActividadesDAO implements ActividadesInterface{
         if (activity.getDistance()<0) return false;
         if ((activity.getSite()!=null) && (activity.getSite().length()>100)) return false;
         if ((activity.getDescription()!=null) && (activity.getDescription().length()>255)) return false;
-        
+        */
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
@@ -168,6 +170,8 @@ public class ActividadesDAO implements ActividadesInterface{
             em.close();
             return false;
         }
+        
+        System.out.println("TImming on update: "+activity.getTiming());
         
         em.close();
         return true;
@@ -219,6 +223,8 @@ public class ActividadesDAO implements ActividadesInterface{
      */
     public List<Actividades> readAllSportActivities(Deportes sport) {
         
+        if (sport==null) return null;
+        
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
@@ -230,7 +236,7 @@ public class ActividadesDAO implements ActividadesInterface{
         try {
             tx.begin();
             Query q=em.createNamedQuery("Actividades.findByIdsport");
-            q.setParameter("idsport", sport.getId());
+            q.setParameter("idsport", sport);
             
             activities=(List<Actividades>)q.getResultList();
             

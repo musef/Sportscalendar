@@ -188,6 +188,12 @@ public class DeportesBean {
      */
     public long getSportidx() {
         if (sport!=null) this.sportidx=sport.getId();
+        if (sportidx==0) {
+            // borramos los datos
+            this.sportName="";
+            this.sportDescription="";    
+            sport=null;
+        }
         return sportidx;
     }
 

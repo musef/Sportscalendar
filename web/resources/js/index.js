@@ -16,15 +16,32 @@
 
 $(document).ready(function(){
     
-    var message='';
+
+    
     $("[id*=login]").click(function() {
+        
+        // inicializamos variables y background
+        var message='';
+        $("[id*=username]").css('backgroundColor','white');
+        $("[id*=userpass]").css('backgroundColor','white');
+
         var name=$("[id*=username]").val();
-        if (name.length<6 || name.length>15) message+="Longitud inadecuada de nombre de usuario\n";
+        if (name.length<6 || name.length>15) {
+            message+="Longitud inadecuada de nombre de usuario\n";
+            $("[id*=username]").css('backgroundColor','red');
+        }
         var pass=$("[id*=userpass]").val();
-        if (pass.length<8 || pass.length>20) message+="Longitud inadecuada de contraseña\n";
+        if (pass.length<8 || pass.length>20) {
+            message+="Longitud inadecuada de contraseña\n";
+            $("[id*=userpass]").css('backgroundColor','red');
+        }
         
         // mostramos el mensaje si tiene contenido
-        if (message.length>0) alert ("Se han producido los siguientes errores:\n"+message);
+        if (message.length>0) {
+            alert ("Se han producido los siguientes errores:\n"+message);
+            message='';
+            return false;
+        } else return true;
     });
 
     

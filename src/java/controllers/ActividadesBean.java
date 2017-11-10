@@ -16,16 +16,15 @@ package controllers;
 
 import daos.ActividadesDAO;
 import daos.DeportesDAO;
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
+import javax.faces.bean.RequestScoped;
 import javax.faces.event.ValueChangeEvent;
 import models.Actividades;
 import models.Deportes;
@@ -34,18 +33,19 @@ import models.Deportes;
  *
  * @author musef2904@gmail.com
  */
-@ManagedBean
-@ViewScoped
+@ManagedBean(eager = true)
+@RequestScoped
 public class ActividadesBean {
 
     private ActividadesDAO adao;
     private DeportesDAO ddao;
     private Actividades activity;
-    private Deportes selectedSport;    
+    private Deportes selectedSport;   
+    private static long sportidx;
     private List<Deportes> sports;
     private List<Actividades> activities;
     
-    private long activityidx;
+    private static long activityidx;
     private String activityName;
     private float activitySlope;
     private float activityDistance;
@@ -54,7 +54,7 @@ public class ActividadesBean {
     private String activityDescription;
     
     // mensaje de operaciones
-    private String message;
+    private static String message;
     
     
     /**
@@ -78,7 +78,13 @@ public class ActividadesBean {
         
         if (getActivityidx()!=0) {
             boolean result=adao.deleteActivity(getActivityidx());
-            if (result) setMessage("Nueva actividad borrada correctamente");
+            if (result) {
+                setMessage("Nueva actividad borrada correctamente");
+                                // actualizamos la lista despues de operacion DDBB
+                activities=adao.readAllSportActivities(selectedSport);
+                activityidx=0;
+                sportidx=selectedSport.getId();
+            }
             else setMessage("No ha sido posible borrar una nueva actividad");
         }
         return "actividades";
@@ -95,7 +101,7 @@ public class ActividadesBean {
         
         // vamos a grabar el objeto Deportes
         // puede ser una nueva modificacion (sportidx>0) o nuevo valor
-        if (getActivityidx()==0) {
+        if (activityidx==0) {
             // nueva grabacion
             SimpleDateFormat sd=new SimpleDateFormat("HH:mm:ss");
             Date thistime;
@@ -104,22 +110,37 @@ public class ActividadesBean {
             } catch (ParseException ex) {
                 thistime=new Date();
             }
-            Actividades newactivity=new Actividades(LoginBean.user.getKeyuser(), getActivityName(), getActivityDistance(), getActivitySlope(), thistime, getActivitySite(), getActivityDescription(), LoginBean.user, getSelectedSport());
-            
+            Actividades newactivity=new Actividades(LoginBean.user.getKeyuser(), activityName, activityDistance, activitySlope, thistime, activitySite, activityDescription, LoginBean.user, getSelectedSport());
+ 
             boolean result=adao.createActivity(newactivity);
-            if (result) setMessage("Nueva actividad grabada correctamente");
+
+            if (result) {
+                setMessage("Nueva actividad grabada correctamente");
+                // actualizamos la lista despues de operacion DDBB
+                activities=adao.readAllSportActivities(selectedSport);
+                activityidx=0;
+                sportidx=selectedSport.getId();
+            }
             else setMessage("No ha sido posible grabar una nueva actividad");
         } else {
+            if (activity==null && activityidx>0) activity=adao.readActivity(activityidx);
             // modificacion
             activity.setName(activityName);
             activity.setDescription(activityDescription);
             activity.setSite(activitySite);
             activity.setSlope(activitySlope);
             activity.setDistance(activityDistance);
-            activity.setTiming(new Date(activityTimming));
+            activity.setTiming(Time.valueOf(activityTimming));
+            
+            System.out.println("TImming: "+activity.getTiming());
             
             boolean result=adao.updateActivity(getActivity());
-            if (result) setMessage("Actividad modificada correctamente");
+            sportidx=selectedSport.getId();
+            if (result) {
+                setMessage("Actividad modificada correctamente");
+                // actualizamos la lista despues de operacion DDBB
+                activities=adao.readAllSportActivities(selectedSport);
+            }
             else setMessage("No ha sido posible modificar la actividad");            
         }
         return "actividades";
@@ -136,13 +157,13 @@ public class ActividadesBean {
     public void changeSport(ValueChangeEvent e) {
         
         // actualizamos aqui
-         long sportidx=Long.parseLong(e.getNewValue().toString());
+        sportidx=Long.parseLong(e.getNewValue().toString());
         // recuperamos el objeto
         if (sportidx>0) {
             // recuperamos el deporte seleccionado
             selectedSport=ddao.readSport(sportidx);
             // y recuperamos la lista de actividades de ese deporte
-            activities=selectedSport.getRecorridosList();
+            activities=adao.readAllSportActivities(selectedSport);
             // borramos la actividad que estuviera seleccionada
             activity=null;
             activityidx=0;
@@ -151,13 +172,15 @@ public class ActividadesBean {
             selectedSport=null;
             activity=null;
             activityidx=0;
-            this.activities=null;
+            this.activities=adao.readAllSportActivities(selectedSport);
             this.activityName="";
             this.activityDescription="";
             this.activitySite="";
             this.activitySlope=0;
             this.activityDistance=0;
             this.activityTimming="00:00:00";
+
+            
         }
 
     }
@@ -170,6 +193,9 @@ public class ActividadesBean {
      * @param e 
      */
     public void changeActivity(ValueChangeEvent e) {
+        
+        // borramos mensaje
+        message="";
         
         // actualizamos aqui
          activityidx=Long.parseLong(e.getNewValue().toString());
@@ -184,14 +210,7 @@ public class ActividadesBean {
             this.activityDistance=activity.getDistance();
             this.activityTimming=new SimpleDateFormat("HH:mm:ss").format(activity.getTiming());
         } else {
-            // borramos los datos
-            activity=null;
-            this.activityName="";
-            this.activityDescription="";
-            this.activitySite="";
-            this.activitySlope=0;
-            this.activityDistance=0;
-            this.activityTimming="00:00:00";
+
         }
 
     }
@@ -200,6 +219,7 @@ public class ActividadesBean {
      * @return the activity
      */
     public Actividades getActivity() {
+        if (activity==null && activityidx>0) activity=adao.readActivity(activityidx);
         return activity;
     }
 
@@ -229,6 +249,9 @@ public class ActividadesBean {
      * @return the selectedSport
      */
     public Deportes getSelectedSport() {
+        
+        if (selectedSport==null && sportidx>0) selectedSport=ddao.readSport(sportidx);
+        
         return selectedSport;
     }
 
@@ -243,6 +266,11 @@ public class ActividadesBean {
      * @return the activities
      */
     public List<Actividades> getActivities() {
+        
+        if (sportidx>0) selectedSport=ddao.readSport(sportidx);
+            else selectedSport=null;
+        activities=adao.readAllSportActivities(selectedSport);
+ 
         return activities;
     }
 
@@ -257,16 +285,10 @@ public class ActividadesBean {
      * @return the activityidx
      */
     public long getActivityidx() {
-        if (activity!=null) {
-            activityidx=activity.getId();
-            activityName=activity.getName();
-            activityDistance=activity.getDistance();
-            activityDescription=activity.getDescription();
-            activitySlope=activity.getSlope();
-            activityTimming=new SimpleDateFormat("HH:mm:ss").format(activity.getTiming());
-            activitySite=activity.getSite();
-        } else {
-            activityidx=0;
+        
+        if (activityidx==0) {
+            // borramos los datos
+            activity=null;
             this.activityName="";
             this.activityDescription="";
             this.activitySite="";
@@ -274,6 +296,7 @@ public class ActividadesBean {
             this.activityDistance=0;
             this.activityTimming="00:00:00";
         }
+        
         return activityidx;
     }
 
@@ -281,13 +304,14 @@ public class ActividadesBean {
      * @param activityidx the activityidx to set
      */
     public void setActivityidx(long activityidx) {
-        this.activityidx = activityidx;
+        ActividadesBean.activityidx = activityidx;
     }
 
     /**
      * @return the activityName
      */
     public String getActivityName() {
+        if (activity!=null) this.activityName=activity.getName();
         return activityName;
     }
 
@@ -302,6 +326,7 @@ public class ActividadesBean {
      * @return the activitySlope
      */
     public float getActivitySlope() {
+        if (activity!=null) this.activitySlope=activity.getSlope();
         return activitySlope;
     }
 
@@ -316,6 +341,7 @@ public class ActividadesBean {
      * @return the activityDistance
      */
     public float getActivityDistance() {
+        if (activity!=null) this.activityDistance=activity.getDistance();
         return activityDistance;
     }
 
@@ -330,6 +356,7 @@ public class ActividadesBean {
      * @return the activityTimming
      */
     public String getActivityTimming() {
+        if (activity!=null) this.activityTimming=new SimpleDateFormat("HH:mm:ss").format(activity.getTiming());
         return activityTimming;
     }
 
@@ -344,6 +371,7 @@ public class ActividadesBean {
      * @return the activitySite
      */
     public String getActivitySite() {
+        if (activity!=null) this.activitySite=activity.getSite();
         return activitySite;
     }
 
@@ -358,6 +386,7 @@ public class ActividadesBean {
      * @return the activityDescription
      */
     public String getActivityDescription() {
+        if (activity!=null) this.activityDescription=activity.getDescription();
         return activityDescription;
     }
 
@@ -379,7 +408,7 @@ public class ActividadesBean {
      * @param message the message to set
      */
     public void setMessage(String message) {
-        this.message = message;
+        ActividadesBean.message = message;
     }
 
 

@@ -55,7 +55,7 @@
                     <div class="mainbox">                  
                         <h:panelGrid columns="2">
                             <h:outputLabel value="Seleccione"></h:outputLabel>
-                            <h:selectOneMenu id="sportselect" onchange="submit()" valueChangeListener="#{deportesBean.changeName}" >
+                            <h:selectOneMenu id="sportselect" value="#{deportesBean.sportidx}" onchange="submit()" valueChangeListener="#{deportesBean.changeName}" >
                                 <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
                                 <f:selectItems value="#{deportesBean.sports}" var="deporte" itemValue="#{deporte.id}" itemLabel="#{deporte.sportName}"></f:selectItems>
                             </h:selectOneMenu>
