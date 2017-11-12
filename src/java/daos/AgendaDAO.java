@@ -14,12 +14,19 @@
  */
 package daos;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import models.Actividades;
 import models.Agenda;
+import models.Deportes;
+import models.Usuarios;
 
 /**
  *
@@ -201,5 +208,59 @@ public class AgendaDAO implements AgendaInterface{
         return true;
         
     }
+    
+    
+
+    
+    public List<Agenda> listCalendar(Usuarios user, Deportes sport, Actividades activity, String fechini, String fechfin) {
+    
+        /* Verificacion de condiciones */
+        if (user==null) return null;
+        
+        // creamos los objetos de transaccion
+        em=Factory.getEmf().createEntityManager();
+        tx=em.getTransaction();
+        
+        // creamos el objeto
+        List<Agenda> calendar;
+        
+        Date fec1=null;
+        Date fec2=null;
+        // iniciamos la transaccion
+        try {
+            tx.begin();
+            Query q=em.createQuery("SELECT ag FROM Agenda ag WHERE ag.iduser= :iduser AND ag.idsport = :idsport AND ag.idactivity=:idactivity AND ag.date>=:fec1 AND ag.date<= :fec2");
+            //Query q=em.createQuery("SELECT ag FROM Agenda ag WHERE ag.iduser= :iduser AND ag.idsport = :idsport AND ag.idactivity=:idactivity ");
+            q.setParameter("iduser", user);
+            q.setParameter("idsport", sport);
+            q.setParameter("idactivity", activity);
+            SimpleDateFormat sd = new SimpleDateFormat("yyyy-mm-dd");
+            fec1=sd.parse(fechini.substring(6)+fechini.substring(2,6)+fechini.substring(0,2));
+            fec2=sd.parse(fechfin.substring(6)+fechfin.substring(2,6)+fechfin.substring(0,2));
+            q.setParameter("fec1", fec1);
+            q.setParameter("fec2", fec2);
+            
+            calendar=(List<Agenda>)q.getResultList();
+            
+            tx.commit();
+            
+        } catch (ParseException ps) {
+            if (tx!=null && tx.isActive()) tx.rollback();
+            System.err.println("ERROR: Agenda rd-05A"+fec1+"//"+fec2);  
+            em.close();
+            return null;
+        } catch (Exception ex) {
+            if (tx!=null && tx.isActive()) tx.rollback();
+            System.err.println("ERROR: Agenda rd-05B");            
+            em.close();
+            return null;
+        }
+        
+        em.close();
+        
+        return calendar;
+        
+    }
+    
     
 }

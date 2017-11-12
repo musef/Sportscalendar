@@ -153,7 +153,7 @@ main {
     margin-bottom: 5px;
 }
 
-.mainbox input[type="submit"] {
+.mainbox input[type="submit"],input[type="reset"] {
     width: 30%;
     margin-left: 10%;
     margin-top: 10px;
@@ -161,6 +161,15 @@ main {
     font-size: 1.3em;
     font-weight: bold;
     text-align: center;
+}
+
+.agendalist {
+    width: 120%;
+}
+
+.agendalist input[type="submit"],input[type="reset"] {
+
+    width: 150px;
 }
 
 .messagebox {
