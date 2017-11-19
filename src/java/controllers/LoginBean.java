@@ -21,6 +21,7 @@ import daos.UsuariosDAO;
 import javax.faces.bean.SessionScoped;
 import models.Usuarios;
 import components.LoginComponent;
+import daos.AgendaDAO;
 
 import java.io.Serializable;
 import javax.persistence.Transient;
@@ -167,6 +168,12 @@ public class LoginBean extends LoginComponent implements Serializable{
      * @return the worksHoursM
      */
     public String getWorksHoursM() {
+        
+        AgendaDAO agDao=new AgendaDAO();
+        String res=agDao.getHoursByLapseTime(30, user);
+        
+        if (res!=null) worksHoursM=res;           
+        
         return worksHoursM;
     }
 
@@ -181,6 +188,12 @@ public class LoginBean extends LoginComponent implements Serializable{
      * @return the worksSessM
      */
     public String getWorksSessM() {
+
+        AgendaDAO agDao=new AgendaDAO();
+        long res=agDao.getSessionsByLapseTime(30, user);
+        
+        if (res>0) worksSessM=String.valueOf(res);
+
         return worksSessM;
     }
 
@@ -195,6 +208,12 @@ public class LoginBean extends LoginComponent implements Serializable{
      * @return the worksHoursY
      */
     public String getWorksHoursY() {
+        
+        AgendaDAO agDao=new AgendaDAO();
+        String res=agDao.getHoursByLapseTime(365, user);
+        
+        if (res!=null) worksHoursY=res;      
+        
         return worksHoursY;
     }
 
@@ -209,6 +228,12 @@ public class LoginBean extends LoginComponent implements Serializable{
      * @return the worksSessY
      */
     public String getWorksSessY() {
+        
+        AgendaDAO agDao=new AgendaDAO();
+        long res=agDao.getSessionsByLapseTime(365, user);
+        
+        if (res>0) worksSessY=String.valueOf(res);
+        
         return worksSessY;
     }
 

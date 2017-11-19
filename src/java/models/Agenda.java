@@ -43,6 +43,8 @@ import javax.persistence.TemporalType;
     , @NamedQuery(name = "Agenda.findByDistance", query = "SELECT a FROM Agenda a WHERE a.distance = :distance")
     , @NamedQuery(name = "Agenda.findBySlope", query = "SELECT a FROM Agenda a WHERE a.slope = :slope")
     , @NamedQuery(name = "Agenda.findByTiming", query = "SELECT a FROM Agenda a WHERE a.timing = :timing")
+    , @NamedQuery(name = "Agenda.findByUserAndGap", query = "SELECT COUNT (a) FROM Agenda a WHERE a.iduser = :iduser AND a.date > :lapsetime")
+    , @NamedQuery(name = "Agenda.findByUserAndTime", query = "SELECT a FROM Agenda a WHERE a.iduser = :iduser AND a.date > :lapsetime")
     , @NamedQuery(name = "Agenda.findByComments", query = "SELECT a FROM Agenda a WHERE a.comments = :comments")})
 public class Agenda implements Serializable {
 
