@@ -4,7 +4,8 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      >
+          
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>Sportscalendar</title>
         <h:outputStylesheet library="css" name="headercss.css"></h:outputStylesheet>
@@ -44,12 +45,83 @@
                         <li>sesiones: #{loginBean.worksSessY} - horas: #{loginBean.worksHoursY} </li>
                     </ul>
                 </div>
+                <div class="userdata2">
+                    <h:form id="routerform2"> 
+                        <h:commandButton action="main.xhtml" image="/resources/img/agenda.jpg" alt="agenda" title="Pulse para ir a la agenda"></h:commandButton>                        
+                    </h:form>                
+                </div>                    
             </aside>      
             
             <main>
                 <h:form>
 
-                    <div class="mainbox"></div>
+                    <div class="mainbox">
+                        <h:panelGrid columns="3">
+                               <h:button style="width: 25px;height: 25px;" image="/resources/img/left.png" value="-1" ></h:button>  
+                               <h:selectOneMenu value="#{mainBean.dateCalendar}">
+                                   <f:selectItems id="itm" itemValue="#{mainBean.monthchain[1]}" itemLabel="#{mainBean.monthchain[0]}"></f:selectItems>
+                               </h:selectOneMenu>
+                               <h:button style="width: 25px;height: 25px;" image="/resources/img/right.png" value="+1" ></h:button>  
+                               
+                        </h:panelGrid>                        
+                        
+                        <h:panelGrid columns="7">  
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar1[0]}.png" value="#{mainBean.calendar1[0]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar1[1]}.png" value="#{mainBean.calendar1[1]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar1[2]}.png" value="#{mainBean.calendar1[2]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar1[3]}.png" value="#{mainBean.calendar1[3]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar1[4]}.png" value="#{mainBean.calendar1[4]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar1[5]}.png" value="#{mainBean.calendar1[5]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar1[6]}.png" value="#{mainBean.calendar1[6]}" ></h:button>
+                        </h:panelGrid>
+             
+                        <h:panelGrid columns="7">  
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar2[0]}.png" value="#{mainBean.calendar2[0]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar2[1]}.png" value="#{mainBean.calendar2[1]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar2[2]}.png" value="#{mainBean.calendar2[2]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar2[3]}.png" value="#{mainBean.calendar2[3]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar2[4]}.png" value="#{mainBean.calendar2[4]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar2[5]}.png" value="#{mainBean.calendar2[5]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar2[6]}.png" value="#{mainBean.calendar2[6]}" ></h:button>
+                        </h:panelGrid>
+                        <h:panelGrid columns="7">  
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar3[0]}.png" value="#{mainBean.calendar3[0]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar3[1]}.png" value="#{mainBean.calendar3[1]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar3[2]}.png" value="#{mainBean.calendar3[2]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar3[3]}.png" value="#{mainBean.calendar3[3]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar3[4]}.png" value="#{mainBean.calendar3[4]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar3[5]}.png" value="#{mainBean.calendar3[5]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar3[6]}.png" value="#{mainBean.calendar3[6]}" ></h:button>
+                        </h:panelGrid>
+                        <h:panelGrid columns="7">  
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar4[0]}.png" value="#{mainBean.calendar4[0]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar4[1]}.png" value="#{mainBean.calendar4[1]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar4[2]}.png" value="#{mainBean.calendar4[2]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar4[3]}.png" value="#{mainBean.calendar4[3]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar4[4]}.png" value="#{mainBean.calendar4[4]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar4[5]}.png" value="#{mainBean.calendar4[5]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar4[6]}.png" value="#{mainBean.calendar4[6]}" ></h:button>
+                        </h:panelGrid>
+                        <h:panelGrid columns="7">  
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar5[0]}.png" value="#{mainBean.calendar5[0]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar5[1]}.png" value="#{mainBean.calendar5[1]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar5[2]}.png" value="#{mainBean.calendar5[2]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar5[3]}.png" value="#{mainBean.calendar5[3]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar5[4]}.png" value="#{mainBean.calendar5[4]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar5[5]}.png" value="#{mainBean.calendar5[5]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar5[6]}.png" value="#{mainBean.calendar5[6]}" ></h:button>
+                        </h:panelGrid>
+                        <h:panelGrid columns="7">  
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar6[0]}.png" value="#{mainBean.calendar6[0]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar6[1]}.png" value="#{mainBean.calendar6[1]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar6[2]}.png" value="#{mainBean.calendar6[2]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar6[3]}.png" value="#{mainBean.calendar6[3]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar6[4]}.png" value="#{mainBean.calendar6[4]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar6[5]}.png" value="#{mainBean.calendar6[5]}" ></h:button>
+                            <h:button style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar6[6]}.png" value="#{mainBean.calendar6[6]}" ></h:button>
+                        </h:panelGrid>
+                        
+                    </div>
                     <div class="messagebox"></div>
 
                 </h:form>

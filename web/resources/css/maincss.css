@@ -46,7 +46,7 @@ body {
     display: inline-flex;
 }
 .selector {
-    width: 515px;
+    width: 525px;
     margin: 0 auto 0 auto;
 }
 
@@ -55,6 +55,8 @@ body {
     height: 100px;
     width: 150px;
     margin: 10px 10px 10px 10px;
+    border-bottom-style: inset;
+    border-right-style: inset;
         
 }
 
@@ -90,6 +92,14 @@ aside .userdata img {
     margin-left: 25%;
     margin-right: 25%;   
     
+}
+
+.userdata2 input[type="image"] {
+    margin-left: 25%;
+    margin-right: 25%;
+    width: 44%;
+    border-bottom-style: inset;
+    border-right-style: inset;
 }
 
 aside ul {
@@ -168,8 +178,19 @@ main {
 }
 
 .agendalist input[type="submit"],input[type="reset"] {
-
     width: 150px;
+}
+
+.listbox {
+    width: 500px;
+    margin-top:5px;
+    margin-bottom: 5px;
+}
+
+.activitiesList {
+    width: 90%;
+    margin: 0 auto;
+    border: 1px solid black;
 }
 
 .messagebox {

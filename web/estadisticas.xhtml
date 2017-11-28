@@ -4,7 +4,6 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-          
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>Sportscalendar</title>
@@ -45,6 +44,11 @@
                         <li>sesiones: #{loginBean.worksSessY} - horas: #{loginBean.worksHoursY} </li>
                     </ul>
                 </div>
+                <div class="userdata2">
+                    <h:form id="routerform2"> 
+                        <h:commandButton action="main.xhtml" image="/resources/img/agenda.jpg" alt="agenda" title="Pulse para ir a la agenda"></h:commandButton>                        
+                    </h:form>                
+                </div>                     
             </aside>      
             
             <main>
@@ -87,16 +91,25 @@
                     </div>
                     <div class="messagebox">#{message}</div>
                     <div class="listbox">
-                        
-                        <h:panelGrid rendered="true">
-                            <c:forEach var="ag" items="#{estadisticasBean.listaAgenda}">
-                                <h:outputFormat value="#{ag.date}"></h:outputFormat>
-                                <h:outputFormat value="#{ag.timing}"></h:outputFormat>
-                                <h:outputFormat value="#{ag.distance}"></h:outputFormat>
-                                <h:outputFormat value="#{ag.comments}"></h:outputFormat>
-                            </c:forEach>
-                        </h:panelGrid>
-                        
+                        <c:if test="#{estadisticasBean.listaAgenda.size()>0}">
+                            <h:outputLabel value="Fecha"></h:outputLabel>
+                            <h:outputLabel value="Actividad"></h:outputLabel>
+                            <h:outputLabel value="Tiempo"></h:outputLabel>
+                            <h:outputLabel value="distancia"></h:outputLabel>
+                            <h:panelGrid class="activitiesList" rendered="true" columns="4">
+                                <c:forEach var="ag" items="#{estadisticasBean.listaAgenda}">
+                                    
+                                    <h:inputText value="#{ag.date}">
+                                        <f:convertDateTime pattern="dd-MM-yyyy" timeZone="GMT+2" ></f:convertDateTime>
+                                    </h:inputText>
+                                    <h:inputText value="Actividad"></h:inputText>
+                                    <h:inputText value="#{ag.timing}">
+                                         <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT+1"></f:convertDateTime>
+                                    </h:inputText>
+                                    <h:inputText value="#{ag.distance}"></h:inputText>
+                                </c:forEach>
+                            </h:panelGrid>
+                        </c:if>                        
                     </div>
 
                 </h:form>
