@@ -56,13 +56,16 @@
                 <h:form>
 
                     <div class="mainbox">
+                        <h1>#{mainBean.presentDay}</h1>
+                        <h1>#{mainBean.dateCalendar}</h1>
                         <h:panelGrid columns="3">
-                               <h:button style="width: 25px;height: 25px;" image="/resources/img/left.png" value="-1" ></h:button>  
-                               <h:selectOneMenu value="#{mainBean.dateCalendar}">
-                                   <f:selectItems id="itm" itemValue="#{mainBean.monthchain[1]}" itemLabel="#{mainBean.monthchain[0]}"></f:selectItems>
-                               </h:selectOneMenu>
-                               <h:button style="width: 25px;height: 25px;" image="/resources/img/right.png" value="+1" ></h:button>  
-                               
+                            <h:button id="lstm" style="width: 25px;height: 25px;" image="/resources/img/left.png" value="-1" onclick="#{mainBean.lastMonth()}" >
+                            </h:button>  
+                            <h:selectOneMenu value="#{mainBean.dateCalendar}" onchange="submit()" valueChangeListener="#{mainBean.changeMonth}" >
+                                <f:selectItems value="#{mainBean.monthchain}" var="thismonth" itemValue = "#{thismonth[1]}" itemLabel = "#{thismonth[0]}"  /> 
+                            </h:selectOneMenu>
+                            <h:button id="nxtm" style="width: 25px;height: 25px;" image="/resources/img/right.png" value="+1" onclick="#{mainBean.nextMonth()}"  >
+                            </h:button>                                 
                         </h:panelGrid>                        
                         
                         <h:panelGrid columns="7">  
