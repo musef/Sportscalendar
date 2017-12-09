@@ -571,5 +571,50 @@ public class AgendaDAO implements AgendaInterface{
 
     }
     
+    /**
+     * Este metodo nos informa de si una actividad (thisactivity) ha sido usada
+     * en la agenda o no. 
+     * Si la actividad no ha sido usada, es posible borrarla; si ha sido
+     * utilizada, no es posible borrarla porque se perderian datos esenciales.
+     * @param thisactivity
+     * @return boolean; con el resultado usada (true) o no (false)
+     */
+    public boolean usedActivity(Actividades activity){
+        
+        // verificacion de condiciones
+        if (activity==null) return false;
+        
+        // creamos los objetos de transaccion
+        em=Factory.getEmf().createEntityManager();
+        
+        tx=em.getTransaction();
+        
+        Long count=(long)0;
+        try {
+            String sql="SELECT COUNT(u) FROM Agenda u WHERE u.idactivity=:act";
+            tx.begin();
+            
+            Query q=em.createQuery(sql);
+            q.setParameter("act", activity);
+            count=(Long)q.getSingleResult();
+            
+        } catch (Exception ex) {
+            System.out.println("Error:"+ex.toString());
+            // evitamos el borrado
+            return true;
+        } finally {
+            if (tx.isActive()) em.close();
+        }
+
+        // no borramos
+        System.out.println("COUNT:"+count);
+        
+        // sin resultados: borramos
+        if (count<1) return false;
+        
+
+        return true;
+    }
+    
     
 }

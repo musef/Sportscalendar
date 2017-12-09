@@ -97,7 +97,7 @@ public class Actividades implements Serializable {
     @ManyToOne(optional = false)
     private Deportes idsport;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "idactivity")
+    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "idactivity")
     private List<Agenda> agendaList;
     
     

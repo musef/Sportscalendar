@@ -42,7 +42,7 @@ public class ActividadesDAO implements ActividadesInterface{
     public boolean createActivity(Actividades activity) {
         
         /* Verificacion de condiciones */
-        /*
+        
         if (activity==null) return false;
         
         if (activity.getName().isEmpty()) return false;
@@ -54,7 +54,7 @@ public class ActividadesDAO implements ActividadesInterface{
         if (activity.getDistance()<0) return false;
         if ((activity.getSite()!=null) && (activity.getSite().length()>100)) return false;
         if ((activity.getDescription()!=null) && (activity.getDescription().length()>255)) return false;
-        */
+        
         
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
@@ -137,7 +137,7 @@ public class ActividadesDAO implements ActividadesInterface{
     public boolean updateActivity(Actividades activity) {
         
         /* Verificacion de condiciones */
-        /*
+        
         if (activity==null) return false;
         
         if (activity.getId()==0) return false;
@@ -151,7 +151,7 @@ public class ActividadesDAO implements ActividadesInterface{
         if (activity.getDistance()<0) return false;
         if ((activity.getSite()!=null) && (activity.getSite().length()>100)) return false;
         if ((activity.getDescription()!=null) && (activity.getDescription().length()>255)) return false;
-        */
+        
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
@@ -183,13 +183,17 @@ public class ActividadesDAO implements ActividadesInterface{
      * Este metodo borra de la DDBB un objeto Actividades, segun el 
      * id suministrado
      * Verifica previamente que cumple las condiciones
+     * Si el objeto actividades ha sido utilizado en la agenda no es posible
+     * borrarlo, retornando false
      * @param id
      * @return boolean, con el resultado de la operacion
      */
     @Override
     public boolean deleteActivity(Long id) {
         
+        // verificacion de condiciones
         if (id<1) return false;
+        
         
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
@@ -200,6 +204,12 @@ public class ActividadesDAO implements ActividadesInterface{
             tx.begin();
             // attaching el objeto
             Actividades act=em.find(Actividades.class, id);
+            
+            // verificamos si la actividad es usada
+            // si es usada no podemos borrarla
+            AgendaDAO agdao=new AgendaDAO();
+            if (agdao.usedActivity(act)) return false;
+            
             em.remove(act);          
             tx.commit();
             

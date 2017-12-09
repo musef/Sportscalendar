@@ -24,7 +24,7 @@ import java.util.Date;
 
 import java.util.List;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.RequestScoped;
+import javax.faces.bean.ViewScoped;
 import javax.faces.event.ValueChangeEvent;
 import models.Actividades;
 import models.Deportes;
@@ -34,24 +34,27 @@ import models.Deportes;
  * @author musef2904@gmail.com
  */
 @ManagedBean(eager = true)
-@RequestScoped
+@ViewScoped
 public class ActividadesBean {
 
     private ActividadesDAO adao;
     private DeportesDAO ddao;
     private Actividades activity;
     private Deportes selectedSport;   
-    private static long sportidx;
+    private long sportidx;
     private List<Deportes> sports;
     private List<Actividades> activities;
     
-    private static long activityidx;
+    private long activityidx;
     private String activityName;
     private float activitySlope;
     private float activityDistance;
     private String activityTimming;
     private String activitySite;
     private String activityDescription;
+    
+    // flag sport changed
+    boolean sportChanged=false;
     
     // mensaje de operaciones
     private static String message;
@@ -172,21 +175,20 @@ public class ActividadesBean {
             selectedSport=null;
             activity=null;
             activityidx=0;
-            this.activities=adao.readAllSportActivities(selectedSport);
+            this.activities=adao.readAllSportActivities(selectedSport);           
+        }
+            sportChanged=true;
             this.activityName="";
             this.activityDescription="";
             this.activitySite="";
             this.activitySlope=0;
             this.activityDistance=0;
             this.activityTimming="00:00:00";
-
             
-        }
-
     }
     
     
-        /**
+    /**
      * Este metodo recupera el objeto Deportes, en funcion
      * de la seleccion hecha en el select del formulario
      * Puede generar un objeto Deportes vacio
@@ -304,7 +306,12 @@ public class ActividadesBean {
      * @param activityidx the activityidx to set
      */
     public void setActivityidx(long activityidx) {
-        ActividadesBean.activityidx = activityidx;
+        if (!sportChanged){
+            // tomamos el valor del select activity de formulario
+            // si no ha sido modificado el select sport
+            this.activityidx = activityidx;    
+        } else sportChanged=false;
+        
     }
 
     /**
@@ -411,6 +418,12 @@ public class ActividadesBean {
         ActividadesBean.message = message;
     }
 
-
+    public long getSportidx () {
+        return sportidx;
+    }
+    
+    public void setSportidx (long sportidx2) {
+        sportidx=sportidx2;
+    }
     
 }
