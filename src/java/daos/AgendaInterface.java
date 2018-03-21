@@ -22,9 +22,9 @@ import models.Agenda;
  */
 public interface AgendaInterface {
     
-    public boolean createCalendar  (Agenda calendar);
-    public Agenda readCalendar (Long id);
-    public boolean updateCalendar  (Agenda calendar);
-    public boolean deleteCalendar  (Long id);
+    public boolean createCalendar (Agenda calendar) throws Exception;
+    public Agenda readCalendar (Long id) throws Exception;
+    public boolean updateCalendar (Agenda calendar) throws Exception;
+    public boolean deleteCalendar (Long id) throws Exception;
     
 }

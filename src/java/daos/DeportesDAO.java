@@ -21,6 +21,7 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import models.Deportes;
 import models.Usuarios;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -29,21 +30,30 @@ import models.Usuarios;
 
 public class DeportesDAO implements DeportesInterface {
 
-    EntityManager em;
-    EntityTransaction tx;
+    private EntityManager em;
+    private EntityTransaction tx;
+    
+    private Logger log;
+    
+    
+    public DeportesDAO() {
+        log=Logger.getLogger("stdout");
+    }
+    
 
     /**
      * Este metodo crea un nuevo Deporte en la DDBB, con el objeto
      * Deportes suministrado
      * @param sport
      * @return boolean, con el resultado de la operacion
+     * @throws java.lang.Exception
      */    
     @Override
-    public boolean createSport(Deportes sport) {
+    public boolean createSport(Deportes sport) throws Exception {
         
         /* Verificacion de condiciones */
         if (sport==null) return false;
-        
+
         if (sport.getSportName().isEmpty()) return false;
         if (sport.getSportName().length()>50) return false;
         
@@ -60,13 +70,16 @@ public class DeportesDAO implements DeportesInterface {
             tx.commit();
             
         } catch (Exception ex) {
+            // rollback
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes cr-01");
-            em.close();
+            // logger
+            log.error("ERROR: Deportes cr-01 ->user"+sport.getIduser()+" - Mensaje: "+ex);
             return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        
-        em.close();
+        // logger
+        log.info("Creado deporte id"+sport.getId()+" ->user"+sport.getIduser());
         return true;
         
     }
@@ -75,9 +88,10 @@ public class DeportesDAO implements DeportesInterface {
      * Este metodo devuelve el objeto Deportes correspondiente al id
      * @param id
      * @return Object || null
+     * @throws java.lang.Exception
      */
     @Override
-    public Deportes readSport(Long id) {
+    public Deportes readSport(Long id) throws Exception {
         
         if (id<1) return null;
         
@@ -100,17 +114,17 @@ public class DeportesDAO implements DeportesInterface {
             
         } catch (NonUniqueResultException nr) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes rd-02A"); 
-            em.close();
+            // logger
+            log.error("ERROR: Deportes rd-02A leyendo->id "+id+" - Mensaje: "+nr);            
             return null;
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes rd-02B");            
-            em.close();
+            log.error("ERROR: Deportes rd-02B leyendo->id "+id+" - Mensaje: "+ex);                       
             return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
         
-        em.close();
         return sport;
         
     }
@@ -121,9 +135,10 @@ public class DeportesDAO implements DeportesInterface {
      * el objeto suministrado
      * @param sport
      * @return boolean, con el resultado de la operacion
+     * @throws java.lang.Exception
      */
     @Override
-    public boolean updateSport(Deportes sport) {
+    public boolean updateSport(Deportes sport) throws Exception{
         
                 /* Verificacion de condiciones */
         if (sport==null) return false;
@@ -147,44 +162,51 @@ public class DeportesDAO implements DeportesInterface {
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes up-03");            
-            em.close();
+            log.error("ERROR: Deportes up-03 updating->id "+sport.getId()+" - Mensaje: "+ex);                        
             return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        
-        em.close();
+        // logger
+        log.info("Modificado deporte id"+sport.getId()+" ->user"+sport.getIduser());
         return true;
     }
 
+    
     /**
      * Este metodo borra el objeto Deportes de la DDBB, correspondiente
      * al id suministrado
      * @param id
      * @return boolean, con el resultado de la operacion
+     * @throws java.lang.Exception
      */
     @Override
-    public boolean deleteSport(Long id) {
+    public boolean deleteSport(Long id) throws Exception{
 
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
         
+        Deportes sport;
         // iniciamos la transaccion
         try {
             tx.begin();
             // attaching el objeto
-            Deportes sport=em.find(Deportes.class, id);
+            sport=em.find(Deportes.class, id);
             em.remove(sport);          
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes dl-04");            
-            em.close();
+            // logger
+            log.error("ERROR: Deportes dl-04 borrando->id"+id+" - Mensaje: "+ex);                      
             return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();
         }
         
-        em.close();
+        // logger
+        log.info("Borrado deporte id "+id+" ->user"+sport.getIduser());
         return true;
     }
     
@@ -194,8 +216,9 @@ public class DeportesDAO implements DeportesInterface {
      * y los devuelve en forma de lista
      * @param  user
      * @return null | List
+     * @throws java.lang.Exception
      */
-    public List<Deportes> readAllUserSports(Usuarios user) {
+    public List<Deportes> readAllUserSports(Usuarios user) throws Exception{
         
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
@@ -216,12 +239,13 @@ public class DeportesDAO implements DeportesInterface {
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Deportes rd-05");
-            em.close();
+            //logger
+            log.error("ERROR: Deportes rd-05 leyendo all->user "+user.getId()+" - Mensaje: "+ex);             
             return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
         
-        em.close();
         return sport;
         
     }

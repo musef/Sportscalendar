@@ -22,9 +22,9 @@ import models.Actividades;
  */
 public interface ActividadesInterface {
     
-    public boolean createActivity  (Actividades activity);
-    public Actividades readActivity (Long id);
-    public boolean updateActivity  (Actividades activity);
-    public boolean deleteActivity  (Long id);
+    public boolean createActivity (Actividades activity) throws Exception;
+    public Actividades readActivity (Long id) throws Exception;
+    public boolean updateActivity (Actividades activity) throws Exception;
+    public boolean deleteActivity (Long id) throws Exception;
     
 }

@@ -22,9 +22,9 @@ import models.Usuarios;
  */
 public interface UsuariosInterface {
     
-    public boolean createUser (Usuarios user);
-    public Usuarios readUser (Long id);
-    public boolean updateUser (Usuarios user);
-    public boolean deleteUser (Long id);
+    public boolean createUser (Usuarios user) throws Exception;
+    public Usuarios readUser (Long id) throws Exception;
+    public boolean updateUser (Usuarios user) throws Exception;
+    public boolean deleteUser (Long id) throws Exception;
     
 }

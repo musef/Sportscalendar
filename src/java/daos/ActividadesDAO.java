@@ -21,15 +21,25 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import models.Actividades;
 import models.Deportes;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author musef2904@gmail.com
  */
-public class ActividadesDAO implements ActividadesInterface{
+public class ActividadesDAO implements ActividadesInterface {
 
-    EntityManager em;
-    EntityTransaction tx;
+    private EntityManager em;
+    private EntityTransaction tx;
+    
+    private Logger log;
+    
+    
+    public ActividadesDAO() {
+        
+        log=Logger.getLogger("stdout");
+        
+    }
     
     /**
      * Este metodo graba en DDBB un objeto Actividades, suministrado
@@ -39,7 +49,7 @@ public class ActividadesDAO implements ActividadesInterface{
      * @return boolean, con el resultado de la operacion
      */
     @Override
-    public boolean createActivity(Actividades activity) {
+    public boolean createActivity(Actividades activity) throws Exception {
         
         /* Verificacion de condiciones */
         
@@ -68,12 +78,15 @@ public class ActividadesDAO implements ActividadesInterface{
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Actividades cr-01");
-            em.close();
+            // logger
+            log.error("ERROR: Actividades cr-01 creando->user "+activity.getIduser()+" - Mensaje: "+ex);            
             return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
         
-        em.close();
+        // logger
+        log.info("Creada actividad "+activity.getName()+" ->user"+activity.getIduser());        
         return true;
         
     }
@@ -87,7 +100,7 @@ public class ActividadesDAO implements ActividadesInterface{
      * @return objeto Actividades || null
      */
     @Override
-    public Actividades readActivity(Long id) {
+    public Actividades readActivity(Long id) throws Exception {
         
         if (id<1) return null;
         
@@ -110,17 +123,17 @@ public class ActividadesDAO implements ActividadesInterface{
             
         } catch (NonUniqueResultException nr) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Actividades rd-02A");  
-            em.close();
+            // logger
+            log.error("ERROR: Actividades rd-02A leyendo->id "+id+" - Mensaje: "+nr);             
             return null;
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Actividades rd-02B");            
-            em.close();
+            // logger
+            log.error("ERROR: Actividades rd-02B leyendo->id "+id+" - Mensaje: "+ex);
             return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        
-        em.close();
         
         return activity;
                 
@@ -134,7 +147,7 @@ public class ActividadesDAO implements ActividadesInterface{
      * @return boolean, con el resultado de la operacion
      */
     @Override
-    public boolean updateActivity(Actividades activity) {
+    public boolean updateActivity(Actividades activity) throws Exception {
         
         /* Verificacion de condiciones */
         
@@ -166,14 +179,14 @@ public class ActividadesDAO implements ActividadesInterface{
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Actividades up-03");
-            em.close();
+            log.error("ERROR: Actividades up-03 updating->user "+activity.getIduser()+" - Mensaje: "+ex);         
             return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        
-        System.out.println("TImming on update: "+activity.getTiming());
-        
-        em.close();
+
+        // logger
+        log.info("Modificada actividad "+activity.getName()+" ->user"+activity.getIduser());         
         return true;
         
     }
@@ -189,7 +202,7 @@ public class ActividadesDAO implements ActividadesInterface{
      * @return boolean, con el resultado de la operacion
      */
     @Override
-    public boolean deleteActivity(Long id) {
+    public boolean deleteActivity(Long id) throws Exception {
         
         // verificacion de condiciones
         if (id<1) return false;
@@ -199,28 +212,26 @@ public class ActividadesDAO implements ActividadesInterface{
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
         
+        Actividades act;
         // iniciamos la transaccion
         try {
             tx.begin();
             // attaching el objeto
-            Actividades act=em.find(Actividades.class, id);
-            
-            // verificamos si la actividad es usada
-            // si es usada no podemos borrarla
-            AgendaDAO agdao=new AgendaDAO();
-            if (agdao.usedActivity(act)) return false;
+            act=em.find(Actividades.class, id);
             
             em.remove(act);          
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Actividades dl-04");            
-            em.close();
+            log.error("ERROR: Actividades dl-04 borrando->id "+id+" - Mensaje: "+ex);                  
             return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
         
-        em.close();
+        // logger
+        log.info("Borrada actividad id "+id+" ->user"+act.getIduser());         
         return true;
     }
     
@@ -231,7 +242,7 @@ public class ActividadesDAO implements ActividadesInterface{
      * @param  sport
      * @return null | List
      */
-    public List<Actividades> readAllSportActivities(Deportes sport) {
+    public List<Actividades> readAllSportActivities(Deportes sport) throws Exception {
         
         if (sport==null) return null;
         
@@ -254,12 +265,12 @@ public class ActividadesDAO implements ActividadesInterface{
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Actividades rd-05");
-            em.close();
+            log.error("ERROR: Actividades rd-05 leyendo todos->sport "+sport.getId()+" - Mensaje: "+ex);            
             return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
         
-        em.close();
         return activities;
         
     }

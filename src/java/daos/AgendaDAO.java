@@ -17,9 +17,11 @@ package daos;
 import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
+import java.util.TimeZone;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NonUniqueResultException;
@@ -28,6 +30,7 @@ import models.Actividades;
 import models.Agenda;
 import models.Deportes;
 import models.Usuarios;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -35,8 +38,18 @@ import models.Usuarios;
  */
 public class AgendaDAO implements AgendaInterface{
 
-    EntityManager em;
-    EntityTransaction tx;
+    private EntityManager em;
+    private EntityTransaction tx;
+    
+    private Logger log;
+    
+    
+    public AgendaDAO() {
+        
+        log=Logger.getLogger("stdout");
+        
+    }
+    
     
     /**
      * Este metodo graba en DDBB un objeto Agenda, con el parametro
@@ -44,9 +57,10 @@ public class AgendaDAO implements AgendaInterface{
      * Verifica previamente que cumple las condiciones
      * @param calendar
      * @return boolean, con el resultado de la operacion
+     * @throws java.lang.Exception
      */
     @Override
-    public boolean createCalendar(Agenda calendar) {
+    public boolean createCalendar(Agenda calendar) throws Exception {
       
         /* Verificacion de condiciones */
         if (calendar==null) return false;      
@@ -70,12 +84,15 @@ public class AgendaDAO implements AgendaInterface{
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda cr-01");
-            em.close();
+            // logger
+            log.error("ERROR: Agenda cr-01 creando->evento "+calendar.getIdactivity()+" del userid "+calendar.getIduser()+" - Mensaje: "+ex);            
             return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
         
-        em.close();
+        // logger
+        log.info("Evento agenda creado ->user: "+calendar.getIduser().getNameuser());
         return true;        
         
     }
@@ -86,9 +103,10 @@ public class AgendaDAO implements AgendaInterface{
      * Verifica previamente que cumple las condiciones
      * @param id
      * @return objeto Agenda || null
+     * @throws java.lang.Exception
      */
     @Override
-    public Agenda readCalendar(Long id) {
+    public Agenda readCalendar(Long id) throws Exception {
     
         /* Verificacion de condiciones */
         if (id<1) return null;
@@ -112,31 +130,33 @@ public class AgendaDAO implements AgendaInterface{
             
         } catch (NonUniqueResultException nr) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda rd-02A");  
-            em.close();
+            // logger
+            log.error("ERROR: Agenda rd-02A leyendo->evento id"+id+" - Mensaje: "+nr);  
             return null;
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda rd-02B");            
-            em.close();
+            // logger
+            log.error("ERROR: Agenda rd-02B leyendo->evento id"+id+" - Mensaje: "+ex);                        
             return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        
-        em.close();
         
         return calendar;
         
     }
 
+    
     /**
      * Este metodo modifica en DDBB un objeto Agenda, con el objeto
      * Agenda suministrado
      * Verifica previamente que cumple las condiciones
      * @param calendar
      * @return boolean, con el resultado de la operacion
+     * @throws java.lang.Exception
      */
     @Override
-    public boolean updateCalendar(Agenda calendar) {
+    public boolean updateCalendar(Agenda calendar) throws Exception {
         
         /* Verificacion de condiciones */
         if (calendar==null) return false;      
@@ -162,12 +182,15 @@ public class AgendaDAO implements AgendaInterface{
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda up-03");
-            em.close();
+            // logger
+            log.error("ERROR: Agenda up-03 modificando->evento "+calendar.getIdactivity()+" del userid "+calendar.getIduser()+" - Mensaje: "+ex);            
             return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
         
-        em.close();
+        // logger
+        log.info("Evento agenda modificado ->user: "+calendar.getIduser().getNameuser());
         return true;        
         
     }
@@ -179,9 +202,10 @@ public class AgendaDAO implements AgendaInterface{
      * Verifica previamente que cumple las condiciones
      * @param id
      * @return boolean, con el resultado de la operacion
+     * @throws java.lang.Exception
      */
     @Override
-    public boolean deleteCalendar(Long id) {
+    public boolean deleteCalendar(Long id) throws Exception {
        
         /* Verificacion de condiciones */
         if (id<1) return false;
@@ -190,22 +214,26 @@ public class AgendaDAO implements AgendaInterface{
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
         
+        Agenda cal;
         // iniciamos la transaccion
         try {
             tx.begin();
             // attaching el objeto
-            Agenda cal=em.find(Agenda.class, id);
+            cal=em.find(Agenda.class, id);
             em.remove(cal);          
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda dl-04");            
-            em.close();
+            // logger
+            log.error("ERROR: Agenda dl-04 borrando->evento  con id "+id+" - Mensaje: "+ex);                    
             return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
         
-        em.close();
+        // logger
+        log.info("Evento agenda borrado ->user: "+cal.getIduser().getNameuser()+"con id "+id);
         return true;
         
     }
@@ -220,9 +248,10 @@ public class AgendaDAO implements AgendaInterface{
  * @param fechini
  * @param fechfin
  * @return null | List<Agenda> con las actividades
+     * @throws java.lang.Exception
  */
     
-    public List<Agenda> listCalendar(Usuarios user, Deportes sport, Actividades activity, String fechini, String fechfin) {
+    public List<Agenda> listCalendar(Usuarios user, Deportes sport, Actividades activity, String fechini, String fechfin) throws Exception {
     
         /* Verificacion de condiciones */
         if (user==null) return null;
@@ -258,17 +287,17 @@ public class AgendaDAO implements AgendaInterface{
             
         } catch (ParseException ps) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda rd-05A"+fec1+"//"+fec2);  
-            em.close();
+            // logger
+            log.error("ERROR: Agenda rd-05A leyendo->parseo fechas"+fec1+"//"+fec2+" - Mensaje: "+ps);                
             return null;
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda rd-05B");            
-            em.close();
+            // logger
+            log.error("ERROR: Agenda rd-05B leyendo->lista eventos user id"+user.getId()+" - Mensaje: "+ex);                        
             return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        
-        em.close();
         
         return calendar;
         
@@ -283,9 +312,10 @@ public class AgendaDAO implements AgendaInterface{
  * @param fechini
  * @param fechfin
  * @return null | List<Agenda> con las actividades
+     * @throws java.lang.Exception
  */
     
-    public List<Agenda> listCalendar(Usuarios user, Deportes sport, String fechini, String fechfin) {
+    public List<Agenda> listCalendar(Usuarios user, Deportes sport, String fechini, String fechfin) throws Exception {
     
         /* Verificacion de condiciones */
         if (user==null) return null;
@@ -319,33 +349,34 @@ public class AgendaDAO implements AgendaInterface{
             
         } catch (ParseException ps) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda rd-06A"+fec1+"//"+fec2);  
-            em.close();
+            // logger
+            log.error("ERROR: Agenda rd-06A leyendo->parseo fechas"+fec1+"//"+fec2+" - Mensaje: "+ps);                
             return null;
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda rd-06B");            
-            em.close();
+            // logger
+            log.error("ERROR: Agenda rd-06B leyendo->lista eventos user id"+user.getId()+" - Mensaje: "+ex);                       
             return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        
-        em.close();
         
         return calendar;
         
     }
     
         
-/**
- * Este método devuelve un listado con las actividades efectuadas por el usuario user,
- * segun las fechas dadas como parametros
- * @param user
- * @param fechini
- * @param fechfin
- * @return null | List<Agenda> con las actividades
- */
+    /**
+     * Este método devuelve un listado con las actividades efectuadas por el usuario user,
+     * segun las fechas dadas como parametros
+     * @param user
+     * @param fechini
+     * @param fechfin
+     * @return null | List<Agenda> con las actividades
+     * @throws java.lang.Exception
+     */
     
-    public List<Agenda> listCalendar(Usuarios user, String fechini, String fechfin) {
+    public List<Agenda> listCalendar(Usuarios user, String fechini, String fechfin) throws Exception {
     
         /* Verificacion de condiciones */
         if (user==null) return null;
@@ -377,17 +408,17 @@ public class AgendaDAO implements AgendaInterface{
             
         } catch (ParseException ps) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda rd-07A"+fec1+"//"+fec2);  
-            em.close();
+            // logger
+            log.error("ERROR: Agenda rd-07A leyendo->parseo fechas"+fec1+"//"+fec2+" - Mensaje: "+ps);               
             return null;
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda rd-07B");            
-            em.close();
+            // logger
+            log.error("ERROR: Agenda rd-07B leyendo->lista eventos user id"+user.getId()+" - Mensaje: "+ex);                        
             return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        
-        em.close();
         
         return calendar;
         
@@ -400,8 +431,9 @@ public class AgendaDAO implements AgendaInterface{
      * de sesiones desde esa fecha
      * @param user - usuario de la estadistica
      * @return 0 | int con el num. de sesiones acumuladas de entrenamiento
+     * @throws java.lang.Exception
      */
-    public long getSessionsByLapseTime (int lapse, Usuarios user) {
+    public long getSessionsByLapseTime (int lapse, Usuarios user) throws Exception {
         
         /* Verificacion de condiciones */
         if (lapse==0) return 0;
@@ -443,17 +475,17 @@ public class AgendaDAO implements AgendaInterface{
             
         } catch (NonUniqueResultException nr) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda rd-08A");  
-            em.close();
+            // logger
+            log.error("ERROR: Agenda rd-08A leyendo->cuantos eventos user id"+user.getId()+" - Mensaje: "+nr);              
             return (long)0;
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda rd-08B"+ex);            
-            em.close();
+            // logger
+            log.error("ERROR: Agenda rd-08B leyendo->cuantos eventos user id"+user.getId()+" - Mensaje: "+ex);                        
             return (long)0;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        
-        em.close();
         
         return result;
 
@@ -468,8 +500,9 @@ public class AgendaDAO implements AgendaInterface{
      * @param user - usuario de la estadistica
      * @return null | String con un formato hh:mm:ss con las horas acumuladas de 
      * entrenamiento
+     * @throws java.lang.Exception
      */
-    public String getHoursByLapseTime (int lapse, Usuarios user) {
+    public String getHoursByLapseTime (int lapse, Usuarios user) throws Exception {
         
         /* Verificacion de condiciones */
         if (lapse==0) return null;
@@ -507,17 +540,16 @@ public class AgendaDAO implements AgendaInterface{
             
             result=q.getResultList();
             
-            tx.commit();
-            
+            tx.commit();          
         
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Agenda rd-09A"+ex);            
-            em.close();
+            // logger
+            log.error("ERROR: Agenda rd-09A leyendo->tiempo en eventos user id"+user.getId()+" - Mensaje: "+ex);           
             return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        
-        em.close();
         
         // vamos a realizar un sumatorio de tiempo
         Iterator iter=result.iterator();
@@ -576,10 +608,12 @@ public class AgendaDAO implements AgendaInterface{
      * en la agenda o no. 
      * Si la actividad no ha sido usada, es posible borrarla; si ha sido
      * utilizada, no es posible borrarla porque se perderian datos esenciales.
-     * @param thisactivity
+     * @param activity
+     * @param user
      * @return boolean; con el resultado usada (true) o no (false)
+     * @throws java.lang.Exception
      */
-    public boolean usedActivity(Actividades activity){
+    public boolean usedActivity(Actividades activity, Usuarios user) throws Exception {
         
         // verificacion de condiciones
         if (activity==null) return false;
@@ -591,30 +625,151 @@ public class AgendaDAO implements AgendaInterface{
         
         Long count=(long)0;
         try {
-            String sql="SELECT COUNT(u) FROM Agenda u WHERE u.idactivity=:act";
+            String sql="SELECT COUNT(u) FROM Agenda u WHERE u.idactivity=:act AND u.iduser=:iduser";
             tx.begin();
             
             Query q=em.createQuery(sql);
             q.setParameter("act", activity);
+            q.setParameter("iduser", user.getId());
             count=(Long)q.getSingleResult();
             
         } catch (Exception ex) {
-            System.out.println("Error:"+ex.toString());
+            // logger
+            log.error("ERROR: Agenda rd-10 leyendo->actividad usada del user id"+user.getId()+" - Mensaje: "+ex);
             // evitamos el borrado
             return true;
         } finally {
-            if (tx.isActive()) em.close();
+            if (tx!=null && tx.isActive()) em.close();
         }
-
-        // no borramos
-        System.out.println("COUNT:"+count);
         
         // sin resultados: borramos
-        if (count<1) return false;
-        
+        if (count<1) return false;        
 
         return true;
     }
     
+    /**
+     * Este método comprueba si el dia thisday hay alguna actividad
+     * realizada en la agenda
+     * 
+     * @param thisday
+     * @param user
+     * @return 
+     * @throws java.lang.Exception 
+     */
+    public boolean existActivity(String thisday, Usuarios user) throws Exception {
+        
+       // verificamos parametros de entrada
+       if (thisday==null || thisday.length()!=10) return false;
+             
+        // creamos los objetos de transaccion
+        em=Factory.getEmf().createEntityManager();
+        
+        tx=em.getTransaction();
+        
+        // tomamos la fecha en formato String para generar un Date
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
+        cal.set(Integer.parseInt(thisday.substring(6)), Integer.parseInt(thisday.substring(3, 5)), Integer.parseInt(thisday.substring(0, 2)));
+        
+        Date ddate=cal.getTime();
+        long result=0;
+        try {
+            String sql="SELECT COUNT(u) FROM Agenda u WHERE u.date=:ddate AND u.iduser=:iduser";
+            tx.begin();
+            
+            Query q=em.createQuery(sql);
+            q.setParameter("ddate", ddate);
+            q.setParameter("iduser", user.getId());
+            result=(Long)q.getSingleResult();
+            
+        } catch (Exception ex) {
+            // logger
+            log.error("ERROR: Agenda rd-11 leyendo->dia con actividad del user id"+user.getId()+" - Mensaje: "+ex);            
+            return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();
+        }
+        
+        // hay resultados
+        if (result>0) return true;
+
+        
+        return false;
+    }
+
+
+    /**
+     * Este método comprueba si el dia thisday hay alguna actividad
+     * realizada en la agenda, y devuelve la información del día
+     * 
+     * @param thisday
+     * @param iduser
+     * @return null si no hay datos | hashmap con la info del dia
+     * @throws java.lang.Exception
+     */
+    public HashMap<String,String> getActivityOfToday(String thisday, Usuarios user) throws Exception {
+        
+        HashMap<String,String> returndata=null;
+        
+       // verificamos parametros de entrada
+       if (thisday==null || thisday.length()!=10) {
+           return returndata;
+       }
+       
+       if (user==null) return null;
+             
+        // creamos los objetos de transaccion
+        em=Factory.getEmf().createEntityManager();
+        
+        tx=em.getTransaction();
+        
+        // tomamos la fecha en formato String para generar un Date;
+        
+        String chgday=thisday.substring(6)+"-"+thisday.substring(3, 5)+"-"+thisday.substring(0, 2);
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        
+        Date ddate1;
+        Date ddate2;
+        try {
+            ddate1 = sdf.parse(chgday+" 00:00:00");
+            ddate2 = sdf.parse(chgday+" 23:59:59");
+        } catch (ParseException ex) {
+            // logger
+            log.error("ERROR: Agenda rd-12B leyendo->parseando fecha del user id"+user.getId()+" - Mensaje: "+ex);            
+            return null;
+        }
+        
+        List<Agenda> result=null;
+        try {
+            tx.begin();
+            Query q=em.createNamedQuery("Agenda.findByDate");
+            q.setParameter("iduser", user.getId());
+            q.setParameter("date1", ddate1);
+            q.setParameter("date2", ddate2);
+            result=q.getResultList();
+            
+        } catch (Exception ex) {
+            // logger
+            log.error("ERROR: Agenda rd-12A leyendo->dia con actividad del user id"+user.getId()+" - Mensaje: "+ex); 
+            return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();
+        }
+                        
+        // hay resultados
+        if (result!=null && result.size()>0) {
+            returndata=new HashMap<>();
+            returndata.put("time", result.get(0).getTiming().toString());            
+            returndata.put("spname",result.get(0).getIdsport().getSportName());
+            returndata.put("acname",result.get(0).getIdactivity().getName());
+            return returndata;
+        }
+        
+        return null;
+    }
+
+
+
     
 }

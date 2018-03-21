@@ -19,6 +19,7 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import models.Usuarios;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -26,22 +27,28 @@ import models.Usuarios;
  */
 public class UsuariosDAO implements UsuariosInterface {
 
-
     
     private final int MIN_LENGTH_USERNAME=6;
-    private final int MAX_LENGTH_USERNAME=15;
+    private final int MAX_LENGTH_USERNAME=100;
     private final int MIN_LENGTH_USERPASS=8;
-    private final int MAX_LENGTH_USERPASS=20;
+    private final int MAX_LENGTH_USERPASS=255;
 
+    private Logger log;
+    
+    public UsuariosDAO() {
+        
+        log=Logger.getLogger("stdout");
+    }
     
     /**
      * Funcion que crea un usuario en DDBB.
      * Verifica que el usuario cumpla las condiciones para ser creado.
      * @param user
      * @return boolean con el resultado de la operacion
+     * @throws java.lang.Exception
      */    
     @Override
-    public boolean createUser(Usuarios user) {
+    public boolean createUser(Usuarios user) throws Exception {
 
         /* Verificacion de condiciones */
         
@@ -49,11 +56,11 @@ public class UsuariosDAO implements UsuariosInterface {
         
         // por seguridad el username no debe ser inferior a 6 chars.
         String username=user.getLogin();
-        if (username==null || username.length()<6 || username.length()>50) return false;
+        if (username==null || username.length()<MIN_LENGTH_USERNAME || username.length()>MAX_LENGTH_USERNAME) return false;
         
         // por seguridad la contraseña no debe ser inferior a 8 chars.
         String userpass=user.getPassword();
-        if (userpass==null || userpass.length()<8 || userpass.length()>255) return false;
+        if (userpass==null || userpass.length()<MIN_LENGTH_USERPASS || userpass.length()>MAX_LENGTH_USERPASS) return false;
         
         // el nombre de usuario debe contener al menos 2 chars
         String name=user.getNameuser();
@@ -61,7 +68,7 @@ public class UsuariosDAO implements UsuariosInterface {
         
         // por seguridad keyuser no debe ser inferior a 15 chars
         String key=user.getKeyuser();
-        if (key==null || key.length()<15 || key.length()>50) return false;
+        if (key==null || key.length()<15 || key.length()>255) return false;
 
         // el email de usuario debe contener al menos 8 chars
         String email=user.getEmail();
@@ -84,12 +91,15 @@ public class UsuariosDAO implements UsuariosInterface {
         } catch (Exception ex) {
             // problemas
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("Error Usuarios cr-01");
-            em.close();
+            // logger
+            log.error("ERROR: Usuarios cr-01 creando->user "+user.getNameuser()+" - Mensaje: "+ex);             
             return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        // grabacion exitosa
-        em.close();
+        
+        // logger
+        log.info("Usuario creado ->user: "+user.getNameuser()); 
         return true;
     }
 
@@ -99,9 +109,10 @@ public class UsuariosDAO implements UsuariosInterface {
      * al id suministrado
      * @param id
      * @return Usuarios || null
+     * @throws java.lang.Exception
      */
     @Override
-    public Usuarios readUser(Long id) {
+    public Usuarios readUser(Long id) throws Exception {
        
         /* Verificacion de condiciones */
         if (id<1) return null;
@@ -123,12 +134,13 @@ public class UsuariosDAO implements UsuariosInterface {
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Usuarios rd-02");            
-            em.close();
+            // logger
+            log.error("ERROR: Usuarios rd-02 leyendo->id "+id+" - Mensaje: "+ex);                        
             return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-        
-        em.close();
+         
         return us;
     
     }
@@ -139,9 +151,10 @@ public class UsuariosDAO implements UsuariosInterface {
      * Verifica que el usuario cumpla las condiciones para ser actualizado
      * @param user
      * @return boolean con el resultado de la operacion
+     * @throws java.lang.Exception
      */
     @Override
-    public boolean updateUser(Usuarios user) {
+    public boolean updateUser(Usuarios user) throws Exception {
         
         /* Verificacion de condiciones */
         
@@ -153,11 +166,11 @@ public class UsuariosDAO implements UsuariosInterface {
         
         // por seguridad el username no debe ser inferior a 6 chars.
         String username=user.getLogin();
-        if (username==null || username.length()<6 || username.length()>50) return false;
+        if (username==null || username.length()<MIN_LENGTH_USERNAME || username.length()>MAX_LENGTH_USERNAME) return false;
         
         // por seguridad la contraseña no debe ser inferior a 8 chars.
         String userpass=user.getPassword();
-        if (userpass==null || userpass.length()<8 || userpass.length()>255) return false;
+        if (userpass==null || userpass.length()<MIN_LENGTH_USERPASS || userpass.length()>MAX_LENGTH_USERPASS) return false;
         
         // el nombre de usuario debe contener al menos 2 chars
         String name=user.getNameuser();
@@ -165,7 +178,7 @@ public class UsuariosDAO implements UsuariosInterface {
         
         // por seguridad keyuser no debe ser inferior a 15 chars
         String key=user.getKeyuser();
-        if (key==null || key.length()<15 || key.length()>50) return false;
+        if (key==null || key.length()<15 || key.length()>255) return false;
 
         // el email de usuario debe contener al menos 8 chars
         String email=user.getEmail();
@@ -189,24 +202,28 @@ public class UsuariosDAO implements UsuariosInterface {
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("Error Usuarios up-03");
-            em.close();
+            // logger
+            log.error("Error Usuarios up-03 modificando->user "+user.getNameuser()+" - Mensaje: "+ex);             
             return false;          
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-
-        // grabacion exitosa
-        em.close();
+        
+        // logger
+        log.info("Usuario modificado con id "+user.getId()+" ->user: "+user.getNameuser()); 
         return true;
     }
 
+    
     /**
      * Este metodo borra el Usuario de la BBDD, correspondiente al 
      * id suministrado
      * @param id
      * @return boolean, con el resultado de la operacion
+     * @throws java.lang.Exception
      */
     @Override
-    public boolean deleteUser(Long id) {
+    public boolean deleteUser(Long id) throws Exception {
         
         /* Verificacion de condiciones */
         if (id<1) return false;
@@ -216,23 +233,27 @@ public class UsuariosDAO implements UsuariosInterface {
         
         EntityTransaction tx=em.getTransaction();
         
+        Usuarios us;
         // iniciamos la transaccion
         try {
             
             tx.begin();
             // attaching el objeto
-            Usuarios us=em.find(Usuarios.class, id);
+            us=em.find(Usuarios.class, id);
             em.remove(us);          
             tx.commit();
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("ERROR: Usuarios dl-04");            
-            em.close();
+            // logger
+            log.error("ERROR: Usuarios dl-04 borrando->id "+id+" - Mensaje: "+ex);                      
             return false;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
         
-        em.close();
+        // logger
+        log.info("Usuario borrado con id "+id+" ->user: "+us.getNameuser()); 
         return true;
     }
     
@@ -243,12 +264,13 @@ public class UsuariosDAO implements UsuariosInterface {
      * Verifica que los parametros son adecuados
      * @param username
      * @param userpass
-     * @return long - retorna el usuario si correcto; 
+     * @return objeto Usuarios - retorna el usuario si correcto; 
      *                  getId == -1 si incorrecto o 
      *                  getId == 0 si no existe o 
      *                  null si fails
+     * @throws java.lang.Exception
      */
-    public Usuarios identifyUser (String username, String userpass) {
+    public Usuarios identifyUser (String username, String userpass) throws Exception {
         
         // objecto a devolver
         Usuarios us=null;
@@ -281,16 +303,21 @@ public class UsuariosDAO implements UsuariosInterface {
             tx.commit();
             
         } catch (NoResultException nr) {
-            em.close();
             us=new Usuarios((long)-1);
+            // logger
+            log.info("Error Usuarios rd-05A identificando (inexistente)->username "+username+" - Mensaje: "+nr);             
             return us;   
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
-            System.err.println("Error Usuarios rd-05");
-            em.close();
+            // logger
+            log.error("Error Usuarios rd-05B identificando->username "+username+" - Mensaje: "+ex);             
             return null;   
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
         }
-                      
+        
+        // logger
+        log.info("Usuario identificado username "+username);       
         return us;
     }
     

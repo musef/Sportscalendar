@@ -20,11 +20,11 @@ import models.Deportes;
  *
  * @author musef2904@gmail.com
  */
-public interface DeportesInterface {
+public interface DeportesInterface  {
     
-    public boolean createSport (Deportes sport);
-    public Deportes readSport (Long id);
-    public boolean updateSport (Deportes sport);
-    public boolean deleteSport (Long id);
+    public boolean createSport (Deportes sport) throws Exception;
+    public Deportes readSport (Long id) throws Exception;
+    public boolean updateSport (Deportes sport) throws Exception;
+    public boolean deleteSport (Long id) throws Exception;
     
 }
