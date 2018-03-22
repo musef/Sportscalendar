@@ -14,8 +14,9 @@
  */
 package controllers;
 
-import daos.ActividadesDAO;
-import daos.DeportesDAO;
+
+import components.ActividadesComponent;
+import components.DeportesComponent;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -28,6 +29,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.ValueChangeEvent;
 import models.Actividades;
 import models.Deportes;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -37,8 +39,10 @@ import models.Deportes;
 @ViewScoped
 public class ActividadesBean {
 
-    private ActividadesDAO adao;
-    private DeportesDAO ddao;
+    //managers
+    private ActividadesComponent actividadesComponent;
+    private DeportesComponent deportesComponent;
+    
     private Actividades activity;
     private Deportes selectedSport;   
     private long sportidx;
@@ -57,17 +61,17 @@ public class ActividadesBean {
     boolean sportChanged=false;
     
     // mensaje de operaciones
-    private static String message;
+    private String message;
     
+    private Logger log;
+   
     
     /**
      * Creates a new instance of ActividadesBean
      */
     public ActividadesBean() {
         
-        adao=new ActividadesDAO();
-        ddao=new DeportesDAO();
-        
+        log=Logger.getLogger("stdout");
     }
  
     
@@ -75,22 +79,25 @@ public class ActividadesBean {
      * Este metodo elimina un objeto Actividades, en funcion
      * del indice del select activityidx.
      * Genera un mensaje con el resultado de la operacion
-     * @return String con redireccion
      */    
-    public String deleteActivity() {
+    public void deleteActivity() {
         
         if (getActivityidx()!=0) {
-            boolean result=adao.deleteActivity(getActivityidx());
+            
+            actividadesComponent=new ActividadesComponent();
+            deportesComponent=new DeportesComponent();
+            
+            // instanciamos el borrado de la actividad
+            boolean result=actividadesComponent.deleteActivity(getActivityidx(),LoginBean.user);
             if (result) {
                 setMessage("Nueva actividad borrada correctamente");
-                                // actualizamos la lista despues de operacion DDBB
-                activities=adao.readAllSportActivities(selectedSport);
+                // actualizamos la lista despues de operacion DDBB
+                setActivities(actividadesComponent.allActivities(selectedSport, LoginBean.user));
                 activityidx=0;
                 sportidx=selectedSport.getId();
-            }
-            else setMessage("No ha sido posible borrar una nueva actividad");
+            }   else setMessage("No ha sido posible borrar una nueva actividad");
+
         }
-        return "actividades";
     }
 
     
@@ -102,9 +109,13 @@ public class ActividadesBean {
      */
     public String recordActivity() {
         
+        //manager
+        actividadesComponent=new ActividadesComponent();
+        
         // vamos a grabar el objeto Deportes
         // puede ser una nueva modificacion (sportidx>0) o nuevo valor
         if (activityidx==0) {
+
             // nueva grabacion
             SimpleDateFormat sd=new SimpleDateFormat("HH:mm:ss");
             Date thistime;
@@ -114,19 +125,20 @@ public class ActividadesBean {
                 thistime=new Date();
             }
             Actividades newactivity=new Actividades(LoginBean.user.getKeyuser(), activityName, activityDistance, activitySlope, thistime, activitySite, activityDescription, LoginBean.user, getSelectedSport());
- 
-            boolean result=adao.createActivity(newactivity);
 
+            boolean result=actividadesComponent.createActivity(newactivity,LoginBean.user);
             if (result) {
                 setMessage("Nueva actividad grabada correctamente");
                 // actualizamos la lista despues de operacion DDBB
-                activities=adao.readAllSportActivities(selectedSport);
+                setActivities(actividadesComponent.allActivities(selectedSport,LoginBean.user));
                 activityidx=0;
                 sportidx=selectedSport.getId();
             }
             else setMessage("No ha sido posible grabar una nueva actividad");
+
         } else {
-            if (activity==null && activityidx>0) activity=adao.readActivity(activityidx);
+   
+            if (activity==null && activityidx>0) activity=actividadesComponent.readActivity(activityidx,LoginBean.user);
             // modificacion
             activity.setName(activityName);
             activity.setDescription(activityDescription);
@@ -134,17 +146,15 @@ public class ActividadesBean {
             activity.setSlope(activitySlope);
             activity.setDistance(activityDistance);
             activity.setTiming(Time.valueOf(activityTimming));
-            
-            System.out.println("TImming: "+activity.getTiming());
-            
-            boolean result=adao.updateActivity(getActivity());
+
+            boolean result=actividadesComponent.updateActivity(getActivity(),LoginBean.user);
             sportidx=selectedSport.getId();
             if (result) {
                 setMessage("Actividad modificada correctamente");
                 // actualizamos la lista despues de operacion DDBB
-                activities=adao.readAllSportActivities(selectedSport);
-            }
-            else setMessage("No ha sido posible modificar la actividad");            
+                setActivities(actividadesComponent.allActivities(selectedSport,LoginBean.user));            
+            } else setMessage("No ha sido posible modificar la actividad");
+
         }
         return "actividades";
     }
@@ -159,31 +169,40 @@ public class ActividadesBean {
      */
     public void changeSport(ValueChangeEvent e) {
         
-        // actualizamos aqui
+        //manager
+        deportesComponent=new DeportesComponent();
+        
+        // actualizamos el indice
         sportidx=Long.parseLong(e.getNewValue().toString());
+        
         // recuperamos el objeto
         if (sportidx>0) {
+            
             // recuperamos el deporte seleccionado
-            selectedSport=ddao.readSport(sportidx);
+            selectedSport=deportesComponent.readSport(sportidx,LoginBean.user);
             // y recuperamos la lista de actividades de ese deporte
-            activities=adao.readAllSportActivities(selectedSport);
+            setActivities(actividadesComponent.allActivities(selectedSport, LoginBean.user));
             // borramos la actividad que estuviera seleccionada
             activity=null;
             activityidx=0;
+
         } else {
             // borramos los datos  
             selectedSport=null;
             activity=null;
             activityidx=0;
-            this.activities=adao.readAllSportActivities(selectedSport);           
+            // y recuperamos la lista de actividades de ese deporte        
+            setActivities(actividadesComponent.allActivities(selectedSport, LoginBean.user));
+
         }
-            sportChanged=true;
-            this.activityName="";
-            this.activityDescription="";
-            this.activitySite="";
-            this.activitySlope=0;
-            this.activityDistance=0;
-            this.activityTimming="00:00:00";
+        
+        sportChanged=true;
+        this.activityName="";
+        this.activityDescription="";
+        this.activitySite="";
+        this.activitySlope=0;
+        this.activityDistance=0;
+        this.activityTimming="00:00:00";
             
     }
     
@@ -203,7 +222,11 @@ public class ActividadesBean {
          activityidx=Long.parseLong(e.getNewValue().toString());
         // recuperamos el objeto
         if (activityidx>0) {
-            activity=adao.readActivity(activityidx);
+            
+            actividadesComponent=new ActividadesComponent();
+            // leemos la actividad
+            activity=actividadesComponent.readActivity(activityidx, LoginBean.user);
+
             // mostramos los datos
             this.activityName=activity.getName();
             this.activityDescription=activity.getDescription();
@@ -211,17 +234,26 @@ public class ActividadesBean {
             this.activitySlope=activity.getSlope();
             this.activityDistance=activity.getDistance();
             this.activityTimming=new SimpleDateFormat("HH:mm:ss").format(activity.getTiming());
-        } else {
-
-        }
+        } 
 
     }
+
+
+    /* ********************* GETTERS AND SETTERS ************************** */
     
     /**
      * @return the activity
      */
     public Actividades getActivity() {
-        if (activity==null && activityidx>0) activity=adao.readActivity(activityidx);
+        /*
+        if (activity==null && activityidx>0) {
+            try {
+                activity=adao.readActivity(activityidx);
+            } catch (Exception ex) {
+                  log.error("ERROR: Algo ha ido mal obteniendo una actividad para el user "+LoginBean.user.getId()+" - mensaje: "+ex);
+            }
+        }
+        */
         return activity;
     }
 
@@ -236,7 +268,8 @@ public class ActividadesBean {
      * @return the sports
      */
     public List<Deportes> getSports() {
-        sports=LoginBean.user.getDeportesList();
+        // recuperamos la lista de deportes
+        sports=LoginBean.userSportlist.getSportsList();
         return sports;
     }
 
@@ -251,9 +284,15 @@ public class ActividadesBean {
      * @return the selectedSport
      */
     public Deportes getSelectedSport() {
-        
-        if (selectedSport==null && sportidx>0) selectedSport=ddao.readSport(sportidx);
-        
+        /*
+        if (selectedSport==null && sportidx>0) {
+            try {
+                selectedSport=ddao.readSport(sportidx);
+            } catch (Exception ex) {
+                  log.error("ERROR: Algo ha ido mal obteniendo un deporte para el user "+LoginBean.user.getId()+" - mensaje: "+ex);
+            }
+        }
+        */
         return selectedSport;
     }
 
@@ -269,10 +308,16 @@ public class ActividadesBean {
      */
     public List<Actividades> getActivities() {
         
-        if (sportidx>0) selectedSport=ddao.readSport(sportidx);
+        /*
+        try {
+            if (sportidx>0) selectedSport=ddao.readSport(sportidx);
             else selectedSport=null;
-        activities=adao.readAllSportActivities(selectedSport);
- 
+            activities=adao.readAllSportActivities(selectedSport);
+
+        } catch (Exception ex) {
+           log.error("ERROR: Algo ha ido mal obteniendo una lista de actividades para el user "+LoginBean.user.getId()+" - mensaje: "+ex);
+        }
+        */            
         return activities;
     }
 
@@ -415,7 +460,7 @@ public class ActividadesBean {
      * @param message the message to set
      */
     public void setMessage(String message) {
-        ActividadesBean.message = message;
+        this.message = message;
     }
 
     public long getSportidx () {
@@ -425,5 +470,7 @@ public class ActividadesBean {
     public void setSportidx (long sportidx2) {
         sportidx=sportidx2;
     }
+    
+    
     
 }

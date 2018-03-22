@@ -14,9 +14,7 @@
  */
 package controllers;
 
-import daos.ActividadesDAO;
-import daos.AgendaDAO;
-import daos.DeportesDAO;
+import components.EstadisticasComponent;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
@@ -24,6 +22,7 @@ import javax.faces.event.ValueChangeEvent;
 import models.Actividades;
 import models.Agenda;
 import models.Deportes;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -33,46 +32,49 @@ import models.Deportes;
 @RequestScoped
 public class EstadisticasBean {
 
+    //manager
+    EstadisticasComponent estadisticasComponent;
+    
     private static String message="";
     private static long idxsport;
     private long idxactivity;
     private String fechini;
     private String fechfin;
     
-    private AgendaDAO agdao;
-    private DeportesDAO ddao;
-    private ActividadesDAO acdao;
+
     
     private List<Agenda> listaAgenda;
     
+    private Logger log;
     
     
     public EstadisticasBean() {
         
-        if (agdao==null) agdao=new AgendaDAO();
+        log=Logger.getLogger("stdout");   
         
         if (fechini==null) fechini="01-01-2010";
         if (fechfin==null) fechfin="31-12-2050";
         
     }
 
-    
+    /**
+     * Este metodo obtiene la lista de eventos del usuario, grabados en la DDBB
+     * Los datos obtenidos dependen de la información del formulario
+     * @return 
+     */
     public String getRecordsList() {
+ 
         
-        if (ddao==null) ddao=new DeportesDAO();
-        if (acdao==null) acdao=new ActividadesDAO();
+        // instanciamos el manager
+        estadisticasComponent=new EstadisticasComponent();
         
-        Deportes deporte=null;
-        if (idxsport>0) deporte=ddao.readSport(idxsport);
+        // obtenemos el deporte, si procede
+        Deportes deporte=estadisticasComponent.getSelectedSport(idxsport, LoginBean.user);
+
+        // obtenemos la actividad, si procede
+        Actividades actividad=estadisticasComponent.getSelectedActivity(idxactivity, LoginBean.user);
         
-        Actividades actividad=null;
-        if (idxactivity>0) actividad=acdao.readActivity(idxactivity);
-        
-        System.out.println("Data:"+idxsport+"-"+idxactivity+"-"+fechini+"-"+fechfin);
-        
-        setListaAgenda(agdao.listCalendar(LoginBean.user, deporte, actividad, fechini, fechfin));
-        
-        if (listaAgenda!=null) System.out.println("Tamaño:"+listaAgenda.size());
+        this.listaAgenda=estadisticasComponent.getAgendaList(LoginBean.user, deporte, actividad, fechini, fechfin);
         
         
         return "estadisticas";
@@ -80,12 +82,19 @@ public class EstadisticasBean {
     }
     
     
+    /**
+     * Metodo para cambiar de deporte
+     * @param e 
+     */
     public void changeSportIdx(ValueChangeEvent e) {
         
         idxsport=Long.parseLong(e.getNewValue().toString());
         
         
     }
+    
+    
+    /* ***************** GETTERS AND SETTERS ************************ */
     
     /**
      * @return the message
