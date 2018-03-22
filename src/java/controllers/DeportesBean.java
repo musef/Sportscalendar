@@ -14,23 +14,26 @@
  */
 package controllers;
 
+import components.DeportesComponent;
 import javax.faces.bean.ManagedBean;
 import java.util.List;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ValueChangeEvent;
 
 import models.Deportes;
-import daos.DeportesDAO;
+
 
 /**
  *
  * @author musef2904@gmail.com
  */
 @ManagedBean
-@ViewScoped
+@ViewScoped()
 public class DeportesBean {
 
-    private DeportesDAO ddao;
+    //manager
+    private DeportesComponent deportesComponent;
+    
     private Deportes sport;
     private List<Deportes> sports;
     
@@ -40,28 +43,37 @@ public class DeportesBean {
     
     // mensaje de operaciones
     private String message;
+
+    
     
     
     public DeportesBean() {
 
-        ddao=new DeportesDAO();
-        
+
     }
 
+    
     /**
      * Este metodo elimina un objeto Deportes, en funcion
      * del indice del select sportidx.
      * Genera un mensaje con el resultado de la operacion
-     * @return String con redireccion
      */    
-    public String deleteSport() {
+    public void deleteSport() {
         
         if (sportidx!=0) {
-            boolean result=ddao.deleteSport(sportidx);
-            if (result) message="Nuevo deporte borrado correctamente";
-            else message="No ha sido posible borrar un nuevo deporte";
+
+            deportesComponent=new DeportesComponent();
+
+            // instanciamos el borrado del deporte
+            boolean result=deportesComponent.deleteSport(sportidx,LoginBean.user);
+            if (result) {
+                // actualizamos la lista de sportsList
+                LoginBean.userSportlist.setSportsList(deportesComponent.allSports(LoginBean.user));
+                // mensajes y logger
+                message="Nuevo deporte borrado correctamente";
+            } else message="No ha sido posible borrar un nuevo deporte";
+
         }
-        return "deportes";
     }
 
     
@@ -74,22 +86,37 @@ public class DeportesBean {
     public String recordSport() {
         
         // vamos a grabar el objeto Deportes
-        // puede ser una nueva modificacion (sportidx>0) o nuevo valor
+        
+        // instanciamos el manager
+        deportesComponent=new DeportesComponent();
+        
+        // puede ser una nueva modificacion (sportidx>0) o nuevo valor        
         if (sportidx==0) {
+            
             // nueva grabacion
             Deportes newsport=new Deportes(LoginBean.user.getKeyuser(), sportName, sportDescription, LoginBean.user);
-            boolean result=ddao.createSport(newsport);
-            if (result) message="Nuevo deporte grabado correctamente";
-            else message="No ha sido posible grabar un nuevo deporte";
+            if (deportesComponent.createSport(newsport)) {
+                // actualizamos la lista de sportsList
+                LoginBean.userSportlist.setSportsList(deportesComponent.allSports(LoginBean.user));
+                message="Nuevo deporte grabado correctamente";
+            } else message="No ha sido posible grabar un nuevo deporte";
+
         } else {
+            
             // modificacion
             sport.setSportName(sportName);
             sport.setSportDescrip(sportDescription);
-            boolean result=ddao.updateSport(sport);
-            if (result) message="Deporte modificado correctamente";
-            else message="No ha sido posible modificar el deporte";            
+            if (deportesComponent.updateSport(sport)) {
+                // actualizamos la lista de sportsList
+                LoginBean.userSportlist.setSportsList(deportesComponent.allSports(LoginBean.user));
+                this.sportName="";
+                this.sportDescription="";
+                this.sportidx=0;
+                this.message="Deporte modificado correctamente";            
+            } else message="No ha sido posible modificar el deporte";
+
         }
-        return "deportes";
+        return null;
     }
 
     
@@ -105,10 +132,17 @@ public class DeportesBean {
          sportidx=Long.parseLong(e.getNewValue().toString());
         // recuperamos el objeto
         if (sportidx>0) {
-            sport=ddao.readSport(sportidx);
-            // mostramos los datos
-            this.sportName=sport.getSportName();
-            this.sportDescription=sport.getSportDescrip();
+ 
+            // obtenemos el objeto Deportes
+            deportesComponent=new DeportesComponent();
+            sport=deportesComponent.readSport(sportidx, LoginBean.user);
+            
+            if (sport!=null) {
+                // mostramos los datos
+                this.sportName=sport.getSportName();
+                this.sportDescription=sport.getSportDescrip();                
+            }
+
         } else {
             // borramos los datos
             this.sportName="";
@@ -140,8 +174,8 @@ public class DeportesBean {
      */
     public List<Deportes> getSports() {
         // rellenamos la lista de deportes
-        sports=ddao.readAllUserSports(LoginBean.user);
-        return sports;
+        this.sports =LoginBean.userSportlist.getSportsList();
+        return this.sports;
     }
 
     /**
@@ -208,7 +242,7 @@ public class DeportesBean {
      * @return the message
      */
     public String getMessage() {
-        return message;
+        return this.message;
     }
 
     /**

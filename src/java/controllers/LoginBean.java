@@ -17,14 +17,14 @@ package controllers;
 import javax.faces.bean.ManagedBean;
 
 import components.LibraryClass;
-import daos.UsuariosDAO;
 import javax.faces.bean.SessionScoped;
 import models.Usuarios;
 import components.LoginComponent;
+import components.SportsListBean;
 import daos.AgendaDAO;
+import javax.faces.context.FacesContext;
+import org.apache.log4j.Logger;
 
-import java.io.Serializable;
-import javax.persistence.Transient;
 
 
 /**
@@ -33,7 +33,10 @@ import javax.persistence.Transient;
  */
 @ManagedBean
 @SessionScoped
-public class LoginBean extends LoginComponent implements Serializable{
+public class LoginBean  {
+    
+    // manager
+    private LoginComponent loginComponent;
    
     // variable de identificacion
     private String username;
@@ -41,70 +44,112 @@ public class LoginBean extends LoginComponent implements Serializable{
     private String loginmessage;
     
     // datos del usuario
+    protected static Usuarios user;
+    protected static SportsListBean userSportlist;
     
-    public static Usuarios user;
-
+    // datos de estadistica del usuario
     private String worksHoursM;
     private String worksSessM;
     private String worksHoursY;
     private String worksSessY;
     
-    
+    private Logger log;
     
     
     public LoginBean() {
         
+        log=Logger.getLogger("stdout");
     }
 
     
+    /**
+     * Metodo de comprobación del login en la aplicación por parte de un nuevo usuario.
+     * Genera un usuario user static con los datos del usuario, si el login es correcto; 
+     * si es incorrecto, genera un usuario null segun caso.
+     * @return 
+     */
     public String login() {
         
+        // comprobamos longitudes de variables recibidas
         if (this.username==null || this.username.length()< LibraryClass.MIN_LENGTH_USERNAME
                 || this.username.length()> LibraryClass.MAX_LENGTH_USERNAME ||
             this.userpass==null || this.userpass.length()< LibraryClass.MIN_LENGTH_USERPASS
                 || this.userpass.length()> LibraryClass.MAX_LENGTH_USERPASS ) {
+                        
+            // instanciamos el component
+            loginComponent=new LoginComponent();
+            // sanitizamos los inputs
+            username=loginComponent.verifyInput(username);
+            userpass=loginComponent.verifyInput(userpass);
             
-            UsuariosDAO udao=new UsuariosDAO();
+            // realizamos la comprobacion del user-pass introducido
+            user=loginComponent.checkUserLogin(username,userpass); 
+           
+            // el user-pass no existe
+            if (user==null) {
+                this.loginmessage="Usuario-contraseña no válidos. Pruebe de nuevo";
+                return "";
+            }
             
-            user=udao.identifyUser(username, userpass);
-            
-            if (user.getId()==0) this.loginmessage="Usuario-contraseña inexistente";   
-            if (user.getId()==-1) this.loginmessage="Error procesando su solicitud";  
+            // login correcto
+            // cuando un usuario se ha logueado correctamente en la aplicacion
+            // se obtiene el objeto user completo, las estadisticas del usuario
             if (user.getId()>0) {
-                this.loginmessage="Autenticación correcta "+user.getId();
+                
+                // obtenemos variables estadisticas
                 this.worksHoursM="00:00:00";
                 this.worksSessM="0";
                 this.setWorksHoursY("00:00:00");
                 this.setWorksSessY("0");
+                
+                // instanciamos la lista de deportes
+                userSportlist=new SportsListBean();
+
+                // mensajes y logger
+                this.loginmessage="Autenticación correcta "+user.getId();
+                log.info("Usuario "+user.getNameuser()+" - id:"+user.getId()+" CONECTADO CORRECTAMENTE");
+                
+                // navegacion hacia pantalla principal de la aplicación
                 return "main";
             }  
   
-        } else this.loginmessage="Usuario-contraseña no válidos. Pruebe de nuevo";  
+        } else this.loginmessage="Usuario-contraseña incorrectos. Pruebe de nuevo";  
         
-        return "index";
+        return "";
     }
 
     
-    public String clear() {
+    /**
+     * Este metodo borra los datos introducidos en el formulario
+     */
+    public void clear() {
         this.username="";
         this.userpass="";
         this.loginmessage="";
-        return "index";
     }
     
     
+    /**
+     * Metodo para salir de forma segura de la aplicación.
+     * @return 
+     */
     public String exit() {
-        // borramos los datos del usuario
+
+        // mensajes y logger
+        this.loginmessage="Ha salido de la aplicación de forma correcta";
+        log.info("Usuario "+user.getNameuser()+" - id:"+user.getId()+" DESCONECTADO CORRECTAMENTE");
+                
+        // borramos los datos del usuario y de la sesion
+        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         user=null;
         this.username="";
         this.userpass="";
-        // lanzamos mensaje
-        this.loginmessage="Ha salido de la aplicación de forma correcta";        
-        
-        
+                
         return "index";
     }
     
+    
+    /* ******************** GETTERS AND SETTERS ****************** */
     
     /**
      * @return the username
@@ -150,19 +195,6 @@ public class LoginBean extends LoginComponent implements Serializable{
 
    
 
-    /**
-     * @return the user
-     */
-    public Usuarios getUser() {
-        return user;
-    }
-
-    /**
-     * @param user the user to set
-     */
-    public void setUser(Usuarios user) {
-        this.user = user;
-    }
 
     /**
      * @return the worksHoursM
@@ -170,7 +202,12 @@ public class LoginBean extends LoginComponent implements Serializable{
     public String getWorksHoursM() {
         
         AgendaDAO agDao=new AgendaDAO();
-        String res=agDao.getHoursByLapseTime(30, user);
+        String res=null;
+        try {
+            res = agDao.getHoursByLapseTime(30, user);
+        } catch (Exception ex) {
+            log.error("ERROR: Algo ha ido mal leyendo horas de trabajo mensual para el user "+LoginBean.user.getId()+" - mensaje: "+ex);
+        }
         
         if (res!=null) worksHoursM=res;           
         
@@ -190,7 +227,12 @@ public class LoginBean extends LoginComponent implements Serializable{
     public String getWorksSessM() {
 
         AgendaDAO agDao=new AgendaDAO();
-        long res=agDao.getSessionsByLapseTime(30, user);
+        long res=0;
+        try {
+            res = agDao.getSessionsByLapseTime(30, user);
+        } catch (Exception ex) {
+            log.error("ERROR: Algo ha ido mal leyendo sesiones de trabajo mensual para el user "+LoginBean.user.getId()+" - mensaje: "+ex);
+        }
         
         if (res>0) worksSessM=String.valueOf(res);
 
@@ -210,7 +252,12 @@ public class LoginBean extends LoginComponent implements Serializable{
     public String getWorksHoursY() {
         
         AgendaDAO agDao=new AgendaDAO();
-        String res=agDao.getHoursByLapseTime(365, user);
+        String res=null;
+        try {
+            res = agDao.getHoursByLapseTime(365, user);
+        } catch (Exception ex) {
+            log.error("ERROR: Algo ha ido mal leyendo horas de trabajo anual para el user "+LoginBean.user.getId()+" - mensaje: "+ex);
+        }
         
         if (res!=null) worksHoursY=res;      
         
@@ -230,7 +277,12 @@ public class LoginBean extends LoginComponent implements Serializable{
     public String getWorksSessY() {
         
         AgendaDAO agDao=new AgendaDAO();
-        long res=agDao.getSessionsByLapseTime(365, user);
+        long res=0;
+        try {
+            res = agDao.getSessionsByLapseTime(365, user);
+        } catch (Exception ex) {
+            log.error("ERROR: Algo ha ido mal leyendo sesiones de trabajo anual para el user "+LoginBean.user.getId()+" - mensaje: "+ex);
+        }
         
         if (res>0) worksSessY=String.valueOf(res);
         
