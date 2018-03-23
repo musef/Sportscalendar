@@ -14,17 +14,16 @@
  */
 package controllers;
 
-import components.CalendarBean;
-import static controllers.LoginBean.user;
+import components.MainComponent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import javax.faces.event.ValueChangeEvent;
 
 /**
@@ -32,22 +31,30 @@ import javax.faces.event.ValueChangeEvent;
  * @author musef2904@gmail.com
  */
 @ManagedBean
-@SessionScoped
-public class MainBean extends CalendarBean{
+@ViewScoped
+public class MainBean {
 
+    //manager
+    private MainComponent mainComponent;
+    
+    // es el dia elegido del calendario, en formato string
+    // si se ha elegido mes, entonces se ubica en el dia 15
     private static String presentDay;
     
-    private long thisiduser;
-    private String thisusername;
+    private String dateCalendar;    // es el indice del select mm-aaaa
     
-    private String dateCalendar;
-    
+    // calendarios semanales
     private String[]calendar1;
     private String[]calendar2;
     private String[]calendar3;
     private String[]calendar4;
     private String[]calendar5;
     private String[]calendar6;
+    
+    // info del dia
+    private String agSport;
+    private String agActivity;
+    private String agTime;
     
     
     private final List<String> months=new ArrayList<>(Arrays.asList("Enero","Febrero","Marzo",
@@ -59,12 +66,7 @@ public class MainBean extends CalendarBean{
     
     public MainBean() {
     
-        // tomamos el id y el nombre del usuario 
-        this.thisiduser = LoginBean.user.getId();
-        this.thisusername = LoginBean.user.getNameuser();
-        
-        // mensaje en log : QUITAR
-        System.out.println("User:"+thisiduser+" - Object2:"+user);    
+        mainComponent=new MainComponent();                 
         
         // al entrar comprobamos si tenemos dia posicionado en calendario
         if (presentDay==null || presentDay.isEmpty()) {
@@ -72,6 +74,8 @@ public class MainBean extends CalendarBean{
             SimpleDateFormat sd=new SimpleDateFormat("dd-MM-yyyy", Locale.ITALY);
             // se fija el present day en hoy
             presentDay=sd.format(new Date());
+            // obtenemos la actividad del dia, si existe
+            showTodayActivity();
             // construimos un nuevo calendario
             if (monthchain==null || monthchain.isEmpty()) buildCalendar(presentDay);
         }
@@ -90,15 +94,15 @@ public class MainBean extends CalendarBean{
     public void buildCalendar(String day) {
         
         // construimos un list con los 12 meses anteriores al dia asignado
-        monthchain=last18Months(day);
-        if (monthchain.size()>0) System.out.println("First month:"+monthchain.get(0)[0]);
-        else System.out.println("Monthchain is null");
+        monthchain=mainComponent.last18Months(day);
         
         // obtenemos el calendario actual mensual
         // consiste en una matriz de 6 semanas, que sera
         // luego representada visualmente en pantalla
-        int[]calendar=monthCalendar(day);
+        int[]calendar=mainComponent.monthCalendar(day);
         
+        calendar=mainComponent.refillingCalendar(calendar,day,LoginBean.user);
+
         // instanciamos los seis calendarios semanales
         // para una mejor gestion del calendario
         calendar1=new String[7];
@@ -106,17 +110,18 @@ public class MainBean extends CalendarBean{
         calendar3=new String[7];
         calendar4=new String[7];
         calendar5=new String[7];
-        calendar6=new String[7];
-
-        // introducimos los datos en cada calendario semanal
-        for (int j=0;j<7;j++) {
-            calendar1[j]=String.valueOf(calendar[j]);
-            calendar2[j]=String.valueOf(calendar[j+7]);
-            calendar3[j]=String.valueOf(calendar[j+14]);
-            calendar4[j]=String.valueOf(calendar[j+21]);
-            calendar5[j]=String.valueOf(calendar[j+28]);
-            calendar6[j]=String.valueOf(calendar[j+35]);
-        }
+        calendar6=new String[7];        
+        if (calendar!=null) {
+            // introducimos los datos en cada calendario semanal
+            for (int j=0;j<7;j++) {
+                calendar1[j]=String.valueOf(calendar[j]);
+                calendar2[j]=String.valueOf(calendar[j+7]);
+                calendar3[j]=String.valueOf(calendar[j+14]);
+                calendar4[j]=String.valueOf(calendar[j+21]);
+                calendar5[j]=String.valueOf(calendar[j+28]);
+                calendar6[j]=String.valueOf(calendar[j+35]);
+            }
+        }        
         
         // por ultimo, hacemos un option selected del mes dentro del calendario
         // dia de asignacion
@@ -143,27 +148,49 @@ public class MainBean extends CalendarBean{
     
     
     /**
-     * Retrocede un mes en el calendario
-     * @param e 
+     * Retrocede un mes en el calendario 
      */
     public void lastMonth () {
 
         // asignamos el presentDay al 15 de cada mes seleccionado
-        presentDay=getLastMonth(presentDay);
+        presentDay=mainComponent.getLastMonth(presentDay);
         
         // y ahora fabricamos el nuevo calendario
         buildCalendar(presentDay);
     }
     
+    
+    /**
+     * Cambia el dia de trabajo
+     * @param day 
+     */
+    public void changeDay(String day) {
+        
+        int n=Integer.parseInt(day);
+        // si el dia es mayor que 100 es porque tiene actividad
+        // y eso hay que modificarlo
+        if (n>100) {
+            n-=100;
+            day=day.substring(1);
+        }
+        
+        mainComponent.changeDay(n);
+        
+        if (day.length()==1) presentDay="0"+day+presentDay.substring(2); 
+        else {
+            presentDay=day+presentDay.substring(2);
+        }
+        
+    }
 
+    
     /**
      * Avanza un mes en el calendario
-     * @param e 
      */
     public void nextMonth () {
 
         // asignamos el presentDay al 15 de cada mes seleccionado
-        presentDay=getNextMonth(presentDay);
+        presentDay=mainComponent.getNextMonth(presentDay);
         
         // y ahora fabricamos el nuevo calendario
         buildCalendar(presentDay);
@@ -171,32 +198,26 @@ public class MainBean extends CalendarBean{
     
     
     /**
-     * @return the thisiduser
+     * Muestra la actividad del dia en el formulario
      */
-    public long getThisiduser() {
-        return thisiduser;
+    public void showTodayActivity() {
+        
+        // leemos la actividad del dia
+        HashMap<String,String>todayActivity=mainComponent.getDayActivity(presentDay,LoginBean.user);
+        
+        // si existen datos se trasladan a los valores del formulario
+        if (todayActivity!=null) {
+            agTime=todayActivity.get("time");
+            agSport=todayActivity.get("spname");
+            agActivity=todayActivity.get("acname");
+        }
+        
     }
+    
+    
+    /* ****************** GETTERS AND SETTERS *********************** */
+    
 
-    /**
-     * @param thisiduser the thisiduser to set
-     */
-    public void setThisiduser(long thisiduser) {
-        this.thisiduser = thisiduser;
-    }
-
-    /**
-     * @return the thisusername
-     */
-    public String getThisusername() {
-        return thisusername;
-    }
-
-    /**
-     * @param thisusername the thisusername to set
-     */
-    public void setThisusername(String thisusername) {
-        this.thisusername = thisusername;
-    }
 
     /**
      * @return the calendar
@@ -316,6 +337,48 @@ public class MainBean extends CalendarBean{
 
     public String getPresentDay() {
         return presentDay;
+    }
+
+    /**
+     * @return the agSport
+     */
+    public String getAgSport() {
+        return agSport;
+    }
+
+    /**
+     * @param agSport the agSport to set
+     */
+    public void setAgSport(String agSport) {
+        this.agSport = agSport;
+    }
+
+    /**
+     * @return the agActivity
+     */
+    public String getAgActivity() {
+        return agActivity;
+    }
+
+    /**
+     * @param agActivity the agActivity to set
+     */
+    public void setAgActivity(String agActivity) {
+        this.agActivity = agActivity;
+    }
+
+    /**
+     * @return the agTime
+     */
+    public String getAgTime() {
+        return agTime;
+    }
+
+    /**
+     * @param agTime the agTime to set
+     */
+    public void setAgTime(String agTime) {
+        this.agTime = agTime;
     }
  
     
