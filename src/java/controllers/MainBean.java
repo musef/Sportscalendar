@@ -135,6 +135,12 @@ public class MainBean {
      */
     public void changeMonth(ValueChangeEvent e) {
         
+        // borramos la presentacion visual de actividad 
+        // que pudiera haber anteriormente
+        agSport="";
+        agActivity="";
+        agTime="";        
+        
         // recibimos el mes seleccionado en formato mm-yyyy
         String newmonth=e.getNewValue().toString();
         // asignamos el presentDay al 15 de cada mes seleccionado
@@ -142,8 +148,10 @@ public class MainBean {
         
         // y ahora fabricamos el nuevo calendario
         buildCalendar(presentDay);
+
+        // una vez cambiado el dia, mostramos la info de actividad actualizada que pudiera existir
+        showTodayActivity();        
         
-        String s="";
     }
     
     
@@ -152,11 +160,20 @@ public class MainBean {
      */
     public void lastMonth () {
 
+        // borramos la presentacion visual de actividad 
+        // que pudiera haber anteriormente
+        agSport="";
+        agActivity="";
+        agTime="";        
+        
         // asignamos el presentDay al 15 de cada mes seleccionado
         presentDay=mainComponent.getLastMonth(presentDay);
         
         // y ahora fabricamos el nuevo calendario
         buildCalendar(presentDay);
+        
+        // una vez cambiado el dia, mostramos la info de actividad actualizada que pudiera existir
+        showTodayActivity();        
     }
     
     
@@ -166,6 +183,13 @@ public class MainBean {
      */
     public void changeDay(String day) {
         
+        // borramos la presentacion visual de actividad 
+        // que pudiera haber anteriormente
+        agSport="";
+        agActivity="";
+        agTime="";
+
+        
         int n=Integer.parseInt(day);
         // si el dia es mayor que 100 es porque tiene actividad
         // y eso hay que modificarlo
@@ -174,12 +198,15 @@ public class MainBean {
             day=day.substring(1);
         }
         
-        mainComponent.changeDay(n);
+        // si el dia no es cero
+        if (n>0) {
+            // comprobamos si el dia tiene 1 o 2 digitos y añadimos 0 en consecuencia
+            if (day.length()==1) presentDay="0"+day+presentDay.substring(2); 
+                else presentDay=day+presentDay.substring(2);            
+        }        
         
-        if (day.length()==1) presentDay="0"+day+presentDay.substring(2); 
-        else {
-            presentDay=day+presentDay.substring(2);
-        }
+        // una vez cambiado el dia, mostramos la info de actividad actualizada que pudiera existir
+        showTodayActivity();
         
     }
 
@@ -189,11 +216,20 @@ public class MainBean {
      */
     public void nextMonth () {
 
+        // borramos la presentacion visual de actividad 
+        // que pudiera haber anteriormente
+        agSport="";
+        agActivity="";
+        agTime="";
+        
         // asignamos el presentDay al 15 de cada mes seleccionado
         presentDay=mainComponent.getNextMonth(presentDay);
         
         // y ahora fabricamos el nuevo calendario
         buildCalendar(presentDay);
+        
+        // una vez cambiado el dia, mostramos la info de actividad actualizada que pudiera existir
+        showTodayActivity();        
     }
     
     
@@ -212,6 +248,14 @@ public class MainBean {
             agActivity=todayActivity.get("acname");
         }
         
+    }
+    
+    /**
+     * Navega hacia el formulario de introduccion de datos
+     * @return 
+     */
+    public String recordTodayActivity() {
+        return "inputdata";
     }
     
     

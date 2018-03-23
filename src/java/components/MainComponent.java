@@ -21,7 +21,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
 
 import javax.annotation.PostConstruct;
 import models.Usuarios;
@@ -44,7 +43,6 @@ import org.apache.log4j.Logger;
 
 public class MainComponent {
     
-    private String today;                       // fecha del calendario. Vital para la agenda
     private String dateSystem;                  // fecha del sistema. Necesario para statistics
     private final SimpleDateFormat dateF=new SimpleDateFormat("dd-MM-yyyy");             // formato de fechas
     protected static int MAX_YEAR;              // limite de fechas anuales
@@ -68,8 +66,7 @@ public class MainComponent {
         if (dateSystem==null || dateSystem.isEmpty()) {
             Date date=new Date();
             dateSystem=dateF.format(date);
-            // tomamos hoy en formato español
-            today=dateF.format(date);
+
             // obtenemos el año actual para fecha
             try {
             	MAX_YEAR=Integer.parseInt(dateSystem.substring(6));
@@ -195,37 +192,11 @@ public class MainComponent {
         
     }
     
-    
-    /**
-     * Este método cambia a un día determinado en el calendario y lo almacena en la variable estática today
-     * Los dias van desde el 0 al 31 o el que corresponda a ese mes
-     */
-    public void changeDay(int day) {
-
-        Calendar cal=Calendar.getInstance();
-        // seteamos el dia al dia fijado en today
-        int m=0;
-        int a=0;
-        try {
-            // el mes actual es el obtenido-1
-            m=Integer.parseInt(today.substring(3,5))-1;
-            a=Integer.parseInt(today.substring(6));
-        } catch (NumberFormatException nf) {
-            m=1;
-            a=2014;
-        }
-        // seteamos calendario al dia elegido
-        cal.set(a,m,day);
-
-        // formateamos fecha
-        today=dateF.format(cal.getTime());
-        
-    } // end of method
-    
-    
-    
+ 
     /**
      * Este método retrocede un mes en el calendario y lo almacena en la variable estática today
+     * @param thisdate
+     * @return String
      */
     public String getLastMonth(String thisdate) {
 
@@ -256,6 +227,8 @@ public class MainComponent {
     
     /**
      * Este método avanza un mes en el calendario y lo almacena en la variable estática today
+     * @param thisdate
+     * @return String
      */
     public String getNextMonth(String thisdate) {
 
@@ -281,104 +254,6 @@ public class MainComponent {
         return dateF.format(cal.getTime());
         
     } // end of method
-    
-    
-    /**
-     * Este método cambia de fecha en el calendario y lo almacena en la variable estática today
-     */
-    protected void getYear(int month, int year) {
-
-        Calendar cal=Calendar.getInstance();
-        // primero seteamos el dia al dia fijado en today
-        int d=0;
-        int m=0;
-        int a=0;
-        try {
-            d=Integer.parseInt(today.substring(0,2));
-        } catch (NumberFormatException nf) {
-            d=1;
-        }
-        // recogemos y controlamos los datos
-        m=month-1;
-        if (m<0 || m>11) m=0;
-        a=year;
-        if (year<2000 || year>2030) year=2015;
-        cal.set(a,m,d);
-
-        today=dateF.format(cal.getTime());
-        
-    } // end of method
-    
-    
-    /**
-     * Este método retrocede un día en el calendario y lo almacena en la variable estatica today
-     */
-    private void getYesterday() {
-
-        Calendar cal=Calendar.getInstance();
-        // primero seteamos el dia al dia fijado en today
-        int d=0;
-        int m=0;
-        int a=0;
-        try {
-            d=Integer.parseInt(today.substring(0,2));
-            m=Integer.parseInt(today.substring(3,5))-1;
-            a=Integer.parseInt(today.substring(6));
-        } catch (NumberFormatException nf) {
-            d=1;
-            m=1;
-            a=2014;
-        }
-        // setea a la nueva fecha
-        cal.set(a,m,d);
-        
-        // convertimos el dia a milisegundos
-        long tm=cal.getTimeInMillis();
-        
-        // restamos eldia y setemaos
-        tm=tm-(24*60*60*1000);
-        cal.setTimeInMillis(tm);
-        
-        // formateamos fecha
-        today=dateF.format(cal.getTime());
-        
-    } // end of method
-    
-    
-    
-    /**
-     * Este método avanza un día en el calendario y lo almacena en la variable estática today
-     */
-    private void getTomorrow() {
-
-        Calendar cal=Calendar.getInstance();
-        // primero seteamos el dia al dia fijado en today
-        int d=0;
-        int m=0;
-        int a=0;
-        try {
-            d=Integer.parseInt(today.substring(0,2));
-            m=Integer.parseInt(today.substring(3,5))-1;
-            a=Integer.parseInt(today.substring(6));
-        } catch (NumberFormatException nf) {
-            d=1;
-            m=1;
-            a=2014;
-        }
-        cal.set(a,m,d);
-        
-        // convertimos el dia a milisegundos y le sumamos un dia
-        long tm=cal.getTimeInMillis();
-        
-        // avanzamos un dia y seteamos
-        tm=tm+(24*60*60*1000);
-        cal.setTimeInMillis(tm);
-        
-        // formateamos la fecha
-        today=dateF.format(cal.getTime());
-        
-    } // end of method
-    
     
     
     /**
@@ -544,11 +419,6 @@ public class MainComponent {
     
     
     // SETTERS AND GETTERS
-
-
-    public String getToday() {
-        return today;
-    }
 
     public String getDateSystem() {
         return dateSystem;

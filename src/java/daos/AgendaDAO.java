@@ -17,11 +17,9 @@ package daos;
 import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NonUniqueResultException;
@@ -667,19 +665,29 @@ public class AgendaDAO implements AgendaInterface{
         
         tx=em.getTransaction();
         
-        // tomamos la fecha en formato String para generar un Date
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeZone(TimeZone.getTimeZone("Europe/Madrid"));
-        cal.set(Integer.parseInt(thisday.substring(6)), Integer.parseInt(thisday.substring(3, 5)), Integer.parseInt(thisday.substring(0, 2)));
+        // tomamos la fecha en formato String para generar un Date        
+        String chgday=thisday.substring(6)+"-"+thisday.substring(3, 5)+"-"+thisday.substring(0, 2);        
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         
-        Date ddate=cal.getTime();
+        Date ddate1;
+        Date ddate2;
+        try {
+            ddate1 = sdf.parse(chgday+" 00:00:00");
+            ddate2 = sdf.parse(chgday+" 23:59:59");
+        } catch (ParseException ex) {
+            // logger
+            log.error("ERROR: Agenda rd-11B leyendo->parseando fecha del user id"+user.getId()+" - Mensaje: "+ex);            
+            return false;
+        }
+                
         long result=0;
         try {
-            String sql="SELECT COUNT(u) FROM Agenda u WHERE u.date=:ddate AND u.iduser=:iduser";
+            String sql="SELECT COUNT(u) FROM Agenda u WHERE u.ddate>=:ddate1 AND u.ddate<=:ddate2 AND u.iduser=:iduser";
             tx.begin();
             
             Query q=em.createQuery(sql);
-            q.setParameter("ddate", ddate);
+            q.setParameter("ddate1", ddate1);
+            q.setParameter("ddate2", ddate2);
             q.setParameter("iduser", user);
             result=(Long)q.getSingleResult();
             
@@ -693,7 +701,6 @@ public class AgendaDAO implements AgendaInterface{
         
         // hay resultados
         if (result>0) return true;
-
         
         return false;
     }
@@ -704,7 +711,7 @@ public class AgendaDAO implements AgendaInterface{
      * realizada en la agenda, y devuelve la información del día
      * 
      * @param thisday
-     * @param iduser
+     * @param user
      * @return null si no hay datos | hashmap con la info del dia
      * @throws java.lang.Exception
      */
@@ -760,7 +767,10 @@ public class AgendaDAO implements AgendaInterface{
         // hay resultados
         if (result!=null && result.size()>0) {
             returndata=new HashMap<>();
-            returndata.put("time", result.get(0).getTiming().toString());            
+            // convertimos la variable tiempo a HHmmss
+            SimpleDateFormat sdftime=new SimpleDateFormat("HH:mm:ss");
+            String ttime=sdftime.format(result.get(0).getTiming());
+            returndata.put("time", ttime);            
             returndata.put("spname",result.get(0).getIdsport().getSportName());
             returndata.put("acname",result.get(0).getIdactivity().getName());
             return returndata;
