@@ -4,16 +4,12 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      >
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>Sportscalendar</title>
         <h:outputStylesheet library="css" name="headercss.css"></h:outputStylesheet>
         <h:outputStylesheet library="css" name="maincss.css"></h:outputStylesheet>
         <h:outputStylesheet library="css" name="footercss.css"></h:outputStylesheet>
-        
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <h:outputScript name="deportes.js" library="js"></h:outputScript>
-        
     </h:head>
     <h:body>
         
@@ -48,34 +44,53 @@
                         <li>sesiones: #{loginBean.worksSessY} - horas: #{loginBean.worksHoursY} </li>
                     </ul>
                 </div>
-                <div class="userdata2">
-                    <h:form id="routerform2"> 
-                        <h:commandButton action="main.xhtml" image="/resources/img/agenda.jpg" alt="agenda" title="Pulse para ir a la agenda"></h:commandButton>                        
-                    </h:form>                
-                </div>                     
             </aside>      
             
             <main>
                 <h:form>
-                    <div class="mainbox">             
-                        <h:inputHidden value="#{deportesBean.message}" id="sportmessage"></h:inputHidden>
-                        <h:panelGrid columns="2">
-                            <h:outputLabel value="Seleccione"></h:outputLabel>
-                            <h:selectOneMenu id="sportselect" value="#{deportesBean.sportidx}" onchange="submit()" valueChangeListener="#{deportesBean.changeName}" >
-                                <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
-                                <f:selectItems value="#{deportesBean.sports}" var="deporte" itemValue="#{deporte.id}" itemLabel="#{deporte.sportName}"></f:selectItems>
-                            </h:selectOneMenu>
-                            <h:outputLabel value="Nombre"></h:outputLabel>
-                            <h:inputText id="namesp" value="#{deportesBean.sportName}" title="requerido: Nombre del deporte (max. 50 chars)" ></h:inputText>
-                            <h:outputLabel value="Descripción"></h:outputLabel>
-                            <h:inputText id="descrsp" value="#{deportesBean.sportDescription}" title="Descripción del deporte (max. 255 chars)" ></h:inputText>
-                        </h:panelGrid>             
-                            <h:commandButton id="eliminarsp" action="#{deportesBean.deleteSport}" value="Eliminar" onclick="return confirm('¿Seguro que desea eliminar este deporte?')"></h:commandButton>
-                            <h:commandButton id="grabarsp" action="#{deportesBean.recordSport}" value="Grabar" onclick="return confirm('¿Seguro que desea grabar este deporte?')" ></h:commandButton>
+
+                    <div class="mainbox">
+                        
+                        <h:form>                            
+                            <h:panelGrid columns="2" class="agendalist">
+                                
+                                <h:outputLabel value="Seleccione deporte"></h:outputLabel>
+                                <h:selectOneMenu valueChangeListener="#{estadisticasBean.changeSportIdx}" >
+                                    <f:selectItem itemValue="0" itemLabel="Todos"></f:selectItem>
+                                    <f:selectItems value="#{loginBean.user.deportesList}" var="sp" itemValue="#{sp.id}" itemLabel="#{sp.sportName}">
+                                    </f:selectItems> 
+                                </h:selectOneMenu>
+
+                                <h:outputLabel value="Seleccione actividad"></h:outputLabel>
+                                <h:selectOneMenu value="#{estadisticasBean.idxactivity}" >
+                                    <f:selectItem itemValue="0" itemLabel="Todas"></f:selectItem>
+                                    <f:selectItems value="#{loginBean.user.recorridosList}" var="ac" itemValue="#{ac.id}" itemLabel="#{ac.name}">
+                                    </f:selectItems> 
+                                </h:selectOneMenu>
+                                
+                                <h:outputLabel value="Tiempo"></h:outputLabel>
+                                <h:inputText id="tiempo" value="#{estadisticasBean.fechfin}" required="true" title="Formato dd-mm-yyyy"></h:inputText>
+                                
+                                <h:outputLabel value="Distancia"></h:outputLabel>
+                                <h:inputText id="distancia" value="#{estadisticasBean.fechini}" required="true" title="Formato dd-mm-yyyy"></h:inputText>
+
+                                <h:outputLabel value="Desnivel"></h:outputLabel>
+                                <h:inputText id="desnivel" value="#{estadisticasBean.fechfin}" required="true" title="Formato dd-mm-yyyy"></h:inputText>
+
+                                <h:outputLabel value="Comentarios"></h:outputLabel>
+                                <h:inputText id="comentario" value="#{estadisticasBean.fechfin}" required="true" title="Formato dd-mm-yyyy"></h:inputText>                                
+                                
+                            </h:panelGrid>        
+                            
+                            <h:panelGrid columns="2" class="agendalist">
+                                <input type="reset" value="Borrar"></input>
+                                <h:commandButton action="#{estadisticasBean.getRecordsList}" value="Listar"></h:commandButton>
+                            </h:panelGrid>
+                            
+                        </h:form>
+                        
                     </div>
-                    <div class="messagebox">
-                        <h:outputText value="#{deportesBean.message}"></h:outputText>
-                    </div>
+                    <div class="messagebox">#{message}</div>
 
                 </h:form>
             </main>

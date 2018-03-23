@@ -12,7 +12,7 @@
         <h:outputStylesheet library="css" name="footercss.css"></h:outputStylesheet>
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <h:outputScript name="deportes.js" library="js"></h:outputScript>
+        <h:outputScript name="actividades.js" library="js"></h:outputScript>
         
     </h:head>
     <h:body>
@@ -57,25 +57,51 @@
             
             <main>
                 <h:form>
-                    <div class="mainbox">             
-                        <h:inputHidden value="#{deportesBean.message}" id="sportmessage"></h:inputHidden>
-                        <h:panelGrid columns="2">
-                            <h:outputLabel value="Seleccione"></h:outputLabel>
-                            <h:selectOneMenu id="sportselect" value="#{deportesBean.sportidx}" onchange="submit()" valueChangeListener="#{deportesBean.changeName}" >
+                    <div class="mainbox">
+                        <h:inputHidden id="spidx" value="#{agendaBean.sportidx}"></h:inputHidden>
+                        <h:inputHidden id="acidx" value="#{agendaBean.activityidx}"></h:inputHidden>                            
+                        <h:panelGrid columns="4">
+                            <h:outputLabel value="Deporte: "></h:outputLabel>
+                            <h:selectOneMenu id="sportselect" value="#{agendaBean.sportidx}" onchange="submit()" valueChangeListener="#{agendaBean.changeSport}" >
                                 <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
-                                <f:selectItems value="#{deportesBean.sports}" var="deporte" itemValue="#{deporte.id}" itemLabel="#{deporte.sportName}"></f:selectItems>
+                                <f:selectItems value="#{agendaBean.sports}" var="spr" itemValue="#{spr.id}" itemLabel="#{spr.sportName}"></f:selectItems>
                             </h:selectOneMenu>
+                            <h:outputLabel value="Actividad: "></h:outputLabel>
+                            <h:selectOneMenu id="activityselect" value="#{agendaBean.activityidx}" onchange="submit()" valueChangeListener="#{agendaBean.changeActivity}" >
+                                <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
+                                <f:selectItems value="#{agendaBean.activities}" var="act" itemValue="#{act.id}" itemLabel="#{act.name}"></f:selectItems>
+                            </h:selectOneMenu>   
+                            <h:outputLabel value="Dia"></h:outputLabel>
+                            <h:inputText id="dataday" value="#{agendaBean.thisday}" title="Fecha requerida en formato dd-MM-yyyy">
+                                <f:validateRegex pattern="[0-3]{1}[0-9]{1}-[0-1]{1}[0-9]{1}-20[0-9]{2}"></f:validateRegex>
+                            </h:inputText>
                             <h:outputLabel value="Nombre"></h:outputLabel>
-                            <h:inputText id="namesp" value="#{deportesBean.sportName}" title="requerido: Nombre del deporte (max. 50 chars)" ></h:inputText>
+                            <h:inputText id="dataname" value="#{agendaBean.nameact}" title="Requerido: longitud máxima 100 chars" ></h:inputText>
+                            <h:outputLabel value="Distancia"></h:outputLabel>
+                            <h:inputText id="datadst" value="#{agendaBean.distance}" title="Distancia, en kms" ></h:inputText>
+                            <h:outputLabel value="Desnivel"></h:outputLabel>
+                            <h:inputText id="dataslp" value="#{agendaBean.slope}" title="Desnivel, en mts." ></h:inputText>
+                            <h:outputLabel value="Duración"></h:outputLabel>
+                            <h:inputText id="datadrt" value="#{agendaBean.duration}" title="Duración en formato HH:mm:ss">
+                            <f:validateRegex pattern="[0-9]{2}:[0-5]{1}[0-9]{1}:[0-5]{1}[0-9]{1}"></f:validateRegex>
+                            </h:inputText>
+                            <h:outputLabel value="Lugar"></h:outputLabel>
+                            <h:inputText id="datasite" value="#{agendaBean.site}" title="longitud máxima 100 chars"  ></h:inputText>
                             <h:outputLabel value="Descripción"></h:outputLabel>
-                            <h:inputText id="descrsp" value="#{deportesBean.sportDescription}" title="Descripción del deporte (max. 255 chars)" ></h:inputText>
-                        </h:panelGrid>             
-                            <h:commandButton id="eliminarsp" action="#{deportesBean.deleteSport}" value="Eliminar" onclick="return confirm('¿Seguro que desea eliminar este deporte?')"></h:commandButton>
-                            <h:commandButton id="grabarsp" action="#{deportesBean.recordSport}" value="Grabar" onclick="return confirm('¿Seguro que desea grabar este deporte?')" ></h:commandButton>
+                            <h:inputText id="datadsc" value="#{agendaBean.description}" title="longitud máxima 255 chars"  ></h:inputText>                            
+                        </h:panelGrid> 
+                        <!--
+                        <h:commandButton id="eliminarac" action="{actividadesBean.deleteActivity}" value="Eliminar" 
+                            onclick="return confirm('¿Seguro que desea eliminar esta actividad?')" title="Eliminar esta actividad" ></h:commandButton>
+                        -->
+                        <h:commandButton id="grabarac" action="#{agendaBean.recordThisActivity}" value="Grabar" 
+                            onclick="return confirm('¿Seguro que desea grabar esta actividad?')" title="Grabar/actualizar la actividad" ></h:commandButton>
                     </div>
+                    <!--
                     <div class="messagebox">
-                        <h:outputText value="#{deportesBean.message}"></h:outputText>
+                        <h:outputText value="#{actividadesBean.message}"></h:outputText>
                     </div>
+                    -->
 
                 </h:form>
             </main>
