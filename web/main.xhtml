@@ -122,13 +122,13 @@
                             <h:commandButton style="width: 25px;height: 25px;" image="/resources/img/#{mainBean.calendar6[6]}.png" action="#{mainBean.changeDay(mainBean.calendar6[6])}" ></h:commandButton>
                         </h:panelGrid>
                     </div>
-                    <div class="targetday" style="float:right;width: 40%;border:1px solid black">
+                    <div class="targetday" >
                         <h1>Dia #{mainBean.presentDay}</h1>
                         <h1>Actividad del día</h1>
-                        <h:inputText id="agsport" value="#{mainBean.agSport}" disabled=""></h:inputText>
+                        <h:inputText id="agsport" value="#{mainBean.agSport}" disabled="" ></h:inputText>
                         <h:inputText id="agactivity" value="#{mainBean.agActivity}" disabled=""></h:inputText>
                         <h:inputText id="agtime" value="#{mainBean.agTime}" disabled=""></h:inputText>
-                        <h:commandButton action="#{mainBean.showTodayActivity()}" value="Ver datos" ></h:commandButton>
+                        <h:commandButton action="#{mainBean.showTodayActivity()}" value="Introducir datos" ></h:commandButton>
                     </div>                    
                     <div class="messagebox"></div>
 

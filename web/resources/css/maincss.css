@@ -114,10 +114,10 @@ aside li {
 
 
 main {
-    float: left;
-    display: block;
+    display: inline-block;
     min-height: 400px;
-    min-width: 75%;    
+    min-width: 70%;    
+    width: 70%;
 }
 
 .loginbox {
@@ -195,8 +195,50 @@ main {
 
 .messagebox {
     width: 75%;
-    margin-top: 10px;
+    margin: 20px auto;
     font-size: 2em;
     color: red;
     text-align: center;
+}
+
+.targetday {
+    float:right;
+    margin-top: 20px;
+    width: 40%;
+    border:2px double #222222;
+}
+
+.targetday h1{
+    text-align: center;
+}
+
+.targetday input[type="text"]{
+    width:95%;
+    margin-left: 2%;  
+}
+
+.targetday input[type="submit"]{
+    width: 60%;
+    margin-left: 20%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 35px;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;    
+}
+
+/* ******* PAGINA 404 ************ */
+
+.error404 {
+    width: 75%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.error404 input[type="submit"]  {
+    width: 200px;
+    height: 45px;
+    font-size: 1.7em;
+    margin: 15px 5px 0 5px;
 }
