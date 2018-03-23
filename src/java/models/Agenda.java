@@ -39,7 +39,7 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "Agenda.findAll", query = "SELECT a FROM Agenda a")
     , @NamedQuery(name = "Agenda.findById", query = "SELECT a FROM Agenda a WHERE a.id = :id")
     , @NamedQuery(name = "Agenda.findByKeyuser", query = "SELECT a FROM Agenda a WHERE a.keyuser = :keyuser")
-    , @NamedQuery(name = "Agenda.findByDate", query = "SELECT a FROM Agenda a WHERE a.date = :date")
+    , @NamedQuery(name = "Agenda.findByDate", query = "SELECT a FROM Agenda a WHERE a.iduser = :iduser AND a.date >= :date1 AND a.date <= :date2")
     , @NamedQuery(name = "Agenda.findByDistance", query = "SELECT a FROM Agenda a WHERE a.distance = :distance")
     , @NamedQuery(name = "Agenda.findBySlope", query = "SELECT a FROM Agenda a WHERE a.slope = :slope")
     , @NamedQuery(name = "Agenda.findByTiming", query = "SELECT a FROM Agenda a WHERE a.timing = :timing")

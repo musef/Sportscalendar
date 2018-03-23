@@ -14,10 +14,8 @@
  */
 package components;
 
-import controllers.LoginBean;
 import daos.DeportesDAO;
-import java.util.List;
-import java.util.logging.Level;
+import java.util.List;;
 import models.Deportes;
 import models.Usuarios;
 import org.apache.log4j.Logger;

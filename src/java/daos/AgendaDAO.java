@@ -654,7 +654,7 @@ public class AgendaDAO implements AgendaInterface{
      * 
      * @param thisday
      * @param user
-     * @return 
+     * @return boolean
      * @throws java.lang.Exception 
      */
     public boolean existActivity(String thisday, Usuarios user) throws Exception {
@@ -680,7 +680,7 @@ public class AgendaDAO implements AgendaInterface{
             
             Query q=em.createQuery(sql);
             q.setParameter("ddate", ddate);
-            q.setParameter("iduser", user.getId());
+            q.setParameter("iduser", user);
             result=(Long)q.getSingleResult();
             
         } catch (Exception ex) {
@@ -744,7 +744,7 @@ public class AgendaDAO implements AgendaInterface{
         try {
             tx.begin();
             Query q=em.createNamedQuery("Agenda.findByDate");
-            q.setParameter("iduser", user.getId());
+            q.setParameter("iduser", user);
             q.setParameter("date1", ddate1);
             q.setParameter("date2", ddate2);
             result=q.getResultList();

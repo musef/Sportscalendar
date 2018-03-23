@@ -44,7 +44,7 @@ public class LoginBean  {
     private String loginmessage;
     
     // datos del usuario
-    protected static Usuarios user;
+    public static Usuarios user;
     protected static SportsListBean userSportlist;
     
     // datos de estadistica del usuario
@@ -103,7 +103,7 @@ public class LoginBean  {
                 this.setWorksSessY("0");
                 
                 // instanciamos la lista de deportes
-                userSportlist=new SportsListBean();
+                userSportlist=new SportsListBean(LoginBean.user);
 
                 // mensajes y logger
                 this.loginmessage="Autenticación correcta "+user.getId();
@@ -296,5 +296,9 @@ public class LoginBean  {
         this.worksSessY = worksSessY;
     }
     
+    
+    public Usuarios getUser(){
+        return user;
+    }
     
 }

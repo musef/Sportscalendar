@@ -131,7 +131,7 @@ public class ActividadesComponent {
         try {
             activities=adao.readAllSportActivities(deporte);
         } catch (Exception ex) {
-            log.error("ERROR: Algo ha ido mal borrando una actividad para el user "+user.getId()+" - mensaje: "+ex);
+            log.error("ERROR: Algo ha ido mal listando actividades para el user "+user.getId()+" - mensaje: "+ex);
             return null;
         }
         
