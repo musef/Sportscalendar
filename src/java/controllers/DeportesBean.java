@@ -74,12 +74,11 @@ public class DeportesBean {
             if (result) {
                 // actualizamos la lista de sportsList
                 LoginBean.userSportlist.setSportsList(deportesComponent.allSports(LoginBean.user));
+                message="Deporte "+sportName+" borrado correctamente";
                 this.sportName="";
                 this.sportDescription="";
                 this.sportidx=0;                
-                // mensajes y logger
-                message="Nuevo deporte borrado correctamente";
-            } else message="No ha sido posible borrar un nuevo deporte";
+            } else message="No ha sido posible borrar este deporte";
 
             // recuperamos la lista actualizada de deportes
             this.sports =LoginBean.userSportlist.getSportsList();

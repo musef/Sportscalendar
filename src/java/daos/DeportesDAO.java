@@ -19,6 +19,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
+import models.Agenda;
 import models.Deportes;
 import models.Usuarios;
 import org.apache.log4j.Logger;
@@ -176,6 +177,7 @@ public class DeportesDAO implements DeportesInterface {
     /**
      * Este metodo borra el objeto Deportes de la DDBB, correspondiente
      * al id suministrado
+     * Se comprueba si tiene alguna actividad agendada y si es así, no puede borrarse
      * @param id
      * @return boolean, con el resultado de la operacion
      * @throws java.lang.Exception
@@ -193,8 +195,17 @@ public class DeportesDAO implements DeportesInterface {
             tx.begin();
             // attaching el objeto
             sport=em.find(Deportes.class, id);
-            em.remove(sport);          
-            tx.commit();
+            
+            // comprobamos si tiene eventos este deporte
+            if (!checkIfSportsExist(sport)) {   
+                // no tiene, procedemos a borrarlo
+                em.remove(sport);          
+                tx.commit();
+            } else {
+                // no se borra porque tiene eventos en la agenda
+                log.info("NO Borrado deporte id "+id+" porque tenía eventos en agenda ->user"+sport.getIduser());                
+                return false;
+            }
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
@@ -247,6 +258,44 @@ public class DeportesDAO implements DeportesInterface {
         }
         
         return sport;
+        
+    }
+    
+    
+    /**
+     * Este metodo comprueba si el deporte tiene eventos en la agenda, y si los tiene
+     * devuelve un true (existe evento)
+     * @param sport
+     * @return boolean
+     */
+    private boolean checkIfSportsExist(Deportes sport) {
+        
+        // creamos los objetos de transaccion
+        EntityManager em2=Factory.getEmf().createEntityManager();
+        EntityTransaction tx2=em2.getTransaction();
+        
+        Agenda agenda;
+        // iniciamos la transaccion
+        long result=0;
+        try {
+            tx2.begin();
+            Query q=em2.createNamedQuery("Agenda.findBySport");
+            q.setParameter("iduser", sport.getIduser());
+            q.setParameter("idsport", sport);
+            result=(long) q.getResultList().get(0);
+            tx2.commit();
+            
+        } catch (Exception ex) {
+            if (tx2!=null && tx2.isActive()) tx2.rollback();
+            // logger
+            log.error("ERROR: Deportes rd-06 leyendo eventos->idsport"+sport.getId()+" - Mensaje: "+ex);                      
+            return true;
+        } finally {
+            if (tx2!=null && tx2.isActive()) em2.close();
+        }
+        
+        if (result<1) return false;
+        else return true;
         
     }
     
