@@ -15,6 +15,9 @@
 package models;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,13 +42,12 @@ import javax.persistence.TemporalType;
     @NamedQuery(name = "Agenda.findAll", query = "SELECT a FROM Agenda a")
     , @NamedQuery(name = "Agenda.findById", query = "SELECT a FROM Agenda a WHERE a.id = :id")
     , @NamedQuery(name = "Agenda.findByKeyuser", query = "SELECT a FROM Agenda a WHERE a.keyuser = :keyuser")
-    , @NamedQuery(name = "Agenda.findByDate", query = "SELECT a FROM Agenda a WHERE a.iduser = :iduser AND a.date >= :date1 AND a.date <= :date2")
-    , @NamedQuery(name = "Agenda.findByDistance", query = "SELECT a FROM Agenda a WHERE a.distance = :distance")
-    , @NamedQuery(name = "Agenda.findBySlope", query = "SELECT a FROM Agenda a WHERE a.slope = :slope")
-    , @NamedQuery(name = "Agenda.findByTiming", query = "SELECT a FROM Agenda a WHERE a.timing = :timing")
-    , @NamedQuery(name = "Agenda.findByUserAndGap", query = "SELECT COUNT (a) FROM Agenda a WHERE a.iduser = :iduser AND a.date > :lapsetime")
-    , @NamedQuery(name = "Agenda.findByUserAndTime", query = "SELECT a FROM Agenda a WHERE a.iduser = :iduser AND a.date > :lapsetime")
-    , @NamedQuery(name = "Agenda.findByComments", query = "SELECT a FROM Agenda a WHERE a.comments = :comments")})
+    , @NamedQuery(name = "Agenda.findBySport", query = "SELECT COUNT (a) FROM Agenda a WHERE a.iduser = :iduser AND a.idsport = :idsport")        
+    , @NamedQuery(name = "Agenda.findByActivity", query = "SELECT COUNT (a) FROM Agenda a WHERE a.iduser = :iduser AND a.idactivity = :idactivity")         
+    , @NamedQuery(name = "Agenda.findByDate", query = "SELECT a FROM Agenda a WHERE a.iduser = :iduser AND a.ddate >= :date1 AND a.ddate <= :date2")
+    , @NamedQuery(name = "Agenda.findByTiming", query = "SELECT a FROM Agenda a WHERE a.iduser = :iduser AND  a.timing = :timing")
+    , @NamedQuery(name = "Agenda.findByUserAndGap", query = "SELECT COUNT (a) FROM Agenda a WHERE a.iduser = :iduser AND a.ddate > :lapsetime")
+    , @NamedQuery(name = "Agenda.findByUserAndTime", query = "SELECT a FROM Agenda a WHERE a.iduser = :iduser AND a.ddate > :lapsetime")})
 public class Agenda implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -59,8 +61,8 @@ public class Agenda implements Serializable {
     private String keyuser;
 
     @Column(name = "date")
-    @Temporal(TemporalType.DATE)
-    private Date date;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Calendar ddate;
     
     @Column(name = "distance")
     private Float distance;
@@ -96,11 +98,11 @@ public class Agenda implements Serializable {
         this.id = id;
     }
 
-    public Agenda(String keyuser, Date date, Float distance, Float slope, Date timing, 
+    public Agenda(String keyuser, Calendar date, Float distance, Float slope, Date timing, 
             String comments, Usuarios iduser, Deportes idsport, Actividades idactivity) {
         
         this.keyuser = keyuser;
-        this.date = date;
+        this.ddate = date;
         this.distance = distance;
         this.slope = slope;
         this.timing = timing;
@@ -126,12 +128,12 @@ public class Agenda implements Serializable {
         this.keyuser = keyuser;
     }
 
-    public Date getDate() {
-        return date;
+    public Calendar getDate() {
+        return ddate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setDate(Calendar date) {
+        this.ddate = date;
     }
 
     public Float getDistance() {

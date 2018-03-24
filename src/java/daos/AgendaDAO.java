@@ -309,7 +309,7 @@ public class AgendaDAO implements AgendaInterface{
  * @param sport
  * @param fechini
  * @param fechfin
- * @return null | List<Agenda> con las actividades
+ * @return null | List Agenda con las actividades
      * @throws java.lang.Exception
  */
     
@@ -331,7 +331,7 @@ public class AgendaDAO implements AgendaInterface{
         // iniciamos la transaccion
         try {
             tx.begin();
-            Query q=em.createQuery("SELECT ag FROM Agenda ag WHERE ag.iduser= :iduser AND ag.idsport = :idsport AND ag.date>=:fec1 AND ag.date<= :fec2 ORDER BY ag.date DESC");
+            Query q=em.createQuery("SELECT ag FROM Agenda ag WHERE ag.iduser= :iduser AND ag.idsport = :idsport AND ag.ddate>=:fec1 AND ag.ddate<= :fec2 ORDER BY ag.ddate DESC");
 
             q.setParameter("iduser", user);
             q.setParameter("idsport", sport);

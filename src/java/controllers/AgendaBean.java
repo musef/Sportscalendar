@@ -19,6 +19,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -27,7 +28,7 @@ import javax.faces.event.ValueChangeEvent;
 import models.Actividades;
 import models.Agenda;
 import models.Deportes;
-import models.Usuarios;
+
 
 /**
  *
@@ -78,15 +79,12 @@ public class AgendaBean {
         int year=Integer.valueOf(this.thisday.substring(6));
         int month=Integer.valueOf(this.thisday.substring(3, 5));
         int day=Integer.valueOf(this.thisday.substring(0, 2));
-        LocalDateTime ldt=LocalDateTime.of(year, month, day, 0, 0);
+        //LocalDateTime ldt=LocalDateTime.of(year, month, day, 0, 0);
 
         // convertimos el objeto a un Date
-        Date thisdate=null;
-        try {
-            thisdate=new Date(1000*ldt.toEpochSecond(ZoneOffset.UTC));            
-        } catch (Exception ex) {
-            thisdate=null;
-        } 
+        LocalDateTime thisdate=LocalDateTime.of(year, month, day, 0, 0,0);
+        Calendar ddate=Calendar.getInstance();
+        ddate.setTimeInMillis(thisdate.toEpochSecond(ZoneOffset.UTC));
        
         // obtenemos el resto de los datos del formulario
         Float dst=Float.parseFloat(this.distance);
@@ -106,7 +104,7 @@ public class AgendaBean {
         Actividades act=new Actividades(activityidx);
         
         // construimos un objeto Agenda con los datos procesados del formulario
-        Agenda ag=new Agenda(LoginBean.user.getKeyuser(), thisdate, dst, slp, thistime, this.description, LoginBean.user, dp, act);
+        Agenda ag=new Agenda(LoginBean.user.getKeyuser(), ddate, dst, slp, thistime, this.description, LoginBean.user, dp, act);
         
         // instanciamos el manager
         agendaComponent=new AgendaComponent();
