@@ -48,8 +48,13 @@ public class DeportesBean {
     
     
     public DeportesBean() {
-
-
+        // recuperamos la lista actualizada de deportes
+        this.sports =LoginBean.userSportlist.getSportsList();
+        if (sport!=null) {
+            this.sportidx=sport.getId();
+            this.sportName=sport.getSportName();
+            this.sportDescription=sport.getSportDescrip();             
+        }
     }
 
     
@@ -69,10 +74,16 @@ public class DeportesBean {
             if (result) {
                 // actualizamos la lista de sportsList
                 LoginBean.userSportlist.setSportsList(deportesComponent.allSports(LoginBean.user));
+                this.sportName="";
+                this.sportDescription="";
+                this.sportidx=0;                
                 // mensajes y logger
                 message="Nuevo deporte borrado correctamente";
             } else message="No ha sido posible borrar un nuevo deporte";
 
+            // recuperamos la lista actualizada de deportes
+            this.sports =LoginBean.userSportlist.getSportsList();
+            
         }
     }
 
@@ -116,6 +127,10 @@ public class DeportesBean {
             } else message="No ha sido posible modificar el deporte";
 
         }
+        
+        // recuperamos la lista actualizada de deportes
+        this.sports =LoginBean.userSportlist.getSportsList();
+        
         return null;
     }
 
@@ -126,7 +141,7 @@ public class DeportesBean {
      * Puede generar un objeto Deportes vacio
      * @param e 
      */
-    public void changeName(ValueChangeEvent e) {
+    public void changeSport(ValueChangeEvent e) {
         
         // actualizamos aqui
          sportidx=Long.parseLong(e.getNewValue().toString());
@@ -149,6 +164,8 @@ public class DeportesBean {
             this.sportDescription="";    
             sport=null;
         }
+        // borramos los posibles mensajes mostrados
+        message="";
 
     }
     
@@ -174,7 +191,6 @@ public class DeportesBean {
      */
     public List<Deportes> getSports() {
         // rellenamos la lista de deportes
-        this.sports =LoginBean.userSportlist.getSportsList();
         return this.sports;
     }
 
@@ -189,8 +205,6 @@ public class DeportesBean {
      * @return the sportName
      */
     public String getSportName() {
-
-        if (sport!=null) this.sportName=sport.getSportName();
         return sportName;
     }
 
@@ -205,8 +219,6 @@ public class DeportesBean {
      * @return the sportDescription
      */
     public String getSportDescription() {
-        
-        if (sport!=null) this.sportDescription=sport.getSportDescrip();
         return sportDescription;
     }
 
@@ -221,13 +233,6 @@ public class DeportesBean {
      * @return the sportidx
      */
     public long getSportidx() {
-        if (sport!=null) this.sportidx=sport.getId();
-        if (sportidx==0) {
-            // borramos los datos
-            this.sportName="";
-            this.sportDescription="";    
-            sport=null;
-        }
         return sportidx;
     }
 

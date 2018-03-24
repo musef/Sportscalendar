@@ -61,12 +61,16 @@
                         <h:inputHidden value="#{deportesBean.message}" id="sportmessage"></h:inputHidden>
                         <h:panelGrid columns="2">
                             <h:outputLabel value="Seleccione"></h:outputLabel>
-                            <h:selectOneMenu id="sportselect" value="#{deportesBean.sportidx}" onchange="submit()" valueChangeListener="#{deportesBean.changeName}" >
+                            <h:selectOneMenu id="sportselect" value="#{deportesBean.sportidx}" valueChangeListener="#{deportesBean.changeSport}" >
                                 <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
                                 <f:selectItems value="#{deportesBean.sports}" var="deporte" itemValue="#{deporte.id}" itemLabel="#{deporte.sportName}"></f:selectItems>
+                                <f:ajax render="namesp"></f:ajax>
+                                <f:ajax render="descrsp"></f:ajax>
+                                <f:ajax execute="sportselect" render="messagesp"></f:ajax>
                             </h:selectOneMenu>
                             <h:outputLabel value="Nombre"></h:outputLabel>
-                            <h:inputText id="namesp" value="#{deportesBean.sportName}" title="requerido: Nombre del deporte (max. 50 chars)" ></h:inputText>
+                            <h:inputText id="namesp" value="#{deportesBean.sportName}" title="requerido: Nombre del deporte (max. 50 chars)" >
+                            </h:inputText>
                             <h:outputLabel value="Descripción"></h:outputLabel>
                             <h:inputText id="descrsp" value="#{deportesBean.sportDescription}" title="Descripción del deporte (max. 255 chars)" ></h:inputText>
                         </h:panelGrid>             
@@ -74,7 +78,7 @@
                             <h:commandButton id="grabarsp" action="#{deportesBean.recordSport}" value="Grabar" onclick="return confirm('¿Seguro que desea grabar este deporte?')" ></h:commandButton>
                     </div>
                     <div class="messagebox">
-                        <h:outputText value="#{deportesBean.message}"></h:outputText>
+                        <h:outputText id="messagesp" value="#{deportesBean.message}"></h:outputText>
                     </div>
 
                 </h:form>
