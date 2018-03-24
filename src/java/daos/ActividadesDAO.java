@@ -219,8 +219,16 @@ public class ActividadesDAO implements ActividadesInterface {
             // attaching el objeto
             act=em.find(Actividades.class, id);
             
-            em.remove(act);          
-            tx.commit();
+            // comprobamos si tiene eventos este deporte
+            if (!checkIfActivitiesExist(act)) {   
+                // no tiene, procedemos a borrarlo
+                em.remove(act);          
+                tx.commit();
+            } else {
+                // no se borra porque tiene eventos en la agenda
+                log.info("NO Borrada actividad id "+id+" porque tenía eventos en agenda ->user"+act.getIduser());                
+                return false;
+            }            
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
@@ -241,6 +249,7 @@ public class ActividadesDAO implements ActividadesInterface {
      * sport y los devuelve en forma de lista
      * @param  sport
      * @return null | List
+     * @throws java.lang.Exception
      */
     public List<Actividades> readAllSportActivities(Deportes sport) throws Exception {
         
@@ -274,5 +283,43 @@ public class ActividadesDAO implements ActividadesInterface {
         return activities;
         
     }
+    
+    
+    /**
+     * Este metodo comprueba si la actividad tiene eventos en la agenda, y si los tiene
+     * devuelve un true (existe evento)
+     * @param sport
+     * @return boolean
+     */
+    private boolean checkIfActivitiesExist(Actividades activity) {
+        
+        // creamos los objetos de transaccion
+        EntityManager em2=Factory.getEmf().createEntityManager();
+        EntityTransaction tx2=em2.getTransaction();
+        
+        // iniciamos la transaccion
+        long result=0;
+        try {
+            tx2.begin();
+            Query q=em2.createNamedQuery("Agenda.findByActivity");
+            q.setParameter("iduser", activity.getIduser());
+            q.setParameter("idactivity", activity);
+            result=(long) q.getResultList().get(0);
+            tx2.commit();
+            
+        } catch (Exception ex) {
+            if (tx2!=null && tx2.isActive()) tx2.rollback();
+            // logger
+            log.error("ERROR: Actividades rd-06 leyendo eventos->idsport"+activity.getId()+" - Mensaje: "+ex);                      
+            return true;
+        } finally {
+            if (tx2!=null && tx2.isActive()) em2.close();
+        }
+        
+        if (result<1) return false;
+        else return true;
+        
+    }
+    
     
 }

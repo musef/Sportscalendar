@@ -60,14 +60,17 @@
                     <div class="mainbox">                  
                         <h:panelGrid columns="2">
                             <h:outputLabel value="Deporte: "></h:outputLabel>
-                            <h:selectOneMenu id="sportselect" value="#{actividadesBean.sportidx}" onchange="submit()" valueChangeListener="#{actividadesBean.changeSport}" >
+                            <h:selectOneMenu id="sportselect" value="#{actividadesBean.sportidx}" valueChangeListener="#{actividadesBean.changeSport}" >
                                 <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
                                 <f:selectItems value="#{actividadesBean.sports}" var="spr" itemValue="#{spr.id}" itemLabel="#{spr.sportName}"></f:selectItems>
+                                <f:ajax execute="#{actividadesBean.readSportAndGetActivities()}" render="activityselect"></f:ajax>
+                                <f:ajax render="activitynm activityds activitysl activitytm activityst activitydc"></f:ajax>
                             </h:selectOneMenu>
                             <h:outputLabel value="Actividad: "></h:outputLabel>
-                            <h:selectOneMenu id="activityselect" value="#{actividadesBean.activityidx}" onchange="submit()" valueChangeListener="#{actividadesBean.changeActivity}" >
+                            <h:selectOneMenu id="activityselect" value="#{actividadesBean.activityidx}" valueChangeListener="#{actividadesBean.changeActivity}" >
                                 <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
                                 <f:selectItems value="#{actividadesBean.activities}" var="act" itemValue="#{act.id}" itemLabel="#{act.name}"></f:selectItems>
+                                <f:ajax render="activitynm activityds activitysl activitytm activityst activitydc"></f:ajax>
                             </h:selectOneMenu>                            
                             <h:outputLabel value="Nombre"></h:outputLabel>
                             <h:inputText id="activitynm" value="#{actividadesBean.activityName}" title="Requerido: longitud máxima 100 chars" ></h:inputText>
@@ -88,7 +91,7 @@
                             onclick="return confirm('¿Seguro que desea grabar esta actividad?')" title="Grabar/actualizar la actividad" ></h:commandButton>
                     </div>
                     <div class="messagebox">
-                        <h:outputText value="#{actividadesBean.message}"></h:outputText>
+                        <h:outputText id="messageac" value="#{actividadesBean.message}"></h:outputText>
                     </div>
 
                 </h:form>
