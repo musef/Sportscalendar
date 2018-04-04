@@ -68,6 +68,33 @@ public class AgendaComponent {
         }
         
     }
+
+
+    /**
+     * Este método modifica en la base de datos un objeto agenda con los datos suministrados
+     * por parametro
+     * @param agenda
+     * @param user
+     * @return boolean
+     */
+    public boolean modifyEventCalendar (Agenda agenda, Usuarios user) {
+        
+        // chequeo de parametros
+        if (agenda==null) return false;
+        if (user==null) return false;
+        
+        agdao=new AgendaDAO();
+        
+        try {
+            //grabamos en la base de datos el objeto agenda
+            boolean result=agdao.updateCalendar(agenda);
+            return result;
+        } catch (Exception ex) {
+            log.error("ERROR: Algo ha ido mal modificando un evento en agenda, para el user "+user.getId()+" - mensaje: "+ex);
+            return false;
+        }
+        
+    }
     
     
     /**
@@ -82,6 +109,8 @@ public class AgendaComponent {
         if (idActivity<1) return null;
         if (user==null) return null;        
      
+        adao=new ActividadesDAO();
+        
         Actividades activity=null;
         try {
             activity=adao.readActivity(idActivity);
@@ -92,6 +121,36 @@ public class AgendaComponent {
         }
         
     }
+    
+    
+    
+    /**
+     * Este método devuelve una actividad de agenda correspondiente a los parametros suministrados
+     * @param idEvent
+     * @param user
+     * @return null | Objeto Agenda
+     */
+    public Agenda readEvent (long idEvent,Usuarios user) {
+        
+        // chequeo de parametros
+        if (idEvent<1) return null;
+        if (user==null) return null;        
+     
+        agdao=new AgendaDAO();
+        
+        Agenda thisevent;
+        try {
+            thisevent=agdao.readCalendar(idEvent, user);
+            return thisevent;
+        } catch (Exception ex) {
+            log.error("ERROR: Algo ha ido mal leyendo un evento de la agenda, para el user "+user.getId()+" - mensaje: "+ex);
+            return null;
+        }
+        
+    }
+    
+    
+    
     
     /**
      * Este metodo obtiene todas las actividades correspondientes a un objeto deporte concreto, segun los
@@ -105,6 +164,8 @@ public class AgendaComponent {
         // chequeo de parametros
         if (deporte==null) return null;
         if (user==null) return null;
+        
+        adao=new ActividadesDAO();
         
         List<Actividades> activities=null;
         
@@ -133,6 +194,8 @@ public class AgendaComponent {
         // chequeamos parametros
         if (idSport<1) return null;
         if (user==null) return null;
+        
+        ddao=new DeportesDAO();
         
         Deportes sport=null;
         try {

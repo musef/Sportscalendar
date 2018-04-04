@@ -20,8 +20,10 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import models.Actividades;
@@ -100,14 +102,16 @@ public class AgendaDAO implements AgendaInterface{
      * Este metodo devuelve un objeto Agenda, dado el id suministrado
      * Verifica previamente que cumple las condiciones
      * @param id
+     * @param user
      * @return objeto Agenda || null
      * @throws java.lang.Exception
      */
     @Override
-    public Agenda readCalendar(Long id) throws Exception {
+    public Agenda readCalendar(Long id, Usuarios user) throws Exception {
     
         /* Verificacion de condiciones */
         if (id<1) return null;
+        if (user==null) return null;
         
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
@@ -121,18 +125,20 @@ public class AgendaDAO implements AgendaInterface{
             tx.begin();
             Query q=em.createNamedQuery("Agenda.findById");
             q.setParameter("id", id);
+            q.setParameter("iduser", user);
             
             calendar=(Agenda)q.getSingleResult();
             
             tx.commit();
-            
-        } catch (NonUniqueResultException nr) {
-            if (tx!=null && tx.isActive()) tx.rollback();
+        } catch (NoResultException nr) { 
             // logger
-            log.error("ERROR: Agenda rd-02A leyendo->evento id"+id+" - Mensaje: "+nr);  
+            log.error("ERROR: Agenda rd-02C inexistente->evento id"+id+" - Mensaje: "+nr);            
+            return null;
+        } catch (NonUniqueResultException nur) {
+            // logger
+            log.error("ERROR: Agenda rd-02A leyendo->evento id"+id+" - Mensaje: "+nur);  
             return null;
         } catch (Exception ex) {
-            if (tx!=null && tx.isActive()) tx.rollback();
             // logger
             log.error("ERROR: Agenda rd-02B leyendo->evento id"+id+" - Mensaje: "+ex);                        
             return null;
@@ -245,7 +251,7 @@ public class AgendaDAO implements AgendaInterface{
  * @param activity
  * @param fechini
  * @param fechfin
- * @return null | List<Agenda> con las actividades
+ * @return null | List Agenda con las actividades
      * @throws java.lang.Exception
  */
     
@@ -268,14 +274,14 @@ public class AgendaDAO implements AgendaInterface{
         // iniciamos la transaccion
         try {
             tx.begin();
-            Query q=em.createQuery("SELECT ag FROM Agenda ag WHERE ag.iduser= :iduser AND ag.idsport = :idsport AND ag.idactivity=:idactivity AND ag.date>=:fec1 AND ag.date<= :fec2 ORDER BY ag.date DESC");
+            Query q=em.createQuery("SELECT ag FROM Agenda ag WHERE ag.iduser= :iduser AND ag.idsport = :idsport AND ag.idactivity=:idactivity AND ag.ddate>=:fec1 AND ag.ddate<= :fec2 ORDER BY ag.ddate DESC");
 
             q.setParameter("iduser", user);
             q.setParameter("idsport", sport);
             q.setParameter("idactivity", activity);
-            SimpleDateFormat sd = new SimpleDateFormat("yyyy-mm-dd");
-            fec1=sd.parse(fechini.substring(6)+fechini.substring(2,6)+fechini.substring(0,2));
-            fec2=sd.parse(fechfin.substring(6)+fechfin.substring(2,6)+fechfin.substring(0,2));
+            SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            fec1=sd.parse(fechini.substring(6)+fechini.substring(2,6)+fechini.substring(0,2)+" 00:00:00");
+            fec2=sd.parse(fechfin.substring(6)+fechfin.substring(2,6)+fechfin.substring(0,2)+" 23:59:59");
             q.setParameter("fec1", fec1);
             q.setParameter("fec2", fec2);
             
@@ -335,9 +341,9 @@ public class AgendaDAO implements AgendaInterface{
 
             q.setParameter("iduser", user);
             q.setParameter("idsport", sport);
-            SimpleDateFormat sd = new SimpleDateFormat("yyyy-mm-dd");
-            fec1=sd.parse(fechini.substring(6)+fechini.substring(2,6)+fechini.substring(0,2));
-            fec2=sd.parse(fechfin.substring(6)+fechfin.substring(2,6)+fechfin.substring(0,2));
+            SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            fec1=sd.parse(fechini.substring(6)+fechini.substring(2,6)+fechini.substring(0,2)+" 00:00:00");
+            fec2=sd.parse(fechfin.substring(6)+fechfin.substring(2,6)+fechfin.substring(0,2)+" 23:59:59");
             q.setParameter("fec1", fec1);
             q.setParameter("fec2", fec2);
             
@@ -370,7 +376,7 @@ public class AgendaDAO implements AgendaInterface{
      * @param user
      * @param fechini
      * @param fechfin
-     * @return null | List<Agenda> con las actividades
+     * @return null | List Agenda con las actividades
      * @throws java.lang.Exception
      */
     
@@ -391,12 +397,12 @@ public class AgendaDAO implements AgendaInterface{
         // iniciamos la transaccion
         try {
             tx.begin();
-            Query q=em.createQuery("SELECT ag FROM Agenda ag WHERE ag.iduser= :iduser AND ag.date>=:fec1 AND ag.date<= :fec2 ORDER BY ag.date DESC");
+            Query q=em.createQuery("SELECT ag FROM Agenda ag WHERE ag.iduser= :iduser AND ag.ddate>=:fec1 AND ag.ddate<= :fec2 ORDER BY ag.ddate DESC");
 
             q.setParameter("iduser", user);
-            SimpleDateFormat sd = new SimpleDateFormat("yyyy-mm-dd");
-            fec1=sd.parse(fechini.substring(6)+fechini.substring(2,6)+fechini.substring(0,2));
-            fec2=sd.parse(fechfin.substring(6)+fechfin.substring(2,6)+fechfin.substring(0,2));
+            SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            fec1=sd.parse(fechini.substring(6)+fechini.substring(2,6)+fechini.substring(0,2)+" 00:00:00");
+            fec2=sd.parse(fechfin.substring(6)+fechfin.substring(2,6)+fechfin.substring(0,2)+" 23:59:59");
             q.setParameter("fec1", fec1);
             q.setParameter("fec2", fec2);
             
@@ -439,6 +445,7 @@ public class AgendaDAO implements AgendaInterface{
         
         // tomamos la fecha de hoy
         Date thisdate=new Date();
+        Date topdate=new Date();        
         // la pasamos a milisegundos
         long todaytimemillis=thisdate.getTime();
 
@@ -466,6 +473,7 @@ public class AgendaDAO implements AgendaInterface{
             Query q=em.createNamedQuery("Agenda.findByUserAndGap");
             q.setParameter("iduser", user);
             q.setParameter("lapsetime", thisdate);
+            q.setParameter("toptime", topdate);
             
             result=(long)q.getSingleResult();
             
@@ -773,6 +781,8 @@ public class AgendaDAO implements AgendaInterface{
             returndata.put("time", ttime);            
             returndata.put("spname",result.get(0).getIdsport().getSportName());
             returndata.put("acname",result.get(0).getIdactivity().getName());
+            returndata.put("acid",String.valueOf(result.get(0).getId()));
+            
             return returndata;
         }
         
@@ -780,6 +790,132 @@ public class AgendaDAO implements AgendaInterface{
     }
 
 
+    /**
+     * Esta funcion recupera el numero de entrenamiento totales, dentro de las fechas
+     * suministradas, y con los datos concretos
+     * @param sport
+     * @param activity
+     * @param fechini
+     * @param fechfin
+     * @param user - usuario de la estadistica
+     * @return 0 | int con el num. de sesiones acumuladas de entrenamiento
+     * @throws java.lang.Exception
+     */
+    public HashMap<String,String> getSessionsUntilDates (Usuarios user, Deportes sport, Actividades activity, String fechini, String fechfin) throws Exception {
+        
+        /* Verificacion de condiciones */
+        if (user==null) return null;
+        if (fechini==null || fechini.length()!=10) return null;
+        if (fechfin==null || fechfin.length()!=10) return null;
+                 
+        
+        HashMap<String,String> result=null;
+        
+        // tomamos las fecha en formato String para generar un Date        
+        String chgday1=fechini.substring(6)+"-"+fechini.substring(3, 5)+"-"+fechini.substring(0, 2); 
+        String chgday2=fechfin.substring(6)+"-"+fechfin.substring(3, 5)+"-"+fechfin.substring(0, 2);         
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        
+        Date ddate1;
+        Date ddate2;
+        try {
+            ddate1 = sdf.parse(chgday1+" 00:00:00");
+            ddate2 = sdf.parse(chgday2+" 23:59:59");
+        } catch (ParseException ex) {
+            // logger
+            log.error("ERROR: Agenda rd-12 leyendo para estadistica->parseando fecha del user id"+user.getId()+" - Mensaje: "+ex);            
+            return null;
+        }
+        
+        String sql="SELECT a FROM Agenda a WHERE a.iduser = :iduser AND a.ddate >= :lapsetime AND a.ddate <= :toptime ";
+        if (sport!=null) sql+=" AND a.idsport = :sport ";
+        if (activity!=null) sql+=" AND a.idactivity = :activity ";
+        
+        // creamos los objetos de transaccion
+        em=Factory.getEmf().createEntityManager();
+        tx=em.getTransaction();
+        
+        // creamos el objeto
+        List<Agenda> data;
+        
+        // iniciamos la transaccion
+        try {
+            tx.begin();
+            Query q=em.createQuery(sql);
+            q.setParameter("iduser", user);
+            q.setParameter("lapsetime", ddate1);
+            q.setParameter("toptime", ddate2);
+            if (sport!=null) q.setParameter("sport", sport);
+            if (activity!=null) q.setParameter("activity", activity);            
+            
+            data=q.getResultList();
+            
+            tx.commit();
+            
+        } catch (Exception ex) {
+            if (tx!=null && tx.isActive()) tx.rollback();
+            // logger
+            log.error("ERROR: Agenda rd-12B leyendo para estadistica->cuantos eventos user id"+user.getId()+" - Mensaje: "+ex);                        
+            return null;
+        } finally {
+            if (tx!=null && tx.isActive()) em.close();            
+        }
+        
+        // si obtenemos algun resultado, realizamos el sumatorio y devolvemos el hashmap con datos
+        if (data!=null) {
+            result=new HashMap<>();
+            // numero de eventos
+            result.put("counter", String.valueOf(data.size()));
+            long timeac=0;
+            float distanceac=0;
+            for (Agenda agenda : data) {
+                SimpleDateFormat sdf3=new SimpleDateFormat("HH:mm:ss", Locale.ITALY);
+                String stdate=sdf3.format(agenda.getTiming());
+                //Date newdate=sdf3.parse(stdate);
+                distanceac+=agenda.getDistance();
+                timeac+=sdf3.parse(stdate).getTime();
+            }
+
+            // fabricamos "a mano" los acumulados horarios
+            long timeacumulado=timeac/1000;
+            // obtenemos los segundos 
+            int segundos=(int)(timeacumulado % 60);
+            timeacumulado=timeacumulado-segundos;
+            timeacumulado=timeacumulado/60;
+            // obtenemos los minutos
+            int minutos=(int)(timeacumulado % 60);
+            timeacumulado=timeacumulado-minutos;
+            timeacumulado=timeacumulado/60;        
+            // obtenemos las horas
+            int horas=(int)timeacumulado;    
+
+            String hr=String.valueOf(horas);
+            if (hr.length()<2) hr="0"+hr;
+            String mn=String.valueOf(minutos);
+            if (mn.length()<2) mn="0"+mn;
+            String sg=String.valueOf(segundos);
+            if (sg.length()<2) sg="0"+sg;
+        
+
+            
+            
+            /*
+            Date dt=new Date();
+            dt.setTime(timeac);
+            // convertimos la variable tiempo a HHmmss
+            SimpleDateFormat sdftime=new SimpleDateFormat("HH:mm:ss");
+            sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Europe/Madrid" )));
+            String ttime=sdftime.format(dt);   
+            */
+            // tiempo en HHmmss de los eventos
+            result.put("time", hr+":"+mn+":"+sg);
+            // distancias acumuladas, si existen
+            result.put("distance", String.valueOf(distanceac));
+        }
+        
+        return result;
+
+    }    
 
     
 }

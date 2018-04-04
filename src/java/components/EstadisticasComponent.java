@@ -17,6 +17,7 @@ package components;
 import daos.ActividadesDAO;
 import daos.AgendaDAO;
 import daos.DeportesDAO;
+import java.util.HashMap;
 import java.util.List;
 import models.Actividades;
 import models.Agenda;
@@ -44,6 +45,15 @@ public class EstadisticasComponent {
     }
     
     
+    /**
+     * Este metodo obtiene una lista de eventos de la agenda, segun los parametros suministrados
+     * @param user
+     * @param sport
+     * @param activity
+     * @param fechini
+     * @param fechfin
+     * @return null | List Agenda
+     */
     public List<Agenda> getAgendaList(Usuarios user, Deportes sport, Actividades activity, String fechini, String fechfin) {
         
         //chequeamos los parametros
@@ -72,10 +82,48 @@ public class EstadisticasComponent {
         } catch (Exception ex) {
             log.error("ERROR: Algo ha ido mal obteniendo lista de actividades por parametros para el user "+user.getId()+" - mensaje: "+ex);
         }
-              
+        if (agendaList!=null) System.out.println("VER LISTA:"+agendaList.size());
+        else System.out.println("VER LISTA NULL");
         return agendaList;
         
     }
+    
+    /**
+     * Este metodo obtiene de la base de datos el acumulado de resultados entre fechas, segun
+     * los parametros suministrados
+     * @param user
+     * @param sport
+     * @param activity
+     * @param fechini
+     * @param fechfin
+     * @return null | HashMap
+     */
+    public HashMap<String,String> getSumDataAgendaList(Usuarios user, Deportes sport, Actividades activity, String fechini, String fechfin) {
+        
+        //chequeamos los parametros
+        if (user==null) return null;        
+        if (fechini==null || fechini.length()!=10) return null;
+        if (fechfin==null || fechfin.length()!=10) return null;
+        
+        // instanciamos los daos
+        agdao=new AgendaDAO();
+        
+        HashMap<String,String> sumData=null;
+        
+        // buscamos la informacion seleccionando entre los parametros
+        try {
+            // pasamos la informacion al dao
+            sumData=agdao.getSessionsUntilDates(user, sport, activity, fechini, fechfin);
+         
+        } catch (Exception ex) {
+            log.error("ERROR: Algo ha ido mal obteniendo lista de actividades por parametros para el user "+user.getId()+" - mensaje: "+ex);
+        }
+                      if (sumData!=null) System.out.println("VER LISTA data:"+sumData.size());
+        else System.out.println("VER LISTA DATA NULL");
+        return sumData;
+        
+    }
+    
     
     /**
      * Este metodo obtiene un deporte de la base de datos, con los parametros suministrados

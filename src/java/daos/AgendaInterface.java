@@ -15,6 +15,7 @@
 package daos;
 
 import models.Agenda;
+import models.Usuarios;
 
 /**
  *
@@ -23,7 +24,7 @@ import models.Agenda;
 public interface AgendaInterface {
     
     public boolean createCalendar (Agenda calendar) throws Exception;
-    public Agenda readCalendar (Long id) throws Exception;
+    public Agenda readCalendar (Long id, Usuarios user) throws Exception;
     public boolean updateCalendar (Agenda calendar) throws Exception;
     public boolean deleteCalendar (Long id) throws Exception;
     
