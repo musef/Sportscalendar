@@ -228,6 +228,36 @@ main {
     text-align: center;    
 }
 
+.maindata {
+    width: 90%;
+    margin-top: 25px;
+    margin-left: 10%;
+}
+
+.maindata table {
+    width: 90%;    
+}
+
+.maindata h1 {
+    text-align: center;
+}
+
+.maindata select,input[type="text"] {
+    width: 30%;
+    min-width: 225px;
+    height: 45px;
+    font-size: 1.3em;
+}
+.maindata input[type="submit"], input[type="reset"] {
+    width: 24%;
+    margin-left: 5%;
+    margin-top: 10px;
+    height: 35px;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
+}
+
 /* ******* PAGINA 404 ************ */
 
 .error404 {

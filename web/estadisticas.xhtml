@@ -55,22 +55,22 @@
                 <h:form>
 
                     <div class="mainbox">
-                        
-                        <h:form>                            
+                                                  
                             <h:panelGrid columns="2" class="agendalist">
                                 
                                 <h:outputLabel value="Seleccione deporte"></h:outputLabel>
                                 <h:selectOneMenu valueChangeListener="#{estadisticasBean.changeSportIdx}" >
                                     <f:selectItem itemValue="0" itemLabel="Todos"></f:selectItem>
-                                    <f:selectItems value="#{loginBean.user.deportesList}" var="sp" itemValue="#{sp.id}" itemLabel="#{sp.sportName}">
-                                    </f:selectItems> 
+                                    <f:selectItems value="#{estadisticasBean.sportsList}" var="sp" itemValue="#{sp.id}" itemLabel="#{sp.sportName}">
+                                    </f:selectItems>
+                                    <f:ajax render="selectActivity"></f:ajax>
                                 </h:selectOneMenu>
 
                                 <h:outputLabel value="Seleccione actividad"></h:outputLabel>
-                                <h:selectOneMenu value="#{estadisticasBean.idxactivity}" >
+                                <h:selectOneMenu id="selectActivity" valueChangeListener="#{estadisticasBean.changeActivityIdx}" value="#{estadisticasBean.idxactivity}">
                                     <f:selectItem itemValue="0" itemLabel="Todas"></f:selectItem>
-                                    <f:selectItems value="#{loginBean.user.recorridosList}" var="ac" itemValue="#{ac.id}" itemLabel="#{ac.name}">
-                                    </f:selectItems> 
+                                    <f:selectItems value="#{estadisticasBean.activitiesList}" var="ac" itemValue="#{ac.id}" itemLabel="#{ac.name}">
+                                    </f:selectItems>
                                 </h:selectOneMenu>
                                 
                                 <h:outputLabel value="Desde fecha"></h:outputLabel>
@@ -86,26 +86,36 @@
                                 <h:commandButton action="#{estadisticasBean.getRecordsList}" value="Listar"></h:commandButton>
                             </h:panelGrid>
                             
-                        </h:form>
                         
                     </div>
                     <div class="messagebox">#{message}</div>
                     <div class="listbox">
                         <c:if test="#{estadisticasBean.listaAgenda.size()>0}">
-                            <h:outputLabel value="Fecha"></h:outputLabel>
-                            <h:outputLabel value="Actividad"></h:outputLabel>
-                            <h:outputLabel value="Tiempo"></h:outputLabel>
-                            <h:outputLabel value="distancia"></h:outputLabel>
+                            <h:panelGrid class="activitiesList" rendered="true" columns="3">
+                                <h:outputLabel value="Nº actividades"></h:outputLabel>
+                                <h:outputLabel value="Tiempo acumulado"></h:outputLabel>
+                                <h:outputLabel value="Distancia acumulada"></h:outputLabel>                                   
+                                <h:inputText value="#{estadisticasBean.resultAcum.counter}"></h:inputText>
+                                <h:inputText value="#{estadisticasBean.resultAcum.time}">
+                                   <f:convertDateTime pattern="HH:mm:ss"></f:convertDateTime>
+                                </h:inputText>
+                                <h:inputText value="#{estadisticasBean.resultAcum.distance}"></h:inputText>
+                            </h:panelGrid>                            
                             <h:panelGrid class="activitiesList" rendered="true" columns="4">
-                                <c:forEach var="ag" items="#{estadisticasBean.listaAgenda}">
+                                <h:outputLabel value="Fecha"></h:outputLabel>
+                                <h:outputLabel value="Actividad"></h:outputLabel>
+                                <h:outputLabel value="Tiempo"></h:outputLabel>
+                                <h:outputLabel value="distancia"></h:outputLabel>
+                                <c:forEach var="ag" items="#{estadisticasBean.listaAgenda}">                                    
+                                    <h:inputText value="#{ag.date.time}">
+                                       <f:convertDateTime pattern="dd-MM-yyyy" timeZone="GMT+6"></f:convertDateTime>
+                                    </h:inputText>
+                                    <h:inputText value="#{ag.idactivity.name}"></h:inputText>
                                     
-                                    <h:inputText value="#{ag.date}">
-                                        <f:convertDateTime pattern="dd-MM-yyyy" timeZone="GMT+2" ></f:convertDateTime>
+                                    <h:inputText value="#{ag.timing}" >
+                                        <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT+1"></f:convertDateTime>
                                     </h:inputText>
-                                    <h:inputText value="Actividad"></h:inputText>
-                                    <h:inputText value="#{ag.timing}">
-                                         <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT+1"></f:convertDateTime>
-                                    </h:inputText>
+
                                     <h:inputText value="#{ag.distance}"></h:inputText>
                                 </c:forEach>
                             </h:panelGrid>

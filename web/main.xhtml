@@ -125,10 +125,17 @@
                     <div class="targetday" >
                         <h1>Dia #{mainBean.presentDay}</h1>
                         <h1>Actividad del día</h1>
+                        <h:inputHidden id="agid" value="#{mainBean.agIdActivity}"></h:inputHidden>
                         <h:inputText id="agsport" value="#{mainBean.agSport}" disabled="" ></h:inputText>
                         <h:inputText id="agactivity" value="#{mainBean.agActivity}" disabled=""></h:inputText>
                         <h:inputText id="agtime" value="#{mainBean.agTime}" disabled=""></h:inputText>
-                        <h:commandButton action="#{mainBean.recordTodayActivity()}" value="Introducir datos" ></h:commandButton>
+                        <h:commandButton action="#{mainBean.modifyThisActivity()}" value="Modificar evento" >
+                            <f:param name="agIdActivity" value="#{mainBean.agIdActivity}"  ></f:param>
+                            <f:param name="presentDay" value="#{mainBean.presentDay}" ></f:param>
+                        </h:commandButton>                        
+                        <h:commandButton action="#{mainBean.recordTodayActivity()}" value="Nuevo evento" >
+                            <f:param name="presentDay" value="#{mainBean.presentDay}" ></f:param>
+                        </h:commandButton>
                     </div>                    
                     <div class="messagebox"></div>
 
