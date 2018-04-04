@@ -17,6 +17,7 @@ package controllers;
 
 import components.ActividadesComponent;
 import components.DeportesComponent;
+import java.io.Serializable;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,9 +36,9 @@ import org.apache.log4j.Logger;
  *
  * @author musef2904@gmail.com
  */
-@ManagedBean(eager = true)
+@ManagedBean
 @ViewScoped
-public class ActividadesBean {
+public class ActividadesBean implements Serializable {
 
     //managers
     private ActividadesComponent actividadesComponent;
@@ -97,7 +98,7 @@ public class ActividadesBean {
             // instanciamos el borrado de la actividad
             boolean result=actividadesComponent.deleteActivity(getActivityidx(),LoginBean.user);
             if (result) {
-                setMessage("Nueva actividad borrada correctamente");
+                setMessage("La actividad ha sido borrada correctamente");
                 // actualizamos la lista despues de operacion DDBB
                 setActivities(actividadesComponent.allActivities(selectedSport, LoginBean.user));
                 activityidx=0;
@@ -109,7 +110,7 @@ public class ActividadesBean {
                 this.activitySlope=0;
                 this.activityDistance=0;
                 this.activityTimming="";                 
-            }   else setMessage("No ha sido posible borrar una nueva actividad");
+            }   else setMessage("No ha sido posible borrar la actividad seleccionada");
 
         }
     }

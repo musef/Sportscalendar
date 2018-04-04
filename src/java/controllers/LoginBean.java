@@ -22,6 +22,7 @@ import models.Usuarios;
 import components.LoginComponent;
 import components.SportsListBean;
 import daos.AgendaDAO;
+import java.io.Serializable;
 import javax.faces.context.FacesContext;
 import org.apache.log4j.Logger;
 
@@ -33,7 +34,7 @@ import org.apache.log4j.Logger;
  */
 @ManagedBean
 @SessionScoped
-public class LoginBean  {
+public class LoginBean implements Serializable {
     
     // manager
     private LoginComponent loginComponent;
@@ -55,10 +56,14 @@ public class LoginBean  {
     
     private Logger log;
     
+    // dato idActivitySeleccionada
+    public static String eventIdActivity; 
+    
     
     public LoginBean() {
         
         log=Logger.getLogger("stdout");
+        eventIdActivity="0";
     }
 
     
@@ -300,5 +305,21 @@ public class LoginBean  {
     public Usuarios getUser(){
         return user;
     }
+
+    /**
+     * @return the eventIdActivity
+     */
+    public String getEventIdActivity() {
+        return eventIdActivity;
+    }
+
+    /**
+     * @param eventIdActivity the eventIdActivity to set
+     */
+    public void setEventIdActivity(String eventIdActivity) {
+        this.eventIdActivity = eventIdActivity;
+    }
+
+ 
     
 }

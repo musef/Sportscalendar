@@ -15,6 +15,7 @@
 package controllers;
 
 import components.MainComponent;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,9 +31,9 @@ import javax.faces.event.ValueChangeEvent;
  *
  * @author musef2904@gmail.com
  */
-@ManagedBean
+@ManagedBean(eager=true)
 @ViewScoped
-public class MainBean {
+public class MainBean implements Serializable {
 
     //manager
     private MainComponent mainComponent;
@@ -55,13 +56,14 @@ public class MainBean {
     private String agSport;
     private String agActivity;
     private String agTime;
-    
+    private String agIdActivity;
     
     private final List<String> months=new ArrayList<>(Arrays.asList("Enero","Febrero","Marzo",
             "Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"));
     private String[] years;
     
     private static List<String[]> monthchain;
+    
     
     
     public MainBean() {
@@ -246,6 +248,7 @@ public class MainBean {
             agTime=todayActivity.get("time");
             agSport=todayActivity.get("spname");
             agActivity=todayActivity.get("acname");
+            agIdActivity=todayActivity.get("acid");
         }
         
     }
@@ -255,9 +258,19 @@ public class MainBean {
      * @return 
      */
     public String recordTodayActivity() {
+        // Vaciamos el id a estatico para pasarlo como parametro
+        LoginBean.eventIdActivity="0";
         return "inputdata";
     }
     
+    
+    public String modifyThisActivity() {
+        
+        // llevamos el id a estatico para pasarlo como parametro
+        LoginBean.eventIdActivity=agIdActivity;
+        
+        return "inputdata";
+    }
     
     /* ****************** GETTERS AND SETTERS *********************** */
     
@@ -423,6 +436,20 @@ public class MainBean {
      */
     public void setAgTime(String agTime) {
         this.agTime = agTime;
+    }
+
+    /**
+     * @return the agIdActivity
+     */
+    public String getAgIdActivity() {
+        return agIdActivity;
+    }
+
+    /**
+     * @param agIdActivity the agIdActivity to set
+     */
+    public void setAgIdActivity(String agIdActivity) {
+        this.agIdActivity = agIdActivity;
     }
  
     

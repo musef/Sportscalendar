@@ -15,20 +15,33 @@
 package controllers;
 
 import components.AgendaComponent;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.event.ValueChangeEvent;
 import models.Actividades;
 import models.Agenda;
 import models.Deportes;
 
+/**
+ * Flujo de datos en modificación.
+ * Se precarga en constructor la lista de deportes del usuario
+ * Para poder leer el parametro inyectado hay que dar RequestScoped al Bean (ciclo vida Request)
+ * Como parametro inyectado viene thisEventToModify, con el id del evento a cargar
+ * En el postConstruct se lee el evento, el cual carga los datos del evento y los idx del deporte y la actividad
+ * En el getSportidx leemos el valor inyectado y obtenemos el bean del deporte correspondiente, y cargamos la
+ *  lista con los valores de la actividad que corresponde al deporte
+ * Y finalmente, en getActivityidx leemos el valor inyectado que cambia el select de la lista anteriormente cargada
+ */
 
 /**
  *
@@ -36,7 +49,7 @@ import models.Deportes;
  */
 @ManagedBean
 @ViewScoped
-public class AgendaBean {
+public class AgendaBean implements Serializable {
 
     // manager
     AgendaComponent agendaComponent;
@@ -48,7 +61,13 @@ public class AgendaBean {
     private Actividades selectedActivity;
     private Deportes selectedSport;     
 
+    // inyectamos del objeto session del usuario 
+    // la actividad seleccionada
+    @ManagedProperty(value="#{loginBean.eventIdActivity}")
+    private String thisEventToModify;
+    @ManagedProperty(value="#{mainBean.presentDay}")
     private String thisday;
+    
     private String nameact;
     private String distance;
     private String slope;
@@ -60,17 +79,54 @@ public class AgendaBean {
     private SimpleDateFormat sdf;
     
     
+    
     public AgendaBean() {
-        
-        
+                
         sdf=new SimpleDateFormat("HH:mm:ss");
         if (this.message==null) this.message="";
         
+        // rellenamos la lista de deportes con la lista del user
+        sports=LoginBean.userSportlist.getSportsList();
+        
+        // si no tenemos dia definido por parametro
+        if (thisday==null) {        
+           SimpleDateFormat sdt=new SimpleDateFormat("dd-MM-yyyy");
+           Date ldt=new Date();      
+           thisday=sdt.format(ldt);
+        }
+                
+    }
+    
+    @PostConstruct
+    private void init() {
+        // si este atributo tiene valor, es que tenemos que obtener este evento
+        // para mostrarlo en modo modificacion
+        if (thisEventToModify!=null) {
+            // instanciamos el manager
+            agendaComponent=new AgendaComponent();
+            
+            Agenda thisEvent=agendaComponent.readEvent(Long.parseLong(thisEventToModify), LoginBean.user);
+            
+            if (thisEvent!=null) {  
+                // mostramos los datos
+                this.nameact=thisEvent.getIdactivity().getName();
+                this.description=thisEvent.getComments();
+                this.site=thisEvent.getIdactivity().getSite();
+                this.slope=String.valueOf(thisEvent.getSlope());
+                this.distance=String.valueOf(thisEvent.getDistance());
+                this.duration=sdf.format(thisEvent.getTiming());
+                this.sportidx=thisEvent.getIdsport().getId();
+                this.activityidx=thisEvent.getIdactivity().getId();
+                
+            }
+        }
     }
     
     /**
      * Este metodo genera la grabacion de una actividad deportiva en la agenda, segun
-     * los datos obtenidos del formulario
+     * los datos obtenidos del formulario.
+     * Si el atributo thisEventToModify es empty, es una nueva grabación; en caso de 
+     * modificación, contiene el id del evento de agenda a modificar
      * @return 
      */
     public String recordThisActivity() {
@@ -79,13 +135,13 @@ public class AgendaBean {
         int year=Integer.valueOf(this.thisday.substring(6));
         int month=Integer.valueOf(this.thisday.substring(3, 5));
         int day=Integer.valueOf(this.thisday.substring(0, 2));
-        //LocalDateTime ldt=LocalDateTime.of(year, month, day, 0, 0);
 
         // convertimos el objeto a un Date
-        LocalDateTime thisdate=LocalDateTime.of(year, month, day, 0, 0,0);
-        Calendar ddate=Calendar.getInstance();
-        ddate.setTimeInMillis(thisdate.toEpochSecond(ZoneOffset.UTC));
-       
+        LocalDateTime thisdate=LocalDateTime.of(year, month, day, 8, 0,0);
+        thisdate.atZone(ZoneId.of("Europe/Madrid"));
+        Date dateday=new Date();
+        dateday.setTime(thisdate.toEpochSecond(ZoneOffset.UTC)*1000);
+               
         // obtenemos el resto de los datos del formulario
         Float dst=Float.parseFloat(this.distance);
         Float slp=Float.parseFloat(this.slope);
@@ -104,16 +160,43 @@ public class AgendaBean {
         Actividades act=new Actividades(activityidx);
         
         // construimos un objeto Agenda con los datos procesados del formulario
-        Agenda ag=new Agenda(LoginBean.user.getKeyuser(), ddate, dst, slp, thistime, this.description, LoginBean.user, dp, act);
+        Agenda ag=new Agenda(LoginBean.user.getKeyuser(), dateday, dst, slp, thistime, this.description, LoginBean.user, dp, act);
         
         // instanciamos el manager
         agendaComponent=new AgendaComponent();
         
-        // en funcion del resultado devolvemos el control a uno u otro
-        if (agendaComponent.createEventCalendar(ag, LoginBean.user)) return "inputdata.xhmtl";     
-        else return "main.xhtml";
+        if (thisEventToModify==null || thisEventToModify.isEmpty() || thisEventToModify.equals("0")) {
+            // estamos en el caso de grabación de un nuevo evento
+            
+            // en funcion del resultado devolvemos el mensaje
+            if (agendaComponent.createEventCalendar(ag, LoginBean.user)) {
+                setMessage("Evento de agenda grabado correctamente");
+            } else {
+                setMessage("NO ha sido posible grabar un nuevo evento en la agenda");
+            } 
+            
+        } else {
+            // estamos en el caso de modificación de un evento existente
+            ag.setId(Long.parseLong(thisEventToModify));
+            // en funcion del resultado devolvemos el mensaje
+            if (agendaComponent.modifyEventCalendar(ag, LoginBean.user)) {
+                setMessage("Evento de agenda modificado correctamente");
+            } else {
+                setMessage("NO ha sido posible modificar el evento en la agenda");
+            }             
+            
+        }
+          
+        return "";
     }
 
+    
+    public void deleteThisEvent() {
+        
+        setMessage("Evento de agenda borrado correctamente");
+        
+    }
+    
     
      /**
      * Este metodo recupera el objeto Deportes, en funcion
@@ -166,13 +249,11 @@ public class AgendaBean {
      * @param f
      */
     public void changeActivity(ValueChangeEvent f) {
-        
-        // borramos mensaje
-        message="";
-        
+                
         // actualizamos aqui
          activityidx=Long.parseLong(f.getNewValue().toString());
         // recuperamos el objeto
+        System.out.println("ACTIVIDAD IDX"+activityidx);
         if (activityidx>0) {
             
             agendaComponent=new AgendaComponent();
@@ -186,8 +267,30 @@ public class AgendaBean {
                 this.site=selectedActivity.getSite();
                 this.slope=String.valueOf(selectedActivity.getSlope().toString());
                 this.distance=String.valueOf(selectedActivity.getDistance());
-                this.duration=sdf.format(selectedActivity.getTiming());                
-            }
+                this.duration=sdf.format(selectedActivity.getTiming());   
+                System.out.println("ACTIVIDAD IDX2"+activityidx);
+            } else System.out.println("NO ACTIVIDAD IDX"+activityidx);
+        }
+    }
+    
+    public void showActivityData() {
+        System.out.println("ACTIVIDAD IDX 1A-"+activityidx);
+        if (activityidx>0) {
+            
+            agendaComponent=new AgendaComponent();
+            
+            selectedActivity=agendaComponent.readActivity(activityidx, LoginBean.user);
+            
+            if (selectedActivity!=null) {
+                // mostramos los datos
+                this.nameact=selectedActivity.getName();
+                this.description=selectedActivity.getDescription();
+                this.site=selectedActivity.getSite();
+                this.slope=String.valueOf(selectedActivity.getSlope().toString());
+                this.distance=String.valueOf(selectedActivity.getDistance());
+                this.duration=sdf.format(selectedActivity.getTiming());   
+                System.out.println("ACTIVIDAD IDX2"+activityidx);
+            } else System.out.println("NO ACTIVIDAD IDX"+activityidx);
         }
     }
     
@@ -198,6 +301,17 @@ public class AgendaBean {
      * @return the sportidx
      */
     public long getSportidx() {
+        if (sportidx>0) {
+            // recuperamos el deporte seleccionado
+            agendaComponent=new AgendaComponent();
+            
+            selectedSport=agendaComponent.readSport(sportidx, LoginBean.user);            
+
+            if (selectedSport!=null) {
+                // y recuperamos la lista de actividades de ese deporte
+                activities=agendaComponent.allActivities(selectedSport, LoginBean.user);
+            }                     
+        }          
         return sportidx;
     }
 
@@ -219,7 +333,7 @@ public class AgendaBean {
      * @param activityidx the activityidx to set
      */
     public void setActivityidx(long activityidx) {
-        this.activityidx = activityidx;
+        this.activityidx = activityidx;      
     }
 
     /**
@@ -240,7 +354,6 @@ public class AgendaBean {
      * @return the nameact
      */
     public String getNameact() {
-        //if (selectedActivity!=null) this.nameact=selectedActivity.getName();
         return nameact;
     }
 
@@ -255,7 +368,6 @@ public class AgendaBean {
      * @return the distance
      */
     public String getDistance() {
-       // if (selectedActivity!=null) this.distance=String.valueOf(selectedActivity.getDistance());
         return distance;
     }
 
@@ -270,7 +382,6 @@ public class AgendaBean {
      * @return the slope
      */
     public String getSlope() {
-        //if (selectedActivity!=null) this.slope=String.valueOf(selectedActivity.getSlope());
         return slope;
     }
 
@@ -285,7 +396,6 @@ public class AgendaBean {
      * @return the duration
      */
     public String getDuration() {
-       // if (selectedActivity!=null) this.distance=String.valueOf(selectedActivity.getDistance());
         return duration;
     }
 
@@ -300,7 +410,6 @@ public class AgendaBean {
      * @return the description
      */
     public String getDescription() {
-        //if (selectedActivity!=null) this.description=selectedActivity.getDescription();
         return description;
     }
 
@@ -315,7 +424,6 @@ public class AgendaBean {
      * @return the site
      */
     public String getSite() {
-        //if (selectedActivity!=null) this.site=selectedActivity.getSite();
         return site;
     }
 
@@ -330,7 +438,6 @@ public class AgendaBean {
      * @return the sports
      */
     public List<Deportes> getSports() {
-        //if (sports==null) sports=LoginBean.user.getDeportesList();
         return sports;
     }
 
@@ -345,11 +452,6 @@ public class AgendaBean {
      * @return the activities
      */
     public List<Actividades> getActivities() {
-        /*
-        if (sportidx>0) selectedSport=ddao.readSport(sportidx);
-            else selectedSport=null;
-        activities=adao.readAllSportActivities(selectedSport);  
-        */
         return activities;
     }
 
@@ -363,8 +465,7 @@ public class AgendaBean {
     /**
      * @return the selectedActivity
      */
-    public Actividades getSelectedActivity() {
-        //if (selectedActivity==null && activityidx>0) selectedActivity=adao.readActivity(activityidx);        
+    public Actividades getSelectedActivity() {       
         return selectedActivity;
     }
 
@@ -379,7 +480,6 @@ public class AgendaBean {
      * @return the selectedSport
      */
     public Deportes getSelectedSport() {
-        //if (selectedSport==null && sportidx>0) selectedSport=ddao.readSport(sportidx);
         return selectedSport;
     }
 
@@ -388,6 +488,34 @@ public class AgendaBean {
      */
     public void setSelectedSport(Deportes selectedSport) {
         this.selectedSport = selectedSport;
+    }
+
+    /**
+     * @return the thisEventToModify
+     */
+    public String getThisEventToModify() {
+        return thisEventToModify;
+    }
+
+    /**
+     * @param thisEventToModify the thisEventToModify to set
+     */
+    public void setThisEventToModify(String thisEventToModify) {
+        this.thisEventToModify = thisEventToModify;
+    }
+
+    /**
+     * @return the message
+     */
+    public String getMessage() {
+        return message;
+    }
+
+    /**
+     * @param message the message to set
+     */
+    public void setMessage(String message) {
+        this.message = message;
     }
     
     

@@ -15,6 +15,7 @@
 package controllers;
 
 import components.DeportesComponent;
+import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import java.util.List;
 import javax.faces.bean.ViewScoped;
@@ -29,7 +30,7 @@ import models.Deportes;
  */
 @ManagedBean
 @ViewScoped()
-public class DeportesBean {
+public class DeportesBean implements Serializable {
 
     //manager
     private DeportesComponent deportesComponent;
