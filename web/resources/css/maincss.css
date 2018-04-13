@@ -177,7 +177,7 @@ main {
     width: 120%;
 }
 
-.agendalist input[type="submit"],input[type="reset"] {
+.agendalist input[type="submit"],.agendalist input[type="reset"] {
     width: 150px;
 }
 
@@ -242,7 +242,7 @@ main {
     text-align: center;
 }
 
-.maindata select,input[type="text"] {
+.maindata select,.maindata input[type="text"] {
     width: 30%;
     min-width: 225px;
     height: 45px;

@@ -80,6 +80,11 @@ public class MainBean implements Serializable {
             showTodayActivity();
             // construimos un nuevo calendario
             if (monthchain==null || monthchain.isEmpty()) buildCalendar(presentDay);
+        } else {
+            // hacemos un option selected del mes dentro del calendario
+            // dia de asignacion
+            // construimos un nuevo calendario
+            buildCalendar(presentDay);
         }
            
     }
