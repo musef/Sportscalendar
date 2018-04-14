@@ -182,16 +182,22 @@ main {
 }
 
 .listbox {
-    width: 500px;
-    margin-top:5px;
+    width: 100%;
+    margin-top:20px;
     margin-bottom: 5px;
 }
 
 .activitiesList {
-    width: 90%;
-    margin: 0 auto;
+    margin: 20px auto;
     border: 1px solid black;
+    font-size: 0.8em;
 }
+
+.activitiesList label {
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
 
 .messagebox {
     width: 75%;

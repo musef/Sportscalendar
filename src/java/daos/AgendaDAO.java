@@ -17,10 +17,12 @@ package daos;
 import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
@@ -869,19 +871,32 @@ public class AgendaDAO implements AgendaInterface{
             long timeac=0;
             float distanceac=0;
             for (Agenda agenda : data) {
+      
+                // metodo por el que se parsea y luego se traduce y obtiene el
+                // valor de horas, minutos y segundos y luego se acumula
                 SimpleDateFormat sdf3=new SimpleDateFormat("HH:mm:ss", Locale.ITALY);
                 String stdate=sdf3.format(agenda.getTiming());
-                //Date newdate=sdf3.parse(stdate);
+                long hrs=Integer.parseInt(stdate.substring(0,2));
+                long mnt=Integer.parseInt(stdate.substring(3,5));
+                long scn=Integer.parseInt(stdate.substring(6));
+
+                // acumulamos los segundos 
+                timeac+=(hrs*3600)+(mnt*60)+scn;
+            
+                // acumulamos los kms              
                 distanceac+=agenda.getDistance();
-                timeac+=sdf3.parse(stdate).getTime();
+
             }
 
-            // fabricamos "a mano" los acumulados horarios
-            long timeacumulado=timeac/1000;
+            // fabricaremos "a mano" los acumulados horarios
+            long timeacumulado=timeac;
+            
             // obtenemos los segundos 
             int segundos=(int)(timeacumulado % 60);
+            
             timeacumulado=timeacumulado-segundos;
             timeacumulado=timeacumulado/60;
+            
             // obtenemos los minutos
             int minutos=(int)(timeacumulado % 60);
             timeacumulado=timeacumulado-minutos;
@@ -895,18 +910,7 @@ public class AgendaDAO implements AgendaInterface{
             if (mn.length()<2) mn="0"+mn;
             String sg=String.valueOf(segundos);
             if (sg.length()<2) sg="0"+sg;
-        
-
             
-            
-            /*
-            Date dt=new Date();
-            dt.setTime(timeac);
-            // convertimos la variable tiempo a HHmmss
-            SimpleDateFormat sdftime=new SimpleDateFormat("HH:mm:ss");
-            sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Europe/Madrid" )));
-            String ttime=sdftime.format(dt);   
-            */
             // tiempo en HHmmss de los eventos
             result.put("time", hr+":"+mn+":"+sg);
             // distancias acumuladas, si existen

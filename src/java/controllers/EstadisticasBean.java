@@ -86,8 +86,9 @@ public class EstadisticasBean implements Serializable {
 
         // obtenemos la actividad, si procede
         Actividades actividad=estadisticasComponent.getSelectedActivity(idxactivity, LoginBean.user);
+        if (deporte!=null && actividad!=null) System.out.println("THIS DATA:"+LoginBean.user+"**"+deporte.getSportName()+"**"+actividad.getName()+"**"+fechini+"**"+fechfin);
+        else System.out.println("THIS DATA:"+LoginBean.user+"**"+"**"+fechini+"**"+fechfin);
         
-        System.out.println("THIS DATA:"+LoginBean.user+"**"+deporte.getSportName()+"**"+actividad.getName()+"**"+fechini+"**"+fechfin);
         // obtenemos la lista de los datos de la DDBB
         this.listaAgenda=estadisticasComponent.getAgendaList(LoginBean.user, deporte, actividad, fechini, fechfin);
         // obtenemos la estadistica global de esos datos
@@ -224,7 +225,7 @@ public class EstadisticasBean implements Serializable {
      * @param resultAcum the resultAcum to set
      */
     public void setResultAcum(HashMap<String,String> resultAcum) {
-        this.resultAcum = resultAcum;
+        this.resultAcum = null;
     }
 
     /**
