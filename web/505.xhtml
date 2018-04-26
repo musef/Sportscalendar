@@ -16,24 +16,21 @@
         
     </h:head>
     <h:body>
-        <header style="margin-top: 100px">
+        <header>
             <ui:insert>
                 <ui:include src="resources/templates/header.xhtml"></ui:include>
             </ui:insert>            
-        </header>        
+        </header>
+        
         <main class="indexmain">
             <h:form>
-                <div class="loginbox">
-                    <h:panelGrid columns="2">
-                        <h:outputLabel value="Usuario"></h:outputLabel>
-                        <h:inputText id="username" title="Introduzca su nombre de usuario (longitud entre 6 y 15 caracteres)" value="#{loginBean.username}" required="true" maxlength="15" >
-                        </h:inputText>
-                        <h:outputLabel value="Contraseña"></h:outputLabel>
-                        <h:inputSecret id="userpass" title="Introduzca su contraseña (longitud entre 8 y 20 caracteres)" value="#{loginBean.userpass}" required="true" maxlength="20">
-                        </h:inputSecret>  
-                        <h:commandButton id="clear" action="#{loginBean.clear()}" value="Borrar"></h:commandButton>
-                        <h:commandButton id="login" action="#{loginBean.login()}" value="Entrar"></h:commandButton>
-                    </h:panelGrid>                    
+                <div class="error404">
+                    <h1>Uchs.... culpa mía... algo he programado mal</h1>
+                    <video autoplay="true" width="300px">
+                        <source src="resources/img/error404.webm" type="video/webm"/>
+                    </video>
+                    <h1>Pulse el botón para ir al login...</h1>
+                    <h:commandButton id="login" action="index" value="Login"></h:commandButton>                   
                 </div>
                 <div class="messagebox"><h:outputText value="#{loginBean.loginmessage}"></h:outputText></div>
             </h:form>

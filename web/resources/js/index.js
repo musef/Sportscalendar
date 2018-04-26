@@ -25,15 +25,27 @@ $(document).ready(function(){
         $("[id*=username]").css('backgroundColor','white');
         $("[id*=userpass]").css('backgroundColor','white');
 
+        // comprobamos longitudes
         var name=$("[id*=username]").val();
         if (name.length<6 || name.length>15) {
-            message+="Longitud inadecuada de nombre de usuario\n";
+            message+="\n- Longitud inadecuada de nombre de usuario:\n   Entre 6 y 15 caracteres";
             $("[id*=username]").css('backgroundColor','red');
         }
         var pass=$("[id*=userpass]").val();
         if (pass.length<8 || pass.length>20) {
-            message+="Longitud inadecuada de contraseña\n";
+            message+="\n- Longitud inadecuada de contraseña\n   Entre 6 y 20 caracteres";
             $("[id*=userpass]").css('backgroundColor','red');
+        }
+        
+        // comprobamos valores introducidos
+        var resultname=name.match(/[<>!$%&/\()=?;\[\]'"]/g);
+        if (resultname!==null) {
+            message+="\n- Caracteres no admitidos en usuario: \n< > ! & % $ \ / ( ) = ? ; [ ] ' \" ";
+        }
+        // comprobamos valores introducidos
+        var resultpass=pass.match(/[<>!$%&/\()=?;\[\]'"]/g);
+        if (resultpass!==null) {
+            message+="\n- Caracteres no válidos en contraseña: \n< > ! & % $ \ / ( ) = ? ; [ ] ' \" ";
         }
         
         // mostramos el mensaje si tiene contenido

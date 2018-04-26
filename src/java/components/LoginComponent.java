@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
  */
 public class LoginComponent {
     
-    private final CharSequence forbiddenchars="<>!$%&/()=?¿;[]*'";
+    private final CharSequence forbiddenchars="<>!$%&/()=?;[]\"'\\";
     private String loginmessage="";
     
     private Logger log;
@@ -40,7 +40,7 @@ public class LoginComponent {
         log = Logger.getLogger("stdout");
     }
     
-    
+    /*
     protected String getHours(String duration) {
         
         int days=0;
@@ -56,7 +56,7 @@ public class LoginComponent {
         
         return null;
         
-    }
+    }*/
     
     
     /**
@@ -77,7 +77,10 @@ public class LoginComponent {
         data=data.replaceAll("value", "");
         data=data.trim();
         
-        if (!copydata.equals(data)) loginmessage="El dato "+copydata+" ha sido filtrado y convertido en "+data;
+        if (!copydata.equals(data)) {
+            loginmessage="El dato "+copydata+" ha sido filtrado y convertido en "+data;
+            log.warn("ADVERTENCIA: El dato "+copydata+" ha sido filtrado y por motivos de seguridad transformado en "+data);
+        }
         
         return data;        
         
@@ -105,14 +108,15 @@ public class LoginComponent {
         } catch (Exception ex) {
             log.error("ERROR: Algo ha ido mal identificando un usuario con username "+username+" - mensaje: "+ex);
         }
-            
+
+                // problemas ddbb en logueado
+        if (user==null || user.getId()==-1) this.loginmessage="Error procesando su solicitud";
         // error en user-pass
-        if (user.getId()==0) this.loginmessage="Usuario-contraseña inexistente";
-        // problemas ddbb en logueado
-        if (user.getId()==-1) this.loginmessage="Error procesando su solicitud";  
+        else if (user.getId()==0) this.loginmessage="Usuario-contraseña inexistente";
+  
             
         // login correcto
-        if (user.getId()>0) return user;
+        if (user !=null && user.getId()>0) return user;
         
         return null;
     }
@@ -160,7 +164,8 @@ public class LoginComponent {
         int keyLength=512;
         int iterations = 10;
         try {
-            SecretKeyFactory skf = SecretKeyFactory.getInstance( "PBKDF2WithHmacSHA512" );
+            //SecretKeyFactory skf = SecretKeyFactory.getInstance( "PBKDF2WithHmacSHA512" );
+            SecretKeyFactory skf = SecretKeyFactory.getInstance( "PBKDF2WithHmacSHA1" );
             PBEKeySpec spec = new PBEKeySpec( password, salt, iterations, keyLength );
             SecretKey key = skf.generateSecret( spec );
             byte[] res = key.getEncoded( );

@@ -18,11 +18,11 @@ import components.AgendaComponent;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.util.Calendar;
+
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -131,16 +131,18 @@ public class AgendaBean implements Serializable {
      */
     public String recordThisActivity() {
 
-        // obtenemos la fecha y creamos on objeto localDateTime
+        // obtenemos la fecha y creamos objto para calendar
         int year=Integer.valueOf(this.thisday.substring(6));
         int month=Integer.valueOf(this.thisday.substring(3, 5));
+        month--; // calendar empieza en mes 0 = Enero
         int day=Integer.valueOf(this.thisday.substring(0, 2));
 
-        // convertimos el objeto a un Date
-        LocalDateTime thisdate=LocalDateTime.of(year, month, day, 8, 0,0);
-        thisdate.atZone(ZoneId.of("Europe/Madrid"));
+        // convertimos el objeto a un Date        
+        TimeZone tz=TimeZone.getTimeZone("Europe/Madrid");
+        Calendar cal=Calendar.getInstance(tz);
+        cal.set(year, month, day, 8, 0,0);
         Date dateday=new Date();
-        dateday.setTime(thisdate.toEpochSecond(ZoneOffset.UTC)*1000);
+        dateday.setTime(cal.getTimeInMillis());
                
         // obtenemos el resto de los datos del formulario
         Float dst=Float.parseFloat(this.distance);
@@ -161,6 +163,9 @@ public class AgendaBean implements Serializable {
         
         // construimos un objeto Agenda con los datos procesados del formulario
         Agenda ag=new Agenda(LoginBean.user.getKeyuser(), dateday, dst, slp, thistime, this.description, LoginBean.user, dp, act);
+        
+        System.out.println("Fecha:"+dateday.toString()+"//"+day+"/"+month+"/"+year);
+        System.out.println("Calendar:"+cal.getTime().toString());
         
         // instanciamos el manager
         agendaComponent=new AgendaComponent();
