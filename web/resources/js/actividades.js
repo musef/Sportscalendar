@@ -84,5 +84,15 @@ $(document).ready(function(){
         
     });
     
+    $("[id*=helpac]").click(function(){
+        var mess="Para grabar una actividad nueva, primero seleccione un Deporte en el selector.";
+        mess+="\nA continuación, deje el selector de actividad en 'Seleccione...'";
+        mess+="\nIntroduzca los datos de la actividad a grabar. Esta actividad es un modelo de los entrenamientos que ud. realizará.";
+        mess+="\nEs obligatorio poner el nombre y la duración de la actividad (en formato hh:mm:ss)";
+        mess+="\n\nPara modificar una actividad, seleccione la actividad con el selector, y realice las modificaciones pertinentes.";
+        mess+="\n\nPara eliminar una actividad, seleccione la actividad y pulse en el botón eliminar. No podrá borrar una actividad si tiene eventos realizados";
+        mess+="\n\nLa opción eliminar no funciona en modo anonimo.";
+        alert(mess);
+    });
     
 });

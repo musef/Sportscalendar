@@ -35,6 +35,9 @@
                         <h:commandButton id="login" action="#{loginBean.login()}" value="Entrar"></h:commandButton>
                     </h:panelGrid>                    
                 </div>
+                <div class="freetour">
+                    <h:button id="freetour" onclick="freetour()" value="Visitar web"></h:button>
+                </div>
                 <div class="messagebox"><h:outputText value="#{loginBean.loginmessage}"></h:outputText></div>
             </h:form>
         </main>

@@ -11,6 +11,7 @@
         <h:outputStylesheet library="css" name="headercss.css"></h:outputStylesheet>
         <h:outputStylesheet library="css" name="maincss.css"></h:outputStylesheet>
         <h:outputStylesheet library="css" name="footercss.css"></h:outputStylesheet>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     </h:head>
     <h:body>
         
@@ -35,21 +36,9 @@
                 </div>
             </div>
             <aside>
-                <div class="userdata">
-                    <ul>
-                        <li>Bienvenido #{loginBean.user.nameuser}</li>
-                        <li><h:graphicImage library="img" name="foto.jpg" alt="Tu foto"></h:graphicImage></li>
-                        <li>Estadística últimos 30 días:</li>
-                        <li>sesiones: #{loginBean.worksSessM} - horas: #{loginBean.worksHoursM} </li>
-                        <li>Estadística del último año:</li>
-                        <li>sesiones: #{loginBean.worksSessY} - horas: #{loginBean.worksHoursY} </li>
-                    </ul>
-                </div>
-                <div class="userdata2">
-                    <h:form id="routerform2"> 
-                        <h:commandButton action="inputdata.xhtml" image="/resources/img/agenda.jpg" alt="agenda" title="Pulse para ir a la agenda"></h:commandButton>                        
-                    </h:form>                
-                </div>                    
+                <ui:insert>
+                    <ui:include src="resources/templates/asideleft.xhtml"></ui:include>
+                </ui:insert>   
             </aside>      
             
             <main>
@@ -126,9 +115,9 @@
                         <h1>Dia #{mainBean.presentDay}</h1>
                         <h1>Actividad del día</h1>
                         <h:inputHidden id="agid" value="#{mainBean.agIdActivity}"></h:inputHidden>
-                        <h:inputText id="agsport" value="#{mainBean.agSport}" disabled="" ></h:inputText>
-                        <h:inputText id="agactivity" value="#{mainBean.agActivity}" disabled=""></h:inputText>
-                        <h:inputText id="agtime" value="#{mainBean.agTime}" disabled=""></h:inputText>
+                        <h:inputText id="agsport" value="#{mainBean.agSport}" readonly="true" ></h:inputText>
+                        <h:inputText id="agactivity" value="#{mainBean.agActivity}" readonly="true"></h:inputText>
+                        <h:inputText id="agtime" value="#{mainBean.agTime}" readonly="true" ></h:inputText>
                         <h:commandButton action="#{mainBean.modifyThisActivity()}" value="Modificar evento" >
                             <f:param name="agIdActivity" value="#{mainBean.agIdActivity}"  ></f:param>
                             <f:param name="presentDay" value="#{mainBean.presentDay}" ></f:param>
@@ -147,7 +136,7 @@
                 </ui:insert>            
             </footer>                 
         </div>
-   
+           <h:outputScript library="js" name="index.js"></h:outputScript>
     </h:body>
 </html>
 

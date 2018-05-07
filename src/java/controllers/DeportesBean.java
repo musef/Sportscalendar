@@ -45,7 +45,9 @@ public class DeportesBean implements Serializable {
     // mensaje de operaciones
     private String message;
 
-    
+    // habilitar / deshabilitar boton de borrado
+    private boolean disableDeleteButton;
+
     
     
     public DeportesBean() {
@@ -56,6 +58,10 @@ public class DeportesBean implements Serializable {
             this.sportName=sport.getSportName();
             this.sportDescription=sport.getSportDescrip();             
         }
+        
+        // habilitar / deshabilitar boton de borrado
+        disableDeleteButton=LoginBean.user.getKeyuser().equals("anonimo");
+        
     }
 
     
@@ -66,25 +72,28 @@ public class DeportesBean implements Serializable {
      */    
     public void deleteSport() {
         
-        if (sportidx!=0) {
+        // en modo anonino no esta permitido el borrado de deportes
+        if (!LoginBean.user.getKeyuser().equals("anonimo")) {
+            if (sportidx!=0) {
 
-            deportesComponent=new DeportesComponent();
+                deportesComponent=new DeportesComponent();
 
-            // instanciamos el borrado del deporte
-            boolean result=deportesComponent.deleteSport(sportidx,LoginBean.user);
-            if (result) {
-                // actualizamos la lista de sportsList
-                LoginBean.userSportlist.setSportsList(deportesComponent.allSports(LoginBean.user));
-                message="Deporte "+sportName+" borrado correctamente";
-                this.sportName="";
-                this.sportDescription="";
-                this.sportidx=0;                
-            } else message="No ha sido posible borrar este deporte";
+                // instanciamos el borrado del deporte
+                boolean result=deportesComponent.deleteSport(sportidx,LoginBean.user);
+                if (result) {
+                    // actualizamos la lista de sportsList
+                    LoginBean.userSportlist.setSportsList(deportesComponent.allSports(LoginBean.user));
+                    message="Deporte "+sportName+" borrado correctamente";
+                    this.sportName="";
+                    this.sportDescription="";
+                    this.sportidx=0;                
+                } else message="No ha sido posible borrar este deporte";
 
-            // recuperamos la lista actualizada de deportes
-            this.sports =LoginBean.userSportlist.getSportsList();
-            
-        }
+                // recuperamos la lista actualizada de deportes
+                this.sports =LoginBean.userSportlist.getSportsList();
+
+            }        
+        } else message="En modo anónimo no es posible borrar deportes";
     }
 
     
@@ -147,7 +156,7 @@ public class DeportesBean implements Serializable {
          sportidx=Long.parseLong(e.getNewValue().toString());
         // recuperamos el objeto
         if (sportidx>0) {
- 
+            
             // obtenemos el objeto Deportes
             deportesComponent=new DeportesComponent();
             sport=deportesComponent.readSport(sportidx, LoginBean.user);
@@ -163,6 +172,7 @@ public class DeportesBean implements Serializable {
             this.sportName="";
             this.sportDescription="";    
             sport=null;
+
         }
         // borramos los posibles mensajes mostrados
         message="";
@@ -257,7 +267,19 @@ public class DeportesBean implements Serializable {
         this.message = message;
     }
 
+    /**
+     * @return the disableDeleteButton
+     */
+    public boolean isDisableDeleteButton() {
+        return disableDeleteButton;
+    }
 
-    
+    /**
+     * @param disableDeleteButton the disableDeleteButton to set
+     */
+    public void setDisableDeleteButton(boolean disableDeleteButton) {
+        this.disableDeleteButton = disableDeleteButton;
+    }
+
     
 }

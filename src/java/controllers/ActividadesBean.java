@@ -65,6 +65,11 @@ public class ActividadesBean implements Serializable {
     private String message;
     
     private Logger log;
+    
+    // habilitar o deshabilitar boton de borrado
+    private boolean disableDeleteButton;
+        // habilitar / deshabilitar boton de grabar
+    private boolean disableRecordButton;
    
     
     /**
@@ -79,6 +84,11 @@ public class ActividadesBean implements Serializable {
         // recuperamos la lista de actividades
         if (selectedSport!=null)activities=actividadesComponent.allActivities(selectedSport,LoginBean.user);
         
+        // habilitar / deshabilitar boton de borrado
+        disableDeleteButton=LoginBean.user.getKeyuser().equals("anonimo");
+        // deshabilitar boton de grabar
+        disableRecordButton=true;
+        
         log=Logger.getLogger("stdout");
     }
  
@@ -90,29 +100,33 @@ public class ActividadesBean implements Serializable {
      */    
     public void deleteActivity() {
         
-        if (getActivityidx()!=0) {
-            
-            actividadesComponent=new ActividadesComponent();
-            deportesComponent=new DeportesComponent();
-            
-            // instanciamos el borrado de la actividad
-            boolean result=actividadesComponent.deleteActivity(getActivityidx(),LoginBean.user);
-            if (result) {
-                setMessage("La actividad ha sido borrada correctamente");
-                // actualizamos la lista despues de operacion DDBB
-                setActivities(actividadesComponent.allActivities(selectedSport, LoginBean.user));
-                activityidx=0;
-                sportidx=selectedSport.getId();
-                // borramos los datos en formulario
-                this.activityName="";
-                this.activityDescription="";
-                this.activitySite="";
-                this.activitySlope=0;
-                this.activityDistance=0;
-                this.activityTimming="";                 
-            }   else setMessage("No ha sido posible borrar la actividad seleccionada");
+                // en modo anonino no esta permitido el borrado de deportes
+        if (!LoginBean.user.getKeyuser().equals("anonimo")) {
+            if (getActivityidx()!=0) {
 
-        }
+                actividadesComponent=new ActividadesComponent();
+                deportesComponent=new DeportesComponent();
+
+                // instanciamos el borrado de la actividad
+                boolean result=actividadesComponent.deleteActivity(getActivityidx(),LoginBean.user);
+                if (result) {
+                    setMessage("La actividad ha sido borrada correctamente");
+                    // actualizamos la lista despues de operacion DDBB
+                    setActivities(actividadesComponent.allActivities(selectedSport, LoginBean.user));
+                    activityidx=0;
+                    sportidx=selectedSport.getId();
+                    // borramos los datos en formulario
+                    this.activityName="";
+                    this.activityDescription="";
+                    this.activitySite="";
+                    this.activitySlope=0;
+                    this.activityDistance=0;
+                    this.activityTimming="";                 
+                }   else setMessage("No ha sido posible borrar la actividad seleccionada");
+
+            }            
+        } else message="En modo anónimo no es posible borrar actividades";
+        
     }
 
     
@@ -203,6 +217,10 @@ public class ActividadesBean implements Serializable {
         
         // actualizamos el indice
         sportidx=Long.parseLong(e.getNewValue().toString());
+        
+        // habilitamos/deshabilitamos grabar
+        this.disableRecordButton= (sportidx == 0);
+            
         
         // recuperamos el objeto
         readSportAndGetActivities();
@@ -457,6 +475,32 @@ public class ActividadesBean implements Serializable {
         sportidx=sportidx2;
     }
     
+        /**
+     * @return the disableDeleteButton
+     */
+    public boolean isDisableDeleteButton() {
+        return disableDeleteButton;
+    }
+
+    /**
+     * @param disableDeleteButton the disableDeleteButton to set
+     */
+    public void setDisableDeleteButton(boolean disableDeleteButton) {
+        this.disableDeleteButton = disableDeleteButton;
+    }
     
+        /**
+     * @return the disableRecordButton
+     */
+    public boolean isDisableRecordButton() {
+        return disableRecordButton;
+    }
+
+    /**
+     * @param disableRecordButton the disableRecordButton to set
+     */
+    public void setDisableRecordButton(boolean disableRecordButton) {
+        this.disableRecordButton = disableRecordButton;
+    }
     
 }

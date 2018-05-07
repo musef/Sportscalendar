@@ -33,7 +33,7 @@ $(document).ready(function(){
         }
         var pass=$("[id*=userpass]").val();
         if (pass.length<8 || pass.length>20) {
-            message+="\n- Longitud inadecuada de contraseña\n   Entre 6 y 20 caracteres";
+            message+="\n- Longitud inadecuada de contraseña\n   Entre 8 y 20 caracteres";
             $("[id*=userpass]").css('backgroundColor','red');
         }
         
@@ -56,5 +56,26 @@ $(document).ready(function(){
         } else return true;
     });
 
+    $("[id*=freetour]").click(function(){
+        alert ("Puede visitar la web en modo visitante anónimo, con funciones reducidas:\n   usuario: anonimo\n   contraseña: 12345678");
+        $("[id*=username]").val('anonimo');
+        $("[id*=userpass]").val('12345678');
+    });
+    
+    $("[id*=helpmain]").click(function(){
+        var mess='¿Cómo funciona la web?';
+        mess+='\n\nLos eventos deportivos (entrenamientos, competiciones, etc) se registran en la agenda.';
+        mess+='\nTodo evento deportivo corresponde a un deporte (running, bicicleta, baloncesto, etc), que debe ser creado en deportes.';
+        mess+='\nTodo deporte debe tener una o más actividades. Las actividades son diferentes aplicaciones de un deporte, por ejemplo, ';
+        mess+='\ndiferentes rutas de senderismo, o de bicicleta, diferentes entrenamientos de natación, rutinas de gimnasio, etc. ';
+        mess+='\nEstas actividades se graban en actividades, y deben estar siempre ligadas a un deporte previamente creado. ';
+        mess+='\n\nEn el calendario, pulsando sobre un día concreto, puedes crear un evento nuevo, o entrar (mediante modificar) en el ';
+        mess+='\nevento que hubiera sido creado en ese día. ';
+        mess+='\nLos días que contienen un evento se muestran en rojo en el calendario. ';
+        mess+='\nDesde el menú de edición/modificación de eventos, para volver a la agenda hay que pulsar sobre el icono agenda en el lateral ';
+        mess+='\nizquierdo de la pantalla.';
+        mess+='\n\nLas estadísticas te muestran un listado filtrado por deporte, actividad y entre fechas.';
+        alert (mess);
+    });    
     
 });

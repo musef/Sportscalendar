@@ -128,7 +128,7 @@ main {
 
 .loginbox label,input[type="text"],input[type="password"] {
     width: 200px;
-    height: 45px;
+    height: 50px;
     font-size: 2em;
 }
 
@@ -141,6 +141,18 @@ main {
     height: 45px;
     font-size: 2em;
     margin: 15px 5px 0 5px;
+}
+
+.freetour {
+    width: 50%;
+    margin: 30px auto;
+    text-align: center;
+}
+
+.freetour input[type="button"] {
+    width: 200px;
+    height: 50px;
+    font-size: 2em
 }
 
 .mainbox {
@@ -262,6 +274,17 @@ main {
     font-size: 1.3em;
     font-weight: bold;
     text-align: center;
+}
+
+.helpbutton {
+    float: right;
+    border: 2px solid black;
+    border-radius: 7px;
+    background-color: green;
+    color: white;
+    font-weight: bold;
+    font-size: 1em;
+    margin-right: 5px;
 }
 
 /* ******* PAGINA 404 ************ */

@@ -33,7 +33,7 @@
                 </div>
                 <div class="out">
                     <h:form id="outform">
-                        <h:commandButton action="#{loginBean.exit()}" image="/resources/img/salida.png" alt="salida" title="Salir de la aplicación"></h:commandButton>                        
+                        <h:commandButton action="#{loginBean.exit()}" image="/resources/img/salida.png" alt="salida" title="Salir de la aplicación" ></h:commandButton>                        
                     </h:form>                    
                 </div>
             </div>
@@ -60,6 +60,8 @@
                     <div class="mainbox">             
                         <h:inputHidden value="#{deportesBean.message}" id="sportmessage"></h:inputHidden>
                         <h:panelGrid columns="2">
+                            <h:outputLabel value=""></h:outputLabel>
+                            <h:button id="helpsp" value="?" title="Pulse para ver ayuda" class="helpbutton" alt="ayuda" onclick="helpDeportes()"></h:button>
                             <h:outputLabel value="Seleccione"></h:outputLabel>
                             <h:selectOneMenu id="sportselect" value="#{deportesBean.sportidx}" valueChangeListener="#{deportesBean.changeSport}" >
                                 <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
@@ -74,7 +76,8 @@
                             <h:outputLabel value="Descripción"></h:outputLabel>
                             <h:inputText id="descrsp" value="#{deportesBean.sportDescription}" title="Descripción del deporte (max. 255 chars)" ></h:inputText>
                         </h:panelGrid>             
-                            <h:commandButton id="eliminarsp" action="#{deportesBean.deleteSport}" value="Eliminar" onclick="return confirm('¿Seguro que desea eliminar este deporte?')"></h:commandButton>
+                        <h:commandButton id="eliminarsp" action="#{deportesBean.deleteSport}" value="Eliminar" onclick="return confirm('¿Seguro que desea eliminar este deporte?')" 
+                                         disabled="#{deportesBean.disableDeleteButton}"></h:commandButton>
                             <h:commandButton id="grabarsp" action="#{deportesBean.recordSport}" value="Grabar" onclick="return confirm('¿Seguro que desea grabar este deporte?')" ></h:commandButton>
                     </div>
                     <div class="messagebox">

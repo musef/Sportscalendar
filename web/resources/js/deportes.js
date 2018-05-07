@@ -54,5 +54,14 @@ $(document).ready(function(){
         } else return true;
     });
     
+    
+    $("[id*=helpsp]").click(function(){
+        var mess="Para grabar un deporte nuevo, el selector de deporte debe estar en posición 'Seleccione...' y rellene los datos.";
+        mess+="\nPara modificar un deporte, seleccione el deporte con el selector, y realice las modificaciones pertinentes.";
+        mess+="\nPara eliminar un deporte, seleccione el deporte y pulse en el botón eliminar.";
+        mess+="\n\nLa opción eliminar no funciona en modo anonimo.";
+        alert(mess);
+    });
+    
 });
 

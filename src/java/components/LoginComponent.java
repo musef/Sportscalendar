@@ -39,24 +39,7 @@ public class LoginComponent {
 
         log = Logger.getLogger("stdout");
     }
-    
-    /*
-    protected String getHours(String duration) {
-        
-        int days=0;
-        // buscamos las horas empleadas en funcion del mes o del año
-        if (duration.equals("Mes")) {
-           days=30;
-        } else {
-           days=365;
-        }
-        
-        long today=System.currentTimeMillis();
-        long startday=today-(24*60*60*1000*days);
-        
-        return null;
-        
-    }*/
+   
     
     
     /**

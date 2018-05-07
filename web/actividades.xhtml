@@ -59,11 +59,14 @@
                 <h:form>
                     <div class="mainbox">                  
                         <h:panelGrid columns="2">
+                            <h:outputLabel value=""></h:outputLabel>
+                            <h:button id="helpac" value="?" title="Pulse para ver ayuda" class="helpbutton" alt="ayuda" onclick="ayudaActividad()"></h:button>
                             <h:outputLabel value="Deporte: "></h:outputLabel>
                             <h:selectOneMenu id="sportselect" value="#{actividadesBean.sportidx}" valueChangeListener="#{actividadesBean.changeSport}" >
                                 <f:selectItem itemValue="0" itemLabel="Seleccione..."></f:selectItem>
                                 <f:selectItems value="#{actividadesBean.sports}" var="spr" itemValue="#{spr.id}" itemLabel="#{spr.sportName}"></f:selectItems>
                                 <f:ajax execute="#{actividadesBean.readSportAndGetActivities()}" render="activityselect"></f:ajax>
+                                <f:ajax render="grabarac"></f:ajax>
                                 <f:ajax render="activitynm activityds activitysl activitytm activityst activitydc"></f:ajax>
                             </h:selectOneMenu>
                             <h:outputLabel value="Actividad: "></h:outputLabel>
@@ -85,9 +88,9 @@
                             <h:outputLabel value="Descripción"></h:outputLabel>
                             <h:inputText id="activitydc" value="#{actividadesBean.activityDescription}" title="longitud máxima 255 chars"  ></h:inputText>                            
                         </h:panelGrid>             
-                        <h:commandButton id="eliminarac" action="#{actividadesBean.deleteActivity}" value="Eliminar" 
+                        <h:commandButton id="eliminarac" action="#{actividadesBean.deleteActivity}" value="Eliminar" disabled="#{actividadesBean.disableDeleteButton}"
                             onclick="return confirm('¿Seguro que desea eliminar esta actividad?')" title="Eliminar esta actividad" ></h:commandButton>
-                        <h:commandButton id="grabarac" action="#{actividadesBean.recordActivity}" value="Grabar" 
+                        <h:commandButton id="grabarac" action="#{actividadesBean.recordActivity}" value="Grabar" disabled="#{actividadesBean.disableRecordButton}"
                             onclick="return confirm('¿Seguro que desea grabar esta actividad?')" title="Grabar/actualizar la actividad" ></h:commandButton>
                     </div>
                     <div class="messagebox">
