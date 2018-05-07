@@ -199,13 +199,13 @@ public class ActividadesDAO implements ActividadesInterface {
      * Si el objeto actividades ha sido utilizado en la agenda no es posible
      * borrarlo, retornando false
      * @param id
-     * @return boolean, con el resultado de la operacion
+     * @return int, con el resultado de la operacion (1=ok ; 0=fallo dato; -1=tenia eventos; -99=error sistema)
      */
     @Override
-    public boolean deleteActivity(Long id) throws Exception {
+    public int deleteActivity(Long id) throws Exception {
         
         // verificacion de condiciones
-        if (id<1) return false;
+        if (id<1) return 0;
         
         
         // creamos los objetos de transaccion
@@ -227,20 +227,20 @@ public class ActividadesDAO implements ActividadesInterface {
             } else {
                 // no se borra porque tiene eventos en la agenda
                 log.info("NO Borrada actividad id "+id+" porque tenía eventos en agenda ->user"+act.getIduser());                
-                return false;
+                return -1;
             }            
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
             log.error("ERROR: Actividades dl-04 borrando->id "+id+" - Mensaje: "+ex);                  
-            return false;
+            return -99;
         } finally {
             if (tx!=null && tx.isActive()) em.close();            
         }
         
         // logger
         log.info("Borrada actividad id "+id+" ->user"+act.getIduser());         
-        return true;
+        return 1;
     }
     
     

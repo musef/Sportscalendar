@@ -33,6 +33,17 @@ import models.Deportes;
 import org.apache.log4j.Logger;
 
 /**
+ * REGLAS DE NEGOCIO:
+ * 
+ * - Todos los usuarios pueden grabar sus actividades
+ * - El nombre de la actividad puede estar repetida, incluso en el mismo usuario
+ * - Todos los usuarios pueden modificar sus actividades
+ * - Todos los usuarios pueden eliminar sus actividades, excepto el usuario anonimo
+ * - No es posible eliminar una actividad que tenga eventos grabados en la agenda
+ */
+
+
+/**
  *
  * @author musef2904@gmail.com
  */
@@ -108,8 +119,8 @@ public class ActividadesBean implements Serializable {
                 deportesComponent=new DeportesComponent();
 
                 // instanciamos el borrado de la actividad
-                boolean result=actividadesComponent.deleteActivity(getActivityidx(),LoginBean.user);
-                if (result) {
+                int result=actividadesComponent.deleteActivity(getActivityidx(),LoginBean.user);
+                if (result==1) {
                     setMessage("La actividad ha sido borrada correctamente");
                     // actualizamos la lista despues de operacion DDBB
                     setActivities(actividadesComponent.allActivities(selectedSport, LoginBean.user));
@@ -122,7 +133,13 @@ public class ActividadesBean implements Serializable {
                     this.activitySlope=0;
                     this.activityDistance=0;
                     this.activityTimming="";                 
-                }   else setMessage("No ha sido posible borrar la actividad seleccionada");
+                } else if (result==0) {
+                    setMessage("Actividad no borrada: había algún dato incorrecto en la petición");
+                } else if (result==-1) {
+                    setMessage("Actividad no borrada: tiene eventos grabados en la agenda");
+                } else  {
+                    setMessage("No ha sido posible borrar esta actividad: error interno");
+                }
 
             }            
         } else message="En modo anónimo no es posible borrar actividades";

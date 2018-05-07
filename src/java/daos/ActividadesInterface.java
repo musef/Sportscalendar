@@ -25,6 +25,6 @@ public interface ActividadesInterface {
     public boolean createActivity (Actividades activity) throws Exception;
     public Actividades readActivity (Long id) throws Exception;
     public boolean updateActivity (Actividades activity) throws Exception;
-    public boolean deleteActivity (Long id) throws Exception;
+    public int deleteActivity (Long id) throws Exception;
     
 }

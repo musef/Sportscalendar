@@ -94,20 +94,20 @@ public class ActividadesComponent {
      * Este metodo borra una actividad del usuario, segun los parametros suministrados
      * @param idActivity
      * @param user
-     * @return boolean
+     * @return int, con el resultado de la operacion (1=ok ; 0=fallo dato; -1=tenia eventos; -99=error sistema)
      */
-    public boolean deleteActivity(long idActivity, Usuarios user) {
+    public int deleteActivity(long idActivity, Usuarios user) {
         
         // chequeo de parametros
-        if (idActivity<1) return false;
-        if (user==null) return false;
+        if (idActivity<1) return 0;
+        if (user==null) return 0;
         
         try {
-            boolean result=adao.deleteActivity(idActivity);
+            int result=adao.deleteActivity(idActivity);
             return result;
         } catch (Exception ex) {
             log.error("ERROR: Algo ha ido mal borrando una actividad para el user "+user.getId()+" - mensaje: "+ex);
-            return false;
+            return -99;
         }        
                 
     }
