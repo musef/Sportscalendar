@@ -45,21 +45,21 @@ public class DeportesComponent {
      * del indice del select sportidx.
      * @param idSport
      * @param user
-     * @return boolean
+     * @return int, con el resultado de la operacion (1=ok ; 0=fallo dato; -1=tenia eventos; -99=error sistema)
      */
-    public boolean deleteSport(long idSport, Usuarios user) {
+    public int deleteSport(long idSport, Usuarios user) {
         
         // chequeamos parametros
-        if (idSport<1) return false;
-        if (user==null) return false;
+        if (idSport<1) return 0;
+        if (user==null) return 0;
         
         try {
             // borramos en base de datos
-            boolean result=ddao.deleteSport(idSport);
+            int result=ddao.deleteSport(idSport);
             return result;
         } catch (Exception ex) {
             log.error("ERROR: Algo ha ido mal borrando un deporte para el user "+user.getId()+" - mensaje: "+ex);
-            return false;
+            return -99;
         }
     }
     

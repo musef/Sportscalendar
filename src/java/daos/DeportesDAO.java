@@ -179,12 +179,14 @@ public class DeportesDAO implements DeportesInterface {
      * al id suministrado
      * Se comprueba si tiene alguna actividad agendada y si es así, no puede borrarse
      * @param id
-     * @return boolean, con el resultado de la operacion
+     * @return int, con el resultado de la operacion (1=ok ; 0=fallo dato; -1=tenia eventos; -99=error sistema)
      * @throws java.lang.Exception
      */
     @Override
-    public boolean deleteSport(Long id) throws Exception{
+    public int deleteSport(Long id) throws Exception{
 
+        if (id<1) return 0;
+        
         // creamos los objetos de transaccion
         em=Factory.getEmf().createEntityManager();
         tx=em.getTransaction();
@@ -204,21 +206,21 @@ public class DeportesDAO implements DeportesInterface {
             } else {
                 // no se borra porque tiene eventos en la agenda
                 log.info("NO Borrado deporte id "+id+" porque tenía eventos en agenda ->user"+sport.getIduser());                
-                return false;
+                return -1;
             }
             
         } catch (Exception ex) {
             if (tx!=null && tx.isActive()) tx.rollback();
             // logger
             log.error("ERROR: Deportes dl-04 borrando->id"+id+" - Mensaje: "+ex);                      
-            return false;
+            return -99;
         } finally {
             if (tx!=null && tx.isActive()) em.close();
         }
         
         // logger
         log.info("Borrado deporte id "+id+" ->user"+sport.getIduser());
-        return true;
+        return 1;
     }
     
     

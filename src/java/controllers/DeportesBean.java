@@ -25,6 +25,17 @@ import models.Deportes;
 
 
 /**
+ * REGLAS DE NEGOCIO:
+ * 
+ * - Todos los usuarios pueden grabar sus deportes
+ * - El nombre del deporte puede estar repetido, incluso en el mismo usuario
+ * - Todos los usuarios pueden modificar sus deportes
+ * - Todos los usuarios pueden eliminar sus deportes, excepto el usuario anonimo
+ * - No es posible eliminar un deporte que tenga eventos grabados en la agenda
+ */
+
+
+/**
  *
  * @author musef2904@gmail.com
  */
@@ -79,15 +90,21 @@ public class DeportesBean implements Serializable {
                 deportesComponent=new DeportesComponent();
 
                 // instanciamos el borrado del deporte
-                boolean result=deportesComponent.deleteSport(sportidx,LoginBean.user);
-                if (result) {
+                int result=deportesComponent.deleteSport(sportidx,LoginBean.user);
+                if (result==1) {
                     // actualizamos la lista de sportsList
                     LoginBean.userSportlist.setSportsList(deportesComponent.allSports(LoginBean.user));
                     message="Deporte "+sportName+" borrado correctamente";
                     this.sportName="";
                     this.sportDescription="";
                     this.sportidx=0;                
-                } else message="No ha sido posible borrar este deporte";
+                } else if (result==0) {
+                    message="Deporte no borrado: había algún dato incorrecto en la petición";
+                } else if (result==-1) {
+                    message="Deporte no borrado: tiene eventos grabados en la agenda";
+                } else {
+                    message="No ha sido posible borrar este deporte: error en sistema";
+                }
 
                 // recuperamos la lista actualizada de deportes
                 this.sports =LoginBean.userSportlist.getSportsList();
