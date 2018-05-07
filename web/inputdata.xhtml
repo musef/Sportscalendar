@@ -38,22 +38,10 @@
                 </div>
             </div>
             <aside>
-                <div class="userdata">
-                    <ul>
-                        <li>Bienvenido #{loginBean.user.nameuser}</li>
-                        <li><h:graphicImage library="img" name="foto.jpg" alt="Tu foto"></h:graphicImage></li>
-                        <li>Estadística del mes: </li>
-                        <li>sesiones: #{loginBean.worksSessM} - horas: #{loginBean.worksHoursM} </li>
-                        <li>Estadística del año:</li>
-                        <li>sesiones: #{loginBean.worksSessY} - horas: #{loginBean.worksHoursY} </li>
-                    </ul>
-                </div>
-                <div class="userdata2">
-                    <h:form id="routerform2"> 
-                        <h:commandButton action="main.xhtml" image="/resources/img/agenda.jpg" alt="agenda" title="Pulse para ir a la agenda"></h:commandButton>                        
-                    </h:form>                
-                </div>                     
-            </aside>      
+                <ui:insert>
+                    <ui:include src="resources/templates/asideleft.xhtml"></ui:include>
+                </ui:insert>                  
+            </aside>   
             
             <main>
                 <h:form>
