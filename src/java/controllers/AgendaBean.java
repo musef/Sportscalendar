@@ -101,10 +101,10 @@ public class AgendaBean implements Serializable {
     private void init() {
         // si este atributo tiene valor, es que tenemos que obtener este evento
         // para mostrarlo en modo modificacion
-        if (thisEventToModify!=null) {
+        if (thisEventToModify!=null && !thisEventToModify.isEmpty()) {
             // instanciamos el manager
             agendaComponent=new AgendaComponent();
-            
+
             Agenda thisEvent=agendaComponent.readEvent(Long.parseLong(thisEventToModify), LoginBean.user);
             
             if (thisEvent!=null) {  

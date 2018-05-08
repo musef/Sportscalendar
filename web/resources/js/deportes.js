@@ -40,10 +40,24 @@ $(document).ready(function(){
             message+="Longitud inadecuada de nombre de deporte\n";
             $("[id*=namesp]").css('backgroundColor','red');
         }
+
+
+        var filter=namesp.match(/<|>|&|@|#|%|$|!|^|\?|\(|\)|\\|;/gi);
+        if (filter.length>1) {
+            message+="Caracteres < > & @ # % $ ! ^ ? ( ) ; \  no permitidos\n";
+            $("[id*=namesp]").css('backgroundColor','red');            
+        }
+        
         var descsp=$("[id*=descrsp]").val();
         if (descsp.length>255) {
             message+="Longitud inadecuada de descripción de deporte\n";
             $("[id*=descrsp]").css('backgroundColor','red');
+        }
+
+        var filter2=descsp.match(/<|>|&|@|#|%|$|!|^|\?|\(|\)|\\|;/gi);
+        if (filter2.length>1) {
+            message+="Caracteres < > & @ # % $ ! ^ ? ( ) ; \  no permitidos\n";
+            $("[id*=descrsp]").css('backgroundColor','red');            
         }
 
         // mostramos el mensaje si tiene contenido

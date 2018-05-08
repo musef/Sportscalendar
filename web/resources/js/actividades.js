@@ -31,7 +31,10 @@ $(document).ready(function(){
     $("[id*=grabarac]").click(function(){
         
         // inicializamos variables y background
+        var reg=new RegExp("<|>|&|@|#|%|!");
         var message='';
+        
+        
         $("[id*=activitynm]").css('backgroundColor','white');
         $("[id*=activitytm]").css('backgroundColor','white');
         $("[id*=activityst]").css('backgroundColor','white');        
@@ -45,8 +48,13 @@ $(document).ready(function(){
             $("[id*=activitynm]").css('backgroundColor','red');
         }
 
+        if (reg.test(name)) {
+            message+="Caracteres < > & @ # % ! no permitidos\n";
+            $("[id*=activitynm]").css('backgroundColor','red');             
+        }
+
         var timming=$("[id*=activitytm]").val();
-        if (timming.length!=8) {
+        if (timming.length!==8) {
             message+="Formato inadecuado de tiempo (hh:mm:ss)\n";
             $("[id*=activitytm]").css('backgroundColor','red');
         }
@@ -57,23 +65,33 @@ $(document).ready(function(){
             $("[id*=activityst]").css('backgroundColor','red');
         }
 
+        if (reg.test(site)) {
+            message+="Caracteres < > & @ # % ! no permitidos\n";
+            $("[id*=activityst]").css('backgroundColor','red');            
+        }
+
         var desc=$("[id*=activitydc]").val();        
         if (desc.length>255) {
             message+="Longitud inadecuada de descripción\n";
             $("[id*=activitydc]").css('backgroundColor','red');
         }        
 
+        if (reg.test(desc)) {
+            message+="Caracteres < > & @ # % ! no permitidos\n";
+            $("[id*=activitydc]").css('backgroundColor','red');           
+        }
+
         var dist=$("[id*=activityds]").val();        
         if (isNaN(dist)) {
             message+="Distancia incorrecta\n";
             $("[id*=activityds]").css('backgroundColor','red');
-        }          
-
+        }             
+        
         var slp=$("[id*=activitysl]").val();        
         if (isNaN(slp)) {
             message+="Desnivel incorrecto\n";
             $("[id*=activitysl]").css('backgroundColor','red');
-        }         
+        }               
         
         // mostramos el mensaje si tiene contenido
         if (message.length>0) {

@@ -64,11 +64,15 @@ public class MainBean implements Serializable {
     
     private static List<String[]> monthchain;
     
+    private boolean disableModButton;
     
     
     public MainBean() {
     
         mainComponent=new MainComponent();                 
+        
+        // desactivamos el boton de edicion
+        this.disableModButton=true;
         
         // al entrar comprobamos si tenemos dia posicionado en calendario
         if (presentDay==null || presentDay.isEmpty()) {
@@ -254,6 +258,12 @@ public class MainBean implements Serializable {
             agSport=todayActivity.get("spname");
             agActivity=todayActivity.get("acname");
             agIdActivity=todayActivity.get("acid");
+            
+            // activamos el boton de edicion
+            this.setDisableModButton(false);
+        } else {
+            // desactivamos el boton de edicion
+            this.setDisableModButton(true);            
         }
         
     }
@@ -455,6 +465,20 @@ public class MainBean implements Serializable {
      */
     public void setAgIdActivity(String agIdActivity) {
         this.agIdActivity = agIdActivity;
+    }
+
+    /**
+     * @return the disableModButton
+     */
+    public boolean isDisableModButton() {
+        return disableModButton;
+    }
+
+    /**
+     * @param disableModButton the disableModButton to set
+     */
+    public void setDisableModButton(boolean disableModButton) {
+        this.disableModButton = disableModButton;
     }
  
     
