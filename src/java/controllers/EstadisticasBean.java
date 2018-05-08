@@ -18,6 +18,7 @@ import components.ActividadesComponent;
 import components.DeportesComponent;
 import components.EstadisticasComponent;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -86,8 +87,6 @@ public class EstadisticasBean implements Serializable {
 
         // obtenemos la actividad, si procede
         Actividades actividad=estadisticasComponent.getSelectedActivity(idxactivity, LoginBean.user);
-        if (deporte!=null && actividad!=null) System.out.println("THIS DATA:"+LoginBean.user+"**"+deporte.getSportName()+"**"+actividad.getName()+"**"+fechini+"**"+fechfin);
-        else System.out.println("THIS DATA:"+LoginBean.user+"**"+"**"+fechini+"**"+fechfin);
         
         // obtenemos la lista de los datos de la DDBB
         this.listaAgenda=estadisticasComponent.getAgendaList(LoginBean.user, deporte, actividad, fechini, fechfin);
@@ -127,6 +126,13 @@ public class EstadisticasBean implements Serializable {
         
     }
 
+    public String goCalendar(long id) {
+        
+        LoginBean.eventIdActivity=String.valueOf(id);
+        
+        return "inputdata";
+    }
+    
     
     /* ***************** GETTERS AND SETTERS ************************ */
     

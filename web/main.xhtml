@@ -120,7 +120,6 @@
                         <h:inputText id="agtime" value="#{mainBean.agTime}" readonly="true" ></h:inputText>
                         <h:commandButton action="#{mainBean.modifyThisActivity()}" value="Modificar evento" disabled="#{mainBean.disableModButton}">
                             <f:param name="agIdActivity" value="#{mainBean.agIdActivity}"  ></f:param>
-                            <f:param name="presentDay" value="#{mainBean.presentDay}" ></f:param>
                         </h:commandButton>                        
                         <h:commandButton action="#{mainBean.recordTodayActivity()}" value="Nuevo evento" >
                             <f:param name="presentDay" value="#{mainBean.presentDay}" ></f:param>

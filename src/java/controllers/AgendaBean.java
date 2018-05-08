@@ -65,9 +65,8 @@ public class AgendaBean implements Serializable {
     // la actividad seleccionada
     @ManagedProperty(value="#{loginBean.eventIdActivity}")
     private String thisEventToModify;
-    @ManagedProperty(value="#{mainBean.presentDay}")
-    private String thisday;
-    
+
+    private String thisday;    
     private String nameact;
     private String distance;
     private String slope;
@@ -77,11 +76,13 @@ public class AgendaBean implements Serializable {
     private String message;
     
     private SimpleDateFormat sdf;
+    private SimpleDateFormat sdt;
     
     
     
     public AgendaBean() {
-                
+           
+        sdt=new SimpleDateFormat("dd-MM-yyyy");
         sdf=new SimpleDateFormat("HH:mm:ss");
         if (this.message==null) this.message="";
         
@@ -89,8 +90,7 @@ public class AgendaBean implements Serializable {
         sports=LoginBean.userSportlist.getSportsList();
         
         // si no tenemos dia definido por parametro
-        if (thisday==null) {        
-           SimpleDateFormat sdt=new SimpleDateFormat("dd-MM-yyyy");
+        if (thisday==null) {                
            Date ldt=new Date();      
            thisday=sdt.format(ldt);
         }
@@ -117,6 +117,7 @@ public class AgendaBean implements Serializable {
                 this.duration=sdf.format(thisEvent.getTiming());
                 this.sportidx=thisEvent.getIdsport().getId();
                 this.activityidx=thisEvent.getIdactivity().getId();
+                this.thisday=sdt.format(thisEvent.getDate());
                 
             }
         }
@@ -169,17 +170,23 @@ public class AgendaBean implements Serializable {
         if (thisEventToModify==null || thisEventToModify.isEmpty() || thisEventToModify.equals("0")) {
             // estamos en el caso de grabación de un nuevo evento
             
-            // en funcion del resultado devolvemos el mensaje
-            if (agendaComponent.createEventCalendar(ag, LoginBean.user)) {
-                setMessage("Evento de agenda grabado correctamente");
-                // y recuperamos el objeto
-                ag=agendaComponent.readEventByDate(LoginBean.user, thisday);
-                // y retomamos el id del componente para modificacion o borrado
-                LoginBean.eventIdActivity=String.valueOf(ag.getId());
-                thisEventToModify=String.valueOf(ag.getId());
-            } else {
-                setMessage("NO ha sido posible grabar un nuevo evento en la agenda");
-            } 
+            // REGLA DE NEGOCIO : no grabaremos dos eventos el mismo día
+            // por motivos de simplificacion de la app
+            if (agendaComponent.readEventByDate(LoginBean.user, thisday)==null) {
+                // en este caso, no hay eventos grabados este dia               
+                if (agendaComponent.createEventCalendar(ag, LoginBean.user)) {
+                    // en funcion del resultado devolvemos el mensaje
+                    setMessage("Evento de agenda grabado correctamente");
+                    // y recuperamos el objeto
+                    ag=agendaComponent.readEventByDate(LoginBean.user, thisday);
+                    // y retomamos el id del componente para modificacion o borrado
+                    LoginBean.eventIdActivity=String.valueOf(ag.getId());
+                    thisEventToModify=String.valueOf(ag.getId());
+                } else {
+                    setMessage("NO ha sido posible grabar un nuevo evento en la agenda");
+                }                 
+            } else setMessage("No es posible grabar varios eventos en el mismo día");
+            
             
         } else {
             // estamos en el caso de modificación de un evento existente

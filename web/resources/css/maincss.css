@@ -210,6 +210,20 @@ main {
     font-weight: bold;
 }
 
+.statsbutton {
+    border:2px solid black;
+    color:blue;
+    font-weight:bold;
+    height: 45px;
+    width: 45px;
+    border-radius: 6px; 
+}
+
+.statsbutton:hover {
+    background-color: blue;
+    color:white;
+    font-weight: bolder;
+}
 
 .messagebox {
     width: 75%;

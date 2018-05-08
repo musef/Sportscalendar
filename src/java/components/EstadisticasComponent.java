@@ -82,8 +82,7 @@ public class EstadisticasComponent {
         } catch (Exception ex) {
             log.error("ERROR: Algo ha ido mal obteniendo lista de actividades por parametros para el user "+user.getId()+" - mensaje: "+ex);
         }
-        if (agendaList!=null) System.out.println("VER LISTA:"+agendaList.size());
-        else System.out.println("VER LISTA NULL");
+        
         return agendaList;
         
     }
@@ -118,8 +117,7 @@ public class EstadisticasComponent {
         } catch (Exception ex) {
             log.error("ERROR: Algo ha ido mal obteniendo lista de actividades por parametros para el user "+user.getId()+" - mensaje: "+ex);
         }
-        if (sumData!=null) System.out.println("VER LISTA data:"+sumData.get("time"));
-        else System.out.println("VER LISTA DATA NULL");
+
         return sumData;
         
     }

@@ -41,7 +41,7 @@
             </aside>       
             
             <main>
-                <h:form>
+                <h:form id="liststats">
 
                     <div class="mainbox">
                                                   
@@ -73,7 +73,6 @@
                             <h:panelGrid columns="2" class="agendalist">
                                 <input type="reset" value="Borrar"></input>
                                 <h:commandButton action="#{estadisticasBean.getRecordsList}" value="Listar"></h:commandButton>
-
                             </h:panelGrid>
                     </div>
                 </h:form>                            
@@ -90,28 +89,36 @@
                                 <h:inputText value="#{estadisticasBean.resultAcum.time} hrs">
                                 </h:inputText>
                                 <h:inputText value="#{estadisticasBean.resultAcum.distance} kms"></h:inputText>
-                            </h:panelGrid>                            
-                            <h:panelGrid class="activitiesList" rendered="true" columns="5">
-                                <h:outputLabel value=" Fecha"></h:outputLabel>
-                                <h:outputLabel value=" Deporte"></h:outputLabel>
-                                <h:outputLabel value=" Actividad"></h:outputLabel>
-                                <h:outputLabel value=" Tiempo"></h:outputLabel>
-                                <h:outputLabel value=" Distancia"></h:outputLabel>
-                                <c:forEach var="ag" items="#{estadisticasBean.listaAgenda}">                                    
-                                    <h:inputText style="width: 155px"  value="#{ag.date.time}" readonly="true">
-                                       <f:convertDateTime pattern="dd-MM-yyyy"></f:convertDateTime>
-                                    </h:inputText>
-                                    <h:inputText style="width: 205px"  value="#{ag.idsport.sportName}" readonly="true"></h:inputText>
-                                    <h:inputText style="width: 320px" value="#{ag.idactivity.name}" readonly="true"></h:inputText>
-                                    
-                                    <h:inputText style="width: 120px" value="#{ag.timing}" readonly="true">
-                                        <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT+1"></f:convertDateTime>
-                                    </h:inputText>
+                            </h:panelGrid>  
+                            <h:form id="eventslist">
+                                <h:panelGrid class="activitiesList" rendered="true" columns="6">
+                                    <h:outputLabel value=" Fecha"></h:outputLabel>
+                                    <h:outputLabel value=" Deporte"></h:outputLabel>
+                                    <h:outputLabel value=" Actividad"></h:outputLabel>
+                                    <h:outputLabel value=" Tiempo"></h:outputLabel>
+                                    <h:outputLabel value=" Distancia"></h:outputLabel>
+                                    <h:outputLabel value=" "></h:outputLabel>
+                                    <c:forEach var="ag" items="#{estadisticasBean.listaAgenda}">                                    
+                                        <h:inputText style="width: 140px"  value="#{ag.date.time}" readonly="true">
+                                           <f:convertDateTime pattern="dd-MM-yyyy"></f:convertDateTime>
+                                        </h:inputText>
+                                        <h:inputText style="width: 200px"  value="#{ag.idsport.sportName}" readonly="true"></h:inputText>
+                                        <h:inputText style="width: 315px" value="#{ag.idactivity.name}" readonly="true"></h:inputText>
 
-                                    <h:inputText style="width: 105px" value="#{ag.distance} km" readonly="true"></h:inputText>
-                                </c:forEach>
-                            </h:panelGrid>
-                        </c:if>                        
+                                        <h:inputText style="width: 110px" value="#{ag.timing}" readonly="true">
+                                            <f:convertDateTime pattern="HH:mm:ss" timeZone="GMT+1"></f:convertDateTime>
+                                        </h:inputText>
+                                        <h:inputText style="width: 95px" value="#{ag.distance} km" readonly="true"></h:inputText>
+                                        <h:commandButton value="Ir" action="#{estadisticasBean.goCalendar(ag.id)}" class="statsbutton"></h:commandButton>
+                                    </c:forEach>
+                                </h:panelGrid>                                
+                            </h:form>
+
+                        </c:if>
+
+                        <c:if test="#{estadisticasBean.listaAgenda.size()==0}">
+                            <h2 style="text-align: center;color:red;">La búsqueda realizada no ha obtenido ningún resultado</h2>
+                        </c:if>
                     </div>
 
 
