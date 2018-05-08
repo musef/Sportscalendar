@@ -17,12 +17,10 @@ package daos;
 import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
@@ -239,7 +237,7 @@ public class AgendaDAO implements AgendaInterface{
         }
         
         // logger
-        log.info("Evento agenda borrado ->user: "+cal.getIduser().getNameuser()+"con id "+id);
+        log.info("Evento agenda borrado ->user: "+cal.getIduser().getNameuser()+" con id "+id);
         return true;
         
     }

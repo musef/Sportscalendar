@@ -122,6 +122,34 @@ public class AgendaComponent {
         
     }
     
+
+/**
+     * Este método borra una actividad de agenda correspondiente a los parametros suministrados
+     * @param idEvent
+     * @param user
+     * @return null | Objeto Agenda
+     */
+    public int deleteEvent (long idEvent,Usuarios user) {
+        
+        // chequeo de parametros
+        if (idEvent<1) return 0;
+        if (user==null) return 0;        
+     
+        agdao=new AgendaDAO();
+        
+        boolean thisevent;
+        try {
+            thisevent=agdao.deleteCalendar(idEvent);
+            if (thisevent==true) return 1;
+
+        } catch (Exception ex) {
+            log.error("ERROR: Algo ha ido mal leyendo un evento de la agenda, para el user "+user.getId()+" - mensaje: "+ex);
+            return -99;
+        }
+        // no es correcto el intento de borrado
+        return -1;        
+    }
+    
     
     
     /**
@@ -149,6 +177,36 @@ public class AgendaComponent {
         
     }
     
+
+     /**
+     * Este método devuelve una actividad de agenda correspondiente a la fecha suministrada
+     * del usuario suministrado
+     * @param thisdate
+     * @param user
+     * @return null | Objeto Agenda
+     */
+    public Agenda readEventByDate (Usuarios user, String thisdate) {
+        
+        // chequeo de parametros
+        if (thisdate==null || thisdate.isEmpty() || thisdate.length()!=10) return null;
+        if (user==null) return null;        
+     
+        agdao=new AgendaDAO();
+        
+        List<Agenda> listevents;
+        try {
+            listevents=agdao.listCalendar(user, thisdate, thisdate);
+            // no hubo resultado
+            if (listevents==null) return null;
+            // si hay resultado, se toma el primer valor y se retorna
+            return listevents.get(0);
+            
+        } catch (Exception ex) {
+            log.error("ERROR: Algo ha ido mal leyendo un evento de la agenda, para el user "+user.getId()+" - mensaje: "+ex);
+            return null;
+        }
+        
+    }
     
     
     

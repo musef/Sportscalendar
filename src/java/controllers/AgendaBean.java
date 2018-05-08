@@ -162,20 +162,21 @@ public class AgendaBean implements Serializable {
         Actividades act=new Actividades(activityidx);
         
         // construimos un objeto Agenda con los datos procesados del formulario
-        Agenda ag=new Agenda(LoginBean.user.getKeyuser(), dateday, dst, slp, thistime, this.description, LoginBean.user, dp, act);
-        
-        System.out.println("Fecha:"+dateday.toString()+"//"+day+"/"+month+"/"+year);
-        System.out.println("Calendar:"+cal.getTime().toString());
+        Agenda ag=new Agenda(LoginBean.user.getKeyuser(), dateday, dst, slp, thistime, this.description, LoginBean.user, dp, act);       
         
         // instanciamos el manager
         agendaComponent=new AgendaComponent();
-        
         if (thisEventToModify==null || thisEventToModify.isEmpty() || thisEventToModify.equals("0")) {
             // estamos en el caso de grabación de un nuevo evento
             
             // en funcion del resultado devolvemos el mensaje
             if (agendaComponent.createEventCalendar(ag, LoginBean.user)) {
                 setMessage("Evento de agenda grabado correctamente");
+                // y recuperamos el objeto
+                ag=agendaComponent.readEventByDate(LoginBean.user, thisday);
+                // y retomamos el id del componente para modificacion o borrado
+                LoginBean.eventIdActivity=String.valueOf(ag.getId());
+                thisEventToModify=String.valueOf(ag.getId());
             } else {
                 setMessage("NO ha sido posible grabar un nuevo evento en la agenda");
             } 
@@ -198,7 +199,34 @@ public class AgendaBean implements Serializable {
     
     public void deleteThisEvent() {
         
-        setMessage("Evento de agenda borrado correctamente");
+        // si este atributo tiene valor, entonces podemos borrarlo      
+        if (thisEventToModify!=null && !thisEventToModify.isEmpty()) {
+            // instanciamos el manager
+            agendaComponent=new AgendaComponent();
+
+            int deleting=agendaComponent.deleteEvent(Long.parseLong(thisEventToModify), LoginBean.user);
+            
+            if (deleting==1) {
+                // ponemos a cero el id del objeto por si queremos crear otro
+                LoginBean.eventIdActivity="0";
+                setMessage("Evento de agenda borrado correctamente");
+                this.nameact="";
+                this.description="";
+                this.site="";
+                this.slope="0";
+                this.distance="0";
+                this.duration="00:00:00"; 
+            } else if (deleting==0) {
+                setMessage("No pudo borrarse por error en los datos suministrados");
+            } else if (deleting==-99) {
+                setMessage("Evento no borrado: error interno");
+            } else {
+                setMessage("No es posible borrar este evento");
+                
+            }
+        }
+        
+        
         
     }
     
@@ -258,7 +286,7 @@ public class AgendaBean implements Serializable {
         // actualizamos aqui
          activityidx=Long.parseLong(f.getNewValue().toString());
         // recuperamos el objeto
-        System.out.println("ACTIVIDAD IDX"+activityidx);
+ 
         if (activityidx>0) {
             
             agendaComponent=new AgendaComponent();
@@ -273,13 +301,13 @@ public class AgendaBean implements Serializable {
                 this.slope=String.valueOf(selectedActivity.getSlope().toString());
                 this.distance=String.valueOf(selectedActivity.getDistance());
                 this.duration=sdf.format(selectedActivity.getTiming());   
-                System.out.println("ACTIVIDAD IDX2"+activityidx);
-            } else System.out.println("NO ACTIVIDAD IDX"+activityidx);
+
+            } 
         }
     }
     
     public void showActivityData() {
-        System.out.println("ACTIVIDAD IDX 1A-"+activityidx);
+
         if (activityidx>0) {
             
             agendaComponent=new AgendaComponent();
@@ -294,8 +322,8 @@ public class AgendaBean implements Serializable {
                 this.slope=String.valueOf(selectedActivity.getSlope().toString());
                 this.distance=String.valueOf(selectedActivity.getDistance());
                 this.duration=sdf.format(selectedActivity.getTiming());   
-                System.out.println("ACTIVIDAD IDX2"+activityidx);
-            } else System.out.println("NO ACTIVIDAD IDX"+activityidx);
+
+            } 
         }
     }
     
