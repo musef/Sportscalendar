@@ -280,7 +280,7 @@ main {
     height: 45px;
     font-size: 1.3em;
 }
-.maindata input[type="submit"], input[type="reset"] {
+.maindata input[type="submit"], input[type="reset"], #borrarac {
     width: 24%;
     margin-left: 5%;
     margin-top: 10px;
@@ -289,6 +289,26 @@ main {
     font-weight: bold;
     text-align: center;
 }
+
+.maindata input[type="button"] {
+    width: 24%;
+    margin-left: 5%;
+    margin-top: 10px;
+    height: 35px;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.lstbuttons input[type="button"] {
+    width: 150px;
+    margin-left: 5%;
+    margin-top: 10px;
+    height: 35px;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
+}    
 
 .helpbutton {
     float: right;

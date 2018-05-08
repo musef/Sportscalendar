@@ -87,8 +87,7 @@
                         <h:commandButton id="grabarac" action="#{agendaBean.recordThisActivity}" value="Grabar" 
                             onclick="return confirm('¿Seguro que desea grabar este evento en la agenda?')" title="Grabar/actualizar el evento" >
                         </h:commandButton>                        
-                        <h:commandButton id="borrarac" type="reset" value="Borrar" title="Borrar formulario" >
-                        </h:commandButton>                                                  
+                        <h:commandButton id="borrarac" type="button" value="Borrar" title="Borrar formulario" ></h:commandButton>                                                  
                         <h:commandButton id="eliminarac" action="#{agendaBean.deleteThisEvent}" value="Eliminar" 
                             onclick="return confirm('¿Seguro que desea eliminar este evento de la agenda? Si lo hace los datos no podrán ser recuperados.')" title="Eliminar este evento" >                                             
                         </h:commandButton>

@@ -10,7 +10,8 @@
         <h:outputStylesheet library="css" name="headercss.css"></h:outputStylesheet>
         <h:outputStylesheet library="css" name="maincss.css"></h:outputStylesheet>
         <h:outputStylesheet library="css" name="footercss.css"></h:outputStylesheet>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>   
+        <h:outputScript name="estadisticas.js" library="js"></h:outputScript>
     </h:head>
     <h:body>
         
@@ -69,11 +70,12 @@
                                 <h:inputText id="fechfin" value="#{estadisticasBean.fechfin}" required="true" title="Formato dd-mm-yyyy"></h:inputText>
                                 
                             </h:panelGrid>        
-                            
-                            <h:panelGrid columns="2" class="agendalist">
-                                <input type="reset" value="Borrar"></input>
-                                <h:commandButton action="#{estadisticasBean.getRecordsList}" value="Listar"></h:commandButton>
-                            </h:panelGrid>
+                            <div class="lstbuttons">
+                                <h:panelGrid columns="2" class="agendalist">
+                                    <input id="borrarst" type="button" value="Borrar"></input>
+                                    <h:commandButton action="#{estadisticasBean.getRecordsList}" value="Listar"></h:commandButton>
+                                </h:panelGrid>
+                            </div>
                     </div>
                 </h:form>                            
                         

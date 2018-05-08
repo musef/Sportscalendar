@@ -134,4 +134,26 @@ $(document).ready(function(){
     });
     
     
+        // boton eliminar
+    $("[id*=borrarac]").click(function(){
+        
+        $("[id*=dataday]").css('backgroundColor','white');
+        $("[id*=dataname]").css('backgroundColor','white');
+        $("[id*=datasite]").css('backgroundColor','white');        
+        $("[id*=datadrt]").css('backgroundColor','white'); 
+        $("[id*=datadst]").css('backgroundColor','white'); 
+        $("[id*=dataslp]").css('backgroundColor','white'); 
+        $("[id*=datadsc]").css('backgroundColor','white');
+        
+        $("[id*=dataday]").val('');
+        $("[id*=dataname]").val('');
+        $("[id*=datasite]").val('');        
+        $("[id*=datadrt]").val(''); 
+        $("[id*=datadst]").val(''); 
+        $("[id*=dataslp]").val(''); 
+        $("[id*=datadsc]").val('');
+        
+        return true;
+    });
+    
 });
