@@ -16,17 +16,24 @@ package controllers;
 
 import javax.faces.bean.ManagedBean;
 
-import components.LibraryClass;
 import javax.faces.bean.SessionScoped;
 import models.Usuarios;
 import components.LoginComponent;
 import components.SportsListBean;
+import components.LibraryClass;
 import daos.AgendaDAO;
 import java.io.Serializable;
 import javax.faces.context.FacesContext;
 import org.apache.log4j.Logger;
 
-
+/**
+ * REGLAS DE NEGOCIO
+ * EL objeto LoginBean será un objeto de sesión, ya que mantendrá los datos de sesión
+ * del usuario, en especial el objeto user, la lista de deportes userSportlist, y
+ * eventIdActivity como evento en selección, el cual es inyectado en el formulario de
+ * modificación de eventos del calendario.
+ * 
+ */
 
 /**
  *
@@ -34,7 +41,7 @@ import org.apache.log4j.Logger;
  */
 @ManagedBean
 @SessionScoped
-public class LoginBean implements Serializable {
+public class LoginBean extends LibraryClass implements Serializable {
     
     // manager
     private LoginComponent loginComponent;
@@ -47,6 +54,8 @@ public class LoginBean implements Serializable {
     // datos del usuario
     public static Usuarios user;
     protected static SportsListBean userSportlist;
+    // dato idActivitySeleccionada
+    public static String eventIdActivity; 
     
     // datos de estadistica del usuario
     private String worksHoursM;
@@ -56,8 +65,7 @@ public class LoginBean implements Serializable {
     
     private Logger log;
     
-    // dato idActivitySeleccionada
-    public static String eventIdActivity; 
+
     
     
     public LoginBean() {
@@ -76,16 +84,16 @@ public class LoginBean implements Serializable {
     public String login() {
         
         // comprobamos longitudes de variables recibidas
-        if (this.username==null || this.username.length()< LibraryClass.MIN_LENGTH_USERNAME
-                || this.username.length()> LibraryClass.MAX_LENGTH_USERNAME ||
-            this.userpass==null || this.userpass.length()< LibraryClass.MIN_LENGTH_USERPASS
-                || this.userpass.length()> LibraryClass.MAX_LENGTH_USERPASS ) {
+        if (!(this.username==null || this.username.length()< MIN_LENGTH_USERNAME
+                || this.username.length()> MAX_LENGTH_USERNAME ||
+            this.userpass==null || this.userpass.length()< MIN_LENGTH_USERPASS
+                || this.userpass.length()> MAX_LENGTH_USERPASS )) {
                         
             // instanciamos el component
             loginComponent=new LoginComponent();
             // sanitizamos los inputs
-            username=loginComponent.verifyInput(username);
-            userpass=loginComponent.verifyInput(userpass);
+            username=verifyLoginInput(username);
+            userpass=verifyLoginInput(userpass);
             
             // realizamos la comprobacion del user-pass introducido
             user=loginComponent.checkUserLogin(username,userpass); 
@@ -118,7 +126,9 @@ public class LoginBean implements Serializable {
                 return "main";
             }  
   
-        } else this.loginmessage="Usuario-contraseña incorrectos. Pruebe de nuevo";  
+        } else {           
+            this.loginmessage="Usuario-contraseña incorrectos. Pruebe de nuevo";
+        }  
         
         return "";
     }

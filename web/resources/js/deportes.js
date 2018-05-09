@@ -30,6 +30,9 @@ $(document).ready(function(){
     
     $("[id*=grabarsp]").click(function(){
         
+        // patron de signos excluidos
+        var reg=new RegExp("<|>|&|@|#|%|!");
+        
         // inicializamos variables y background
         var message='';
         $("[id*=namesp]").css('backgroundColor','white');
@@ -41,11 +44,9 @@ $(document).ready(function(){
             $("[id*=namesp]").css('backgroundColor','red');
         }
 
-
-        var filter=namesp.match(/<|>|&|@|#|%|$|!|^|\?|\(|\)|\\|;/gi);
-        if (filter.length>1) {
-            message+="Caracteres < > & @ # % $ ! ^ ? ( ) ; \  no permitidos\n";
-            $("[id*=namesp]").css('backgroundColor','red');            
+        if (reg.test(namesp)) {
+            message+="Caracteres < > & @ # % ! no permitidos\n";
+            $("[id*=namesp]").css('backgroundColor','red');              
         }
         
         var descsp=$("[id*=descrsp]").val();
@@ -54,11 +55,11 @@ $(document).ready(function(){
             $("[id*=descrsp]").css('backgroundColor','red');
         }
 
-        var filter2=descsp.match(/<|>|&|@|#|%|$|!|^|\?|\(|\)|\\|;/gi);
-        if (filter2.length>1) {
-            message+="Caracteres < > & @ # % $ ! ^ ? ( ) ; \  no permitidos\n";
-            $("[id*=descrsp]").css('backgroundColor','red');            
+        if (reg.test(descsp)) {
+            message+="Caracteres < > & @ # % ! no permitidos\n";
+            $("[id*=descrsp]").css('backgroundColor','red');              
         }
+
 
         // mostramos el mensaje si tiene contenido
         if (message.length>0) {

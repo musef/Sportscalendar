@@ -15,6 +15,7 @@
 package controllers;
 
 import components.AgendaComponent;
+import components.LibraryClass;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,13 +35,17 @@ import models.Deportes;
 
 /**
  * Flujo de datos en modificación.
- * Se precarga en constructor la lista de deportes del usuario
- * Para poder leer el parametro inyectado hay que dar RequestScoped al Bean (ciclo vida Request)
- * Como parametro inyectado viene thisEventToModify, con el id del evento a cargar
+ * Se precarga en constructor la lista de deportes del usuario (es un static)
+ * Como parametro inyectado viene thisEventToModify (static), con el id del evento a cargar 
  * En el postConstruct se lee el evento, el cual carga los datos del evento y los idx del deporte y la actividad
  * En el getSportidx leemos el valor inyectado y obtenemos el bean del deporte correspondiente, y cargamos la
  *  lista con los valores de la actividad que corresponde al deporte
  * Y finalmente, en getActivityidx leemos el valor inyectado que cambia el select de la lista anteriormente cargada
+ */
+
+/**
+ * REGLA DE NEGOCIO:
+ * No se graban dos eventos en el mismo día. Solo se manejará un evento diario.
  */
 
 /**
@@ -49,11 +54,12 @@ import models.Deportes;
  */
 @ManagedBean
 @ViewScoped
-public class AgendaBean implements Serializable {
+public class AgendaBean extends LibraryClass implements Serializable {
 
     // manager
     AgendaComponent agendaComponent;
 
+    // objetos seleccionables
     private long sportidx;
     private long activityidx;
     private List<Deportes> sports;
@@ -66,6 +72,7 @@ public class AgendaBean implements Serializable {
     @ManagedProperty(value="#{loginBean.eventIdActivity}")
     private String thisEventToModify;
 
+    // campos de formulario
     private String thisday;    
     private String nameact;
     private String distance;
@@ -73,8 +80,11 @@ public class AgendaBean implements Serializable {
     private String duration;
     private String description;
     private String site;
+    
+    // mensaje informativo
     private String message;
     
+    // formatters
     private SimpleDateFormat sdf;
     private SimpleDateFormat sdt;
     
@@ -123,6 +133,7 @@ public class AgendaBean implements Serializable {
         }
     }
     
+    
     /**
      * Este metodo genera la grabacion de una actividad deportiva en la agenda, segun
      * los datos obtenidos del formulario.
@@ -132,7 +143,11 @@ public class AgendaBean implements Serializable {
      */
     public String recordThisActivity() {
 
-        // obtenemos la fecha y creamos objto para calendar
+            thisday=verifyFormsInput(thisday);    
+            duration=verifyFormsInput(duration);            
+            description=verifyFormsInput(description);
+        
+        // obtenemos la fecha y creamos objeto para calendar
         int year=Integer.valueOf(this.thisday.substring(6));
         int month=Integer.valueOf(this.thisday.substring(3, 5));
         month--; // calendar empieza en mes 0 = Enero
@@ -167,6 +182,7 @@ public class AgendaBean implements Serializable {
         
         // instanciamos el manager
         agendaComponent=new AgendaComponent();
+        
         if (thisEventToModify==null || thisEventToModify.isEmpty() || thisEventToModify.equals("0")) {
             // estamos en el caso de grabación de un nuevo evento
             
@@ -196,8 +212,7 @@ public class AgendaBean implements Serializable {
                 setMessage("Evento de agenda modificado correctamente");
             } else {
                 setMessage("NO ha sido posible modificar el evento en la agenda");
-            }             
-            
+            }                         
         }
           
         return "";
@@ -228,13 +243,9 @@ public class AgendaBean implements Serializable {
             } else if (deleting==-99) {
                 setMessage("Evento no borrado: error interno");
             } else {
-                setMessage("No es posible borrar este evento");
-                
+                setMessage("No es posible borrar este evento");                
             }
-        }
-        
-        
-        
+        }                        
     }
     
     
@@ -313,6 +324,9 @@ public class AgendaBean implements Serializable {
         }
     }
     
+    /**
+     * 
+     */
     public void showActivityData() {
 
         if (activityidx>0) {
@@ -329,7 +343,6 @@ public class AgendaBean implements Serializable {
                 this.slope=String.valueOf(selectedActivity.getSlope().toString());
                 this.distance=String.valueOf(selectedActivity.getDistance());
                 this.duration=sdf.format(selectedActivity.getTiming());   
-
             } 
         }
     }

@@ -14,6 +14,7 @@
  */
 package controllers;
 
+import components.LibraryClass;
 import components.MainComponent;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -60,10 +61,13 @@ public class MainBean implements Serializable {
     
     private final List<String> months=new ArrayList<>(Arrays.asList("Enero","Febrero","Marzo",
             "Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"));
-    private String[] years;
     
+    // lista de años del select
+    private String[] years;
+    // lista de meses del select
     private static List<String[]> monthchain;
     
+    // control del boton modificar
     private boolean disableModButton;
     
     

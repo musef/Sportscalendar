@@ -41,11 +41,13 @@ $(document).ready(function(){
         var resultname=name.match(/[<>!$%&/\()=?;\[\]'"]/g);
         if (resultname!==null) {
             message+="\n- Caracteres no admitidos en usuario: \n< > ! & % $ \ / ( ) = ? ; [ ] ' \" ";
+            $("[id*=username]").css('backgroundColor','red');
         }
         // comprobamos valores introducidos
         var resultpass=pass.match(/[<>!$%&/\()=?;\[\]'"]/g);
         if (resultpass!==null) {
             message+="\n- Caracteres no válidos en contraseña: \n< > ! & % $ \ / ( ) = ? ; [ ] ' \" ";
+            $("[id*=userpass]").css('backgroundColor','red');
         }
         
         // mostramos el mensaje si tiene contenido

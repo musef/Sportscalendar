@@ -15,6 +15,7 @@
 package controllers;
 
 import components.DeportesComponent;
+import components.LibraryClass;
 import java.io.Serializable;
 import javax.faces.bean.ManagedBean;
 import java.util.List;
@@ -41,7 +42,7 @@ import models.Deportes;
  */
 @ManagedBean
 @ViewScoped()
-public class DeportesBean implements Serializable {
+public class DeportesBean extends LibraryClass implements Serializable {
 
     //manager
     private DeportesComponent deportesComponent;
@@ -123,6 +124,10 @@ public class DeportesBean implements Serializable {
     public String recordSport() {
         
         // vamos a grabar el objeto Deportes
+        
+        // sanitizamos la entradas
+        sportName=verifyFormsInput(sportName);
+        sportDescription=verifyFormsInput(sportDescription);
         
         // instanciamos el manager
         deportesComponent=new DeportesComponent();

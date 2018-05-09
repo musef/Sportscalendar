@@ -17,6 +17,7 @@ package controllers;
 
 import components.ActividadesComponent;
 import components.DeportesComponent;
+import components.LibraryClass;
 import java.io.Serializable;
 import java.sql.Time;
 import java.text.ParseException;
@@ -49,7 +50,7 @@ import org.apache.log4j.Logger;
  */
 @ManagedBean
 @ViewScoped
-public class ActividadesBean implements Serializable {
+public class ActividadesBean extends LibraryClass implements Serializable {
 
     //managers
     private ActividadesComponent actividadesComponent;
@@ -111,7 +112,7 @@ public class ActividadesBean implements Serializable {
      */    
     public void deleteActivity() {
         
-                // en modo anonino no esta permitido el borrado de deportes
+        // en modo anonino no esta permitido el borrado de deportes
         if (!LoginBean.user.getKeyuser().equals("anonimo")) {
             if (getActivityidx()!=0) {
 
@@ -154,6 +155,12 @@ public class ActividadesBean implements Serializable {
      * @return String con redireccion
      */
     public String recordActivity() {
+        
+        // sanitizamos entradas
+        activityName=verifyFormsInput(activityName);
+        activityDescription=verifyFormsInput(activityDescription);
+        activitySite=verifyFormsInput(activitySite);
+        activityTimming=verifyFormsInput(activityTimming);       
         
         //manager
         actividadesComponent=new ActividadesComponent();

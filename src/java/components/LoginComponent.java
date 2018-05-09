@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
  */
 public class LoginComponent {
     
-    private final CharSequence forbiddenchars="<>!$%&/()=?;[]\"'\\";
+
     private String loginmessage="";
     
     private Logger log;
@@ -42,32 +42,7 @@ public class LoginComponent {
    
     
     
-    /**
-     * Este método sanitiza el parametro data recibido, y lo devuelve sanitizado
-     * @param data
-     * @return 
-     */
-    public String verifyInput(String data) {
-          
-        // copia para comparacion posterior
-        String copydata=data;
-        
-        // caracteres prohibidos
-        data=data.replace(forbiddenchars, " ");
-        // secuencias prohibidas
-        data=data.replaceAll("script", "");
-        data=data.replaceAll("document", "");
-        data=data.replaceAll("value", "");
-        data=data.trim();
-        
-        if (!copydata.equals(data)) {
-            loginmessage="El dato "+copydata+" ha sido filtrado y convertido en "+data;
-            log.warn("ADVERTENCIA: El dato "+copydata+" ha sido filtrado y por motivos de seguridad transformado en "+data);
-        }
-        
-        return data;        
-        
-    }
+
     
     
     /**

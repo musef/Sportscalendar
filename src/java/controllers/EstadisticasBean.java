@@ -17,8 +17,8 @@ package controllers;
 import components.ActividadesComponent;
 import components.DeportesComponent;
 import components.EstadisticasComponent;
+import components.LibraryClass;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -30,19 +30,31 @@ import models.Deportes;
 import org.apache.log4j.Logger;
 
 /**
+ * REGLAS DE NEGOCIO:
+ * 
+ * Muestra el listado segun los filtros del formulario, los cuales permiten listar
+ * entre fechas, todos los eventos, eventos seleccionados por deportes, y eventos
+ * seleccionados por deportes y actividades.
+ * 
+ * Desde el listado, pulsando en el botón correspondiente, se puede acceder directamente
+ * al evento seleccionado.
+ * 
+ */
+
+/**
  *
  * @author floren
  */
 @ManagedBean
 @ViewScoped
-public class EstadisticasBean implements Serializable {
+public class EstadisticasBean extends LibraryClass implements Serializable {
 
-    //manager
+    //managers
     EstadisticasComponent estadisticasComponent;
-    
     DeportesComponent deportesComponent;
     ActividadesComponent actividadesComponent;
     
+    // formulario
     private List<Deportes> sportsList;
     private List<Actividades> activitiesList;
     private String message="";
@@ -51,9 +63,11 @@ public class EstadisticasBean implements Serializable {
     private String fechini;
     private String fechfin;
     
+    // resultados de la busqueda
     private List<Agenda> listaAgenda;
     private HashMap<String,String> resultAcum;
     
+    // log
     private Logger log;
     
     
@@ -78,6 +92,9 @@ public class EstadisticasBean implements Serializable {
      */
     public String getRecordsList() {
  
+        // sanitizamos las entradas
+        fechini=verifyFormsInput(fechini);
+        fechfin=verifyFormsInput(fechfin);
         
         // instanciamos el manager
         estadisticasComponent=new EstadisticasComponent();
@@ -125,11 +142,22 @@ public class EstadisticasBean implements Serializable {
         Actividades actividad=estadisticasComponent.getSelectedActivity(idxactivity, LoginBean.user);        
         
     }
-
+    
+    
+    /**
+     * Este método envía la navegación desde el listado de eventos según la selección del formulario,
+     * hacia el formulario de edición del evento seleccionado pulsado en el botón "Ir".
+     * Pulsando en el botón se suministra el id del evento seleccionado, el cual se guarda en la
+     * variable static del objeto session LoginBean, el cual es inyectado en agendaBean => inputdata.xhtml
+     * 
+     * @param id
+     * @return 
+     */
     public String goCalendar(long id) {
         
+        //cambiamos el id del evento segun seleccion
         LoginBean.eventIdActivity=String.valueOf(id);
-        
+        // navegamos al formulario de edicion de eventos
         return "inputdata";
     }
     

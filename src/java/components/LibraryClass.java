@@ -14,6 +14,8 @@
  */
 package components;
 
+import org.apache.log4j.Logger;
+
 /**
  *
  * @author floren
@@ -21,9 +23,71 @@ package components;
 public class LibraryClass {
     
     // longitudes parametros en identificacion
-    public static final int MIN_LENGTH_USERNAME=8;
+    public static final int MIN_LENGTH_USERNAME=6;
     public static final int MAX_LENGTH_USERNAME=15;
     public static final int MIN_LENGTH_USERPASS=8;
     public static final int MAX_LENGTH_USERPASS=20;
+    
+    // caracteres prohibidos en login
+    private final CharSequence forbiddenCharsInLogin="<>!$%&/()=?;[]\"'\\";
+    // caracteres prohibidos en formularios
+    private final CharSequence forbiddenCharsInForms="<>&@#%\\";
+    
+    // log
+    private Logger log;
+    
+    /**
+     * Este método sanitiza el parametro data recibido, y lo devuelve sanitizado
+     * @param data
+     * @return 
+     */
+    public String verifyLoginInput(String data) {
+          
+        // copia para comparacion posterior
+        String copydata=data;
+        
+        // caracteres prohibidos
+        data=data.replace(forbiddenCharsInLogin, " ");
+        // secuencias prohibidas
+        data=data.replaceAll("script", "");
+        data=data.replaceAll("document", "");
+        data=data.replaceAll("value", "");
+        data=data.trim();
+        
+        if (!copydata.equals(data)) {
+            log.warn("ADVERTENCIA: El dato "+copydata+" ha sido filtrado y por motivos de seguridad transformado en "+data);
+        }
+
+        return data;        
+        
+    }
+
+    /**
+     * Este método sanitiza el parametro data recibido, y lo devuelve sanitizado
+     * @param data
+     * @return 
+     */
+    public String verifyFormsInput(String data) {
+          
+        // copia para comparacion posterior
+        String copydata=data;
+        
+        // caracteres prohibidos
+        data=data.replace(forbiddenCharsInForms, "");
+        // secuencias prohibidas
+        data=data.replaceAll("script", "");
+        data=data.replaceAll("document", "");
+        data=data.replaceAll("value", "");
+        data=data.replaceAll("ById", "");
+        data=data.trim();
+        
+        if (!copydata.equals(data)) {
+            log.warn("ADVERTENCIA: El dato "+copydata+" ha sido filtrado y por motivos de seguridad transformado en "+data);
+        }
+        
+        return data;        
+        
+    }
+
     
 }
