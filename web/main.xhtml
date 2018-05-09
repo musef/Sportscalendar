@@ -14,12 +14,12 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     </h:head>
     <h:body>
-        
+        <c:if test="#{loginBean.user!=null}" >
         <header>
             <ui:insert>
                 <ui:include src="resources/templates/header.xhtml"></ui:include>
             </ui:insert>            
-        </header>
+        </header>        
         <div class="mainzone">
             <div class="headselector">
                 <div class="selector">
@@ -42,6 +42,7 @@
             </aside>      
             
             <main>
+                
                 <h:form>
 
                     <div class="mainbox" style="float: right;width: 45%">
@@ -127,14 +128,40 @@
                     </div>                    
                     <div class="messagebox"></div>
 
-                </h:form>
-            </main>
+                </h:form>                  
+            </main>             
             <footer>
                 <ui:insert>
                     <ui:include src="resources/templates/footer.xhtml"></ui:include>
                 </ui:insert>            
             </footer>                 
         </div>
+        </c:if>
+        <c:if test="#{loginBean.user==null}" >
+            <header>
+                <ui:insert>
+                    <ui:include src="resources/templates/header.xhtml"></ui:include>
+                </ui:insert>            
+            </header> 
+            <main class="indexmain">
+                <h:form>
+                    <div class="error404">
+                        <h1>Error: página inexistente o no permitida</h1>
+                        <video autoplay="true" width="300px" >
+                            <source src="resources/img/error404.webm" type="video/webm" />
+                        </video>
+                        <h1>Pulse el botón para ir al login...</h1>
+                        <h:commandButton id="login" action="index" value="Login"></h:commandButton>                   
+                    </div>
+                    <div class="messagebox"><h:outputText value="#{loginBean.loginmessage}"></h:outputText></div>
+                </h:form>
+            </main>
+            <footer>
+                <ui:insert>
+                    <ui:include src="resources/templates/footer.xhtml"></ui:include>
+                </ui:insert>            
+            </footer> 
+        </c:if>              
     </h:body>
 </html>
 

@@ -41,7 +41,7 @@ import models.Deportes;
  * @author musef2904@gmail.com
  */
 @ManagedBean
-@ViewScoped()
+@ViewScoped
 public class DeportesBean extends LibraryClass implements Serializable {
 
     //manager
@@ -76,7 +76,7 @@ public class DeportesBean extends LibraryClass implements Serializable {
         
     }
 
-    
+
     /**
      * Este metodo elimina un objeto Deportes, en funcion
      * del indice del select sportidx.

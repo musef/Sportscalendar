@@ -14,7 +14,7 @@
  */
 package controllers;
 
-import components.LibraryClass;
+
 import components.MainComponent;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -32,7 +32,7 @@ import javax.faces.event.ValueChangeEvent;
  *
  * @author musef2904@gmail.com
  */
-@ManagedBean(eager=true)
+@ManagedBean
 @ViewScoped
 public class MainBean implements Serializable {
 
@@ -73,31 +73,30 @@ public class MainBean implements Serializable {
     
     public MainBean() {
     
-        mainComponent=new MainComponent();                 
-        
-        // desactivamos el boton de edicion
-        this.disableModButton=true;
-        
-        // al entrar comprobamos si tenemos dia posicionado en calendario
-        if (presentDay==null || presentDay.isEmpty()) {
-            // creamos el formateador de fechas y transformamos a formato string
-            SimpleDateFormat sd=new SimpleDateFormat("dd-MM-yyyy", Locale.ITALY);
-            // se fija el present day en hoy
-            presentDay=sd.format(new Date());
-            // obtenemos la actividad del dia, si existe
-            showTodayActivity();
-            // construimos un nuevo calendario
-            if (monthchain==null || monthchain.isEmpty()) buildCalendar(presentDay);
-        } else {
-            // hacemos un option selected del mes dentro del calendario
-            // dia de asignacion
-            // construimos un nuevo calendario
-            buildCalendar(presentDay);
-        }
-           
-    }
+            mainComponent=new MainComponent();                 
+
+            // desactivamos el boton de edicion
+            this.disableModButton=true;
+
+            // al entrar comprobamos si tenemos dia posicionado en calendario
+            if (presentDay==null || presentDay.isEmpty()) {
+                // creamos el formateador de fechas y transformamos a formato string
+                SimpleDateFormat sd=new SimpleDateFormat("dd-MM-yyyy", Locale.ITALY);
+                // se fija el present day en hoy
+                presentDay=sd.format(new Date());
+                // obtenemos la actividad del dia, si existe
+                showTodayActivity();
+                // construimos un nuevo calendario
+                if (monthchain==null || monthchain.isEmpty()) buildCalendar(presentDay);
+            } else {
+                // hacemos un option selected del mes dentro del calendario
+                // dia de asignacion
+                // construimos un nuevo calendario
+                buildCalendar(presentDay);
+            }
+        }        
     
-    
+        
     /**
      * Construye un calendario con el dia asignado
      * POr un lado se construira un calendario de 6 sem * 7 dias correspondiente
